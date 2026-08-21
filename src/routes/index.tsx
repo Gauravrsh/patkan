@@ -146,13 +146,11 @@ function PromptArchitect() {
           <div className="border-t border-border p-4">
             <div className="mx-auto w-full max-w-2xl">
               <PromptInput
-                onSubmit={(_message, event) => {
-                  event.preventDefault();
-                  submit(input);
+                onSubmit={(message) => {
+                  submit(message.text);
                 }}
               >
                 <PromptInputTextarea
-                  value={input}
                   onChange={(event) => setInput(event.currentTarget.value)}
                   placeholder="What do you want the AI to do?"
                 />
