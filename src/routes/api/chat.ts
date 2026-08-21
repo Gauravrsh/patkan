@@ -62,6 +62,10 @@ export const Route = createFileRoute("/api/chat")({
                 description:
                   "Create or update sections of the structured prompt draft. Pass null for fields you are not changing.",
                 inputSchema: draftSchema,
+                execute: async () => ({
+                  saved: true,
+                  note: "Draft updated in the user's panel. Now reply in chat with your single next question, or a one-line ready confirmation if the draft is complete.",
+                }),
               }),
             },
           });
