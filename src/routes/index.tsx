@@ -1,168 +1,95 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useChat } from "@ai-sdk/react";
-import { DefaultChatTransport } from "ai";
-import { useMemo, useState } from "react";
-import { AlertTriangle } from "lucide-react";
-import {
-  Conversation,
-  ConversationContent,
-  ConversationScrollButton,
-} from "@/components/ai-elements/conversation";
-import { Message, MessageContent, MessageResponse } from "@/components/ai-elements/message";
-import {
-  PromptInput,
-  PromptInputTextarea,
-  PromptInputFooter,
-  PromptInputSubmit,
-} from "@/components/ai-elements/prompt-input";
-import { Shimmer } from "@/components/ai-elements/shimmer";
+import { useEffect, useState } from "react";
+import { PromptForm } from "@/components/PromptForm";
 import { PromptDraftPanel } from "@/components/PromptDraftPanel";
-import { mergeDraft, type PromptDraft } from "@/lib/prompt-draft";
+import {
+  DEFAULT_OUTPUT_FORMAT,
+  EMPTY_DRAFT,
+  REQUIRED_FIELDS,
+  mergeDraft,
+  requiredFilled,
+  type PromptDraft,
+} from "@/lib/prompt-draft";
 import mark from "@/assets/prompt-architect-mark.png";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Prompt Architect — Turn plain English into expert prompts" },
+      { title: "Prompt Architect — Build expert prompts from plain English" },
       {
         name: "description",
         content:
-          "A focused chat that interviews you and assembles a surgically structured expert prompt: role, context, objective, guardrails and output format.",
+          "Fill a short structured form and watch a surgically crafted expert prompt assemble live: role, context, objective, guardrails and output format.",
       },
-      { property: "og:title", content: "Prompt Architect — expert prompt generator" },
+      { property: "og:title", content: "Prompt Architect — expert prompt builder" },
       {
         property: "og:description",
         content:
-          "Describe your task in plain language. Prompt Architect asks only what's missing and builds a precision-engineered prompt you can copy or export.",
+          "A two-column builder: structured fields on the left, a precision-engineered prompt on the right. Copy it or export as .md or .txt.",
       },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: PromptArchitect,
 });
 
-const STARTERS = [
-  "Help me write a prompt to design a multi-tenant billing schema",
-  "I need a prompt that audits my React codebase for accessibility issues",
-  "Build me a prompt for writing a cold outbound email sequence",
-];
+const STORAGE_KEY = "prompt-architect-draft-v1";
+
+const INITIAL: PromptDraft = { ...EMPTY_DRAFT, outputFormat: [...DEFAULT_OUTPUT_FORMAT] };
 
 function PromptArchitect() {
-  const [input, setInput] = useState("");
-  const transport = useMemo(() => new DefaultChatTransport({ api: "/api/chat" }), []);
-  const { messages, sendMessage, status, error } = useChat({ transport });
+  const [draft, setDraft] = useState<PromptDraft>(INITIAL);
+  const [hydrated, setHydrated] = useState(false);
 
-  const draft = useMemo<PromptDraft>(() => {
-    let acc: PromptDraft = {};
-    for (const message of messages) {
-      for (const part of message.parts) {
-        if (part.type === "tool-update_prompt_draft" && part.input) {
-          acc = mergeDraft(acc, part.input as PromptDraft);
-        }
-      }
+  useEffect(() => {
+    try {
+      const stored = window.localStorage.getItem(STORAGE_KEY);
+      if (stored) setDraft(mergeDraft(INITIAL, JSON.parse(stored) as PromptDraft));
+    } catch {
+      /* ignore malformed storage */
     }
-    return acc;
-  }, [messages]);
+    setHydrated(true);
+  }, []);
 
-  const isBusy = status === "submitted" || status === "streaming";
+  useEffect(() => {
+    if (!hydrated) return;
+    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(draft));
+  }, [draft, hydrated]);
 
-  const submit = (text: string) => {
-    const value = text.trim();
-    if (!value || isBusy) return;
-    setInput("");
-    void sendMessage({ text: value });
-  };
+  const done = requiredFilled(draft);
+  const total = REQUIRED_FIELDS.length;
 
   return (
     <main className="flex h-screen flex-col bg-background text-foreground">
-      <header className="flex items-center gap-3 border-b border-border px-5 py-3">
-        <img src={mark} alt="" width={512} height={512} className="h-6 w-6 object-contain" />
-        <div className="leading-tight">
-          <h1 className="text-sm font-semibold tracking-tight">Prompt Architect</h1>
-          <p className="text-xs text-muted-foreground">
-            Natural language in, surgically crafted prompt out.
-          </p>
+      <header className="grid shrink-0 grid-cols-[minmax(0,1fr)_auto] items-center gap-4 border-b border-border px-6 py-3">
+        <div className="flex min-w-0 items-center gap-3">
+          <img src={mark} alt="" width={512} height={512} className="size-6 shrink-0 object-contain" />
+          <div className="min-w-0 leading-tight">
+            <h1 className="truncate text-sm font-semibold tracking-tight">Prompt Architect</h1>
+            <p className="truncate text-xs text-muted-foreground">
+              Natural language in, surgically crafted prompt out.
+            </p>
+          </div>
+        </div>
+        <div className="flex shrink-0 items-center gap-2.5">
+          <span className="font-mono text-[11px] text-muted-foreground">
+            {done}/{total} required
+          </span>
+          <div className="h-1 w-20 overflow-hidden rounded-full bg-muted">
+            <div
+              className="h-full rounded-full bg-primary transition-all duration-300"
+              style={{ width: `${(done / total) * 100}%` }}
+            />
+          </div>
         </div>
       </header>
 
       <div className="grid min-h-0 flex-1 grid-cols-1 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
-        <div className="flex min-h-0 flex-col border-b border-border lg:border-b-0 lg:border-r">
-          <Conversation className="min-h-0 flex-1">
-            <ConversationContent className="mx-auto w-full max-w-2xl px-5 py-6">
-              {messages.length === 0 ? (
-                <div className="py-10">
-                  <h2 className="text-lg font-semibold tracking-tight">
-                    Describe the task. I'll ask only what's missing.
-                  </h2>
-                  <p className="mt-2 max-w-md text-sm text-muted-foreground">
-                    One question at a time, then a complete prompt with role, context, objective,
-                    guardrails and output structure.
-                  </p>
-                  <div className="mt-6 flex flex-col items-start gap-2">
-                    {STARTERS.map((starter) => (
-                      <button
-                        key={starter}
-                        type="button"
-                        onClick={() => submit(starter)}
-                        className="rounded-md border border-border bg-card px-3 py-2 text-left text-sm transition-colors hover:border-primary/40 hover:bg-accent"
-                      >
-                        {starter}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              ) : (
-                messages.map((message) => {
-                  const text = message.parts
-                    .filter((part) => part.type === "text")
-                    .map((part) => (part.type === "text" ? part.text : ""))
-                    .join("");
-                  if (!text.trim()) return null;
-                  return (
-                    <Message from={message.role} key={message.id}>
-                      <MessageContent>
-                        <MessageResponse>{text}</MessageResponse>
-                      </MessageContent>
-                    </Message>
-                  );
-                })
-              )}
-
-              {isBusy && (
-                <div className="px-1 py-2">
-                  <Shimmer className="text-sm">Thinking...</Shimmer>
-                </div>
-              )}
-
-              {error && (
-                <div className="mt-3 flex items-start gap-2 rounded-md border border-destructive/30 bg-destructive/5 px-3 py-2 text-sm text-destructive">
-                  <AlertTriangle className="mt-0.5 size-4 shrink-0" />
-                  <span>{error.message || "Something went wrong. Try sending again."}</span>
-                </div>
-              )}
-            </ConversationContent>
-            <ConversationScrollButton />
-          </Conversation>
-
-          <div className="border-t border-border p-4">
-            <div className="mx-auto w-full max-w-2xl">
-              <PromptInput
-                onSubmit={(message) => {
-                  submit(message.text);
-                }}
-              >
-                <PromptInputTextarea
-                  onChange={(event) => setInput(event.currentTarget.value)}
-                  placeholder="What do you want the AI to do?"
-                />
-                <PromptInputFooter className="justify-end">
-                  <PromptInputSubmit status={status} disabled={!input.trim() || isBusy} />
-                </PromptInputFooter>
-              </PromptInput>
-            </div>
-          </div>
+        <div className="min-h-0 overflow-y-auto border-b border-border lg:border-b-0 lg:border-r">
+          <PromptForm draft={draft} onChange={(patch) => setDraft((d) => mergeDraft(d, patch))} />
         </div>
-
-        <PromptDraftPanel draft={draft} />
+        <PromptDraftPanel draft={draft} onReset={() => setDraft(INITIAL)} />
       </div>
     </main>
   );

@@ -1,14 +1,8 @@
 import { useMemo, useState } from "react";
-import { Check, Copy, Download, FileText } from "lucide-react";
+import { Check, Copy, Download, FileText, RotateCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import {
-  DRAFT_SECTIONS,
-  draftProgress,
-  isSectionFilled,
-  renderPrompt,
-  type PromptDraft,
-} from "@/lib/prompt-draft";
+import { isComplete, renderPrompt, requiredFilled, type PromptDraft } from "@/lib/prompt-draft";
 
 function download(filename: string, contents: string) {
   const blob = new Blob([contents], { type: "text/plain;charset=utf-8" });
@@ -20,11 +14,17 @@ function download(filename: string, contents: string) {
   URL.revokeObjectURL(url);
 }
 
-export function PromptDraftPanel({ draft }: { draft: PromptDraft }) {
+export function PromptDraftPanel({
+  draft,
+  onReset,
+}: {
+  draft: PromptDraft;
+  onReset: () => void;
+}) {
   const [copied, setCopied] = useState(false);
   const prompt = useMemo(() => renderPrompt(draft), [draft]);
-  const progress = draftProgress(draft);
-  const started = progress > 0;
+  const ready = isComplete(draft);
+  const started = requiredFilled(draft) > 0;
 
   const handleCopy = async () => {
     await navigator.clipboard.writeText(prompt);
@@ -33,20 +33,27 @@ export function PromptDraftPanel({ draft }: { draft: PromptDraft }) {
   };
 
   return (
-    <section className="flex h-full min-h-0 flex-col bg-card" aria-label="Generated prompt">
-      <header className="flex flex-wrap items-center gap-3 border-b border-border px-5 py-3">
-        <h2 className="text-sm font-semibold tracking-tight">Prompt draft</h2>
-        <span
-          className={cn(
-            "rounded-full border px-2 py-0.5 font-mono text-[11px]",
-            draft.complete
-              ? "border-primary/30 bg-primary/10 text-primary"
-              : "border-border text-muted-foreground",
-          )}
-        >
-          {draft.complete ? "READY" : `${progress}% mapped`}
-        </span>
-        <div className="ml-auto flex items-center gap-1.5">
+    <section
+      className="flex h-full min-h-0 flex-col bg-card"
+      aria-label="Generated prompt"
+    >
+      <header className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 border-b border-border px-6 py-3.5">
+        <div className="flex min-w-0 items-center gap-2.5">
+          <h2 className="truncate text-[13px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+            Live prompt
+          </h2>
+          <span
+            className={cn(
+              "shrink-0 rounded-full border px-2 py-0.5 font-mono text-[10px] tracking-wider",
+              ready
+                ? "border-primary/30 bg-primary/10 text-primary"
+                : "border-border text-muted-foreground",
+            )}
+          >
+            {ready ? "READY" : "DRAFT"}
+          </span>
+        </div>
+        <div className="flex shrink-0 items-center gap-1">
           <Button variant="outline" size="sm" onClick={handleCopy} disabled={!started}>
             {copied ? <Check /> : <Copy />}
             {copied ? "Copied" : "Copy"}
@@ -69,33 +76,17 @@ export function PromptDraftPanel({ draft }: { draft: PromptDraft }) {
             <Download />
             .txt
           </Button>
+          <Button variant="ghost" size="icon-sm" onClick={onReset} aria-label="Reset form">
+            <RotateCcw />
+          </Button>
         </div>
       </header>
 
-      <div className="flex flex-wrap gap-1.5 border-b border-border px-5 py-2.5">
-        {DRAFT_SECTIONS.map((section) => {
-          const filled = isSectionFilled(draft, section.key);
-          return (
-            <span
-              key={section.key}
-              className={cn(
-                "rounded-full px-2 py-0.5 text-[11px] font-medium transition-colors",
-                filled
-                  ? "bg-accent text-accent-foreground"
-                  : "bg-muted text-muted-foreground/60",
-              )}
-            >
-              {section.label}
-            </span>
-          );
-        })}
-      </div>
-
-      <div className="min-h-0 flex-1 overflow-y-auto px-5 py-4">
+      <div className="min-h-0 flex-1 overflow-y-auto px-6 py-5">
         <pre
           className={cn(
             "whitespace-pre-wrap break-words font-mono text-[12.5px] leading-relaxed",
-            started ? "text-foreground" : "text-muted-foreground/55",
+            started ? "text-foreground" : "text-muted-foreground/60",
           )}
         >
           {prompt}
