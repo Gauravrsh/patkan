@@ -111,7 +111,7 @@ export const recordFieldUsage = createServerFn({ method: "POST" })
       .map((entry) => ({ field: entry.field, value: entry.value.slice(0, 400) })),
   }))
   .handler(async ({ data }) => {
-    const supabase = client();
+    const { supabaseAdmin: supabase } = await import("@/integrations/supabase/client.server");
     await Promise.all(
       data.entries.map((entry) =>
         supabase.rpc("record_field_usage", { _field: entry.field, _value: entry.value }),
