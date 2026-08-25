@@ -1,8 +1,10 @@
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { Check, Copy, Download, FileText, RotateCcw } from "lucide-react";
+import { useServerFn } from "@tanstack/react-start";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { isComplete, renderPrompt, requiredFilled, type PromptDraft } from "@/lib/prompt-draft";
+import { recordFieldUsage } from "@/lib/suggestions.functions";
 
 function download(filename: string, contents: string) {
   const blob = new Blob([contents], { type: "text/plain;charset=utf-8" });
@@ -25,10 +27,25 @@ export function PromptDraftPanel({
   const prompt = useMemo(() => renderPrompt(draft), [draft]);
   const ready = isComplete(draft);
   const started = requiredFilled(draft) > 0;
+  const record = useServerFn(recordFieldUsage);
+
+  // Learn from prompts the user actually uses (copy/export), never on typing.
+  const learn = useCallback(() => {
+    const entries = (
+      [
+        { field: "role" as const, value: draft.role ?? "" },
+        { field: "scenario" as const, value: draft.scenario ?? "" },
+        { field: "objective" as const, value: draft.objective ?? "" },
+      ] as const
+    ).filter((entry) => entry.value.trim().length >= 3);
+    if (entries.length === 0) return;
+    void record({ data: { entries: entries.map((e) => ({ ...e })) } }).catch(() => {});
+  }, [draft.role, draft.scenario, draft.objective, record]);
 
   const handleCopy = async () => {
     await navigator.clipboard.writeText(prompt);
     setCopied(true);
+    learn();
     setTimeout(() => setCopied(false), 1600);
   };
 
@@ -61,7 +78,10 @@ export function PromptDraftPanel({
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => download("prompt.md", prompt)}
+            onClick={() => {
+              download("prompt.md", prompt);
+              learn();
+            }}
             disabled={!started}
           >
             <FileText />
@@ -70,7 +90,10 @@ export function PromptDraftPanel({
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => download("prompt.txt", prompt)}
+            onClick={() => {
+              download("prompt.txt", prompt);
+              learn();
+            }}
             disabled={!started}
           >
             <Download />

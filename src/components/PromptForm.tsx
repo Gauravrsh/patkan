@@ -4,6 +4,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { BASE_GUARDRAILS, type PromptDraft } from "@/lib/prompt-draft";
+import { SuggestInput } from "@/components/SuggestInput";
 
 type FieldProps = {
   label: string;
@@ -123,11 +124,12 @@ export function PromptForm({
           htmlFor="role"
           hint="e.g. Senior Solutions Architect, growth copywriter, forensic data analyst"
         >
-          <Input
+          <SuggestInput
+            field="role"
             id="role"
             value={draft.role ?? ""}
             placeholder="Senior Solutions Architect"
-            onChange={(event) => set("role", event.target.value)}
+            onChange={(next) => set("role", next)}
           />
         </Field>
         <Field
@@ -152,12 +154,14 @@ export function PromptForm({
           htmlFor="scenario"
           hint="Finish the sentence: “I am currently …”"
         >
-          <Textarea
+          <SuggestInput
+            multiline
+            field="scenario"
             id="scenario"
             rows={2}
             value={draft.scenario ?? ""}
             placeholder="building a full-stack collections app for enterprise banks"
-            onChange={(event) => set("scenario", event.target.value)}
+            onChange={(next) => set("scenario", next)}
           />
         </Field>
         <Field label="Target users" htmlFor="targetUsers">
@@ -195,12 +199,14 @@ export function PromptForm({
           htmlFor="objective"
           hint="Start with an action verb: design, audit, refactor, draft…"
         >
-          <Textarea
+          <SuggestInput
+            multiline
+            field="objective"
             id="objective"
             rows={2}
             value={draft.objective ?? ""}
             placeholder="design a step-by-step database schema and API routing spec"
-            onChange={(event) => set("objective", event.target.value)}
+            onChange={(next) => set("objective", next)}
           />
         </Field>
       </section>
