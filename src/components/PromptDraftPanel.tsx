@@ -1,8 +1,10 @@
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { Check, Copy, Download, FileText, RotateCcw } from "lucide-react";
+import { useServerFn } from "@tanstack/react-start";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { isComplete, renderPrompt, requiredFilled, type PromptDraft } from "@/lib/prompt-draft";
+import { recordFieldUsage } from "@/lib/suggestions.functions";
 
 function download(filename: string, contents: string) {
   const blob = new Blob([contents], { type: "text/plain;charset=utf-8" });
