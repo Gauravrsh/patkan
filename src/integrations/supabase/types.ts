@@ -14,13 +14,73 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      field_ngrams: {
+        Row: {
+          field: string
+          id: string
+          next_word: string
+          prefix: string
+          uses: number
+        }
+        Insert: {
+          field: string
+          id?: string
+          next_word: string
+          prefix: string
+          uses?: number
+        }
+        Update: {
+          field?: string
+          id?: string
+          next_word?: string
+          prefix?: string
+          uses?: number
+        }
+        Relationships: []
+      }
+      field_suggestions: {
+        Row: {
+          created_at: string
+          field: string
+          id: string
+          last_used_at: string
+          uses: number
+          value: string
+          value_norm: string
+        }
+        Insert: {
+          created_at?: string
+          field: string
+          id?: string
+          last_used_at?: string
+          uses?: number
+          value: string
+          value_norm: string
+        }
+        Update: {
+          created_at?: string
+          field?: string
+          id?: string
+          last_used_at?: string
+          uses?: number
+          value?: string
+          value_norm?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      is_valid_field_value: { Args: { _value: string }; Returns: boolean }
+      normalize_field_value: { Args: { _value: string }; Returns: string }
+      record_field_usage: {
+        Args: { _field: string; _value: string }
+        Returns: undefined
+      }
+      show_limit: { Args: never; Returns: number }
+      show_trgm: { Args: { "": string }; Returns: string[] }
     }
     Enums: {
       [_ in never]: never
