@@ -27,10 +27,25 @@ export function PromptDraftPanel({
   const prompt = useMemo(() => renderPrompt(draft), [draft]);
   const ready = isComplete(draft);
   const started = requiredFilled(draft) > 0;
+  const record = useServerFn(recordFieldUsage);
+
+  // Learn from prompts the user actually uses (copy/export), never on typing.
+  const learn = useCallback(() => {
+    const entries = (
+      [
+        { field: "role" as const, value: draft.role ?? "" },
+        { field: "scenario" as const, value: draft.scenario ?? "" },
+        { field: "objective" as const, value: draft.objective ?? "" },
+      ] as const
+    ).filter((entry) => entry.value.trim().length >= 3);
+    if (entries.length === 0) return;
+    void record({ data: { entries: entries.map((e) => ({ ...e })) } }).catch(() => {});
+  }, [draft.role, draft.scenario, draft.objective, record]);
 
   const handleCopy = async () => {
     await navigator.clipboard.writeText(prompt);
     setCopied(true);
+    learn();
     setTimeout(() => setCopied(false), 1600);
   };
 
