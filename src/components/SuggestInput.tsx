@@ -212,9 +212,9 @@ export function SuggestInput({
       </div>
 
       {ghost && focused && (
-        <p className="mt-1 text-[10.5px] uppercase tracking-[0.1em] text-muted-foreground/70">
-          Tab to complete
-        </p>
+        <span className="pointer-events-none absolute right-2 top-1.5 rounded border border-border bg-muted px-1 font-mono text-[9px] uppercase tracking-wider text-muted-foreground">
+          Tab
+        </span>
       )}
 
       {showList && (
