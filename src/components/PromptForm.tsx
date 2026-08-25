@@ -123,11 +123,12 @@ export function PromptForm({
           htmlFor="role"
           hint="e.g. Senior Solutions Architect, growth copywriter, forensic data analyst"
         >
-          <Input
+          <SuggestInput
+            field="role"
             id="role"
             value={draft.role ?? ""}
             placeholder="Senior Solutions Architect"
-            onChange={(event) => set("role", event.target.value)}
+            onChange={(next) => set("role", next)}
           />
         </Field>
         <Field
