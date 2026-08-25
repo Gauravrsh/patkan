@@ -78,7 +78,10 @@ export function PromptDraftPanel({
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => download("prompt.md", prompt)}
+            onClick={() => {
+              download("prompt.md", prompt);
+              learn();
+            }}
             disabled={!started}
           >
             <FileText />
@@ -87,7 +90,10 @@ export function PromptDraftPanel({
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => download("prompt.txt", prompt)}
+            onClick={() => {
+              download("prompt.txt", prompt);
+              learn();
+            }}
             disabled={!started}
           >
             <Download />
