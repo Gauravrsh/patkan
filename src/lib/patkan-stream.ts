@@ -15,8 +15,8 @@ export interface TransformResult {
   prompt: string;
   assumptions: string[];
   clarifiers: { label: string; refinement: string }[];
-  used?: number;
-  limit?: number;
+  used?: number | undefined;
+  limit?: number | undefined;
 }
 
 /**
