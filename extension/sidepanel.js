@@ -1,22 +1,45 @@
-import { PERSONAS, DEFAULT_API_BASE } from "./patkan-core.js";
+import {
+  PERSONAS,
+  DIALECTS,
+  INTENSITIES,
+  DEFAULT_API_BASE,
+  dialectForHost,
+  localScaffold,
+} from "./patkan-core.js";
 
 const $ = (id) => document.getElementById(id);
-let persona = "product-manager";
+let persona = "auto";
+let dialect = "markdown";
+let intensity = "standard";
 let output = "";
 
-function renderPersonas() {
-  $("personas").innerHTML = "";
-  for (const p of PERSONAS) {
+function renderChips(containerId, items, current, onPick) {
+  const el = $(containerId);
+  el.innerHTML = "";
+  for (const item of items) {
     const b = document.createElement("button");
-    b.textContent = p.label;
-    b.setAttribute("aria-pressed", String(p.id === persona));
-    b.addEventListener("click", async () => {
-      persona = p.id;
-      await chrome.storage.local.set({ persona });
-      renderPersonas();
-    });
-    $("personas").appendChild(b);
+    b.textContent = item.label;
+    b.setAttribute("aria-pressed", String(item.id === current));
+    b.addEventListener("click", () => onPick(item.id));
+    el.appendChild(b);
   }
+}
+
+function renderControls() {
+  renderChips("personas", PERSONAS, persona, async (id) => {
+    persona = id;
+    await chrome.storage.local.set({ persona });
+    renderControls();
+  });
+  renderChips("dialects", DIALECTS, dialect, (id) => {
+    dialect = id;
+    renderControls();
+  });
+  renderChips("intensities", INTENSITIES, intensity, async (id) => {
+    intensity = id;
+    await chrome.storage.local.set({ intensity });
+    renderControls();
+  });
 }
 
 function setUsage(used, limit) {
@@ -54,7 +77,14 @@ async function loadTemplates(settings) {
 async function init() {
   const settings = await chrome.runtime.sendMessage({ type: "PATKAN_GET_SETTINGS" });
   persona = settings?.persona || persona;
-  renderPersonas();
+  intensity = settings?.intensity || intensity;
+  try {
+    const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+    if (tab?.url) dialect = dialectForHost(new URL(tab.url).hostname);
+  } catch {
+    /* keep the default dialect */
+  }
+  renderControls();
   if (settings?.usage) setUsage(settings.usage.used, settings.usage.limit);
   loadTemplates(settings || {});
 }
@@ -63,10 +93,13 @@ $("go").addEventListener("click", async () => {
   const text = $("input").value.trim();
   if (text.length < 3) return;
   $("go").disabled = true;
-  $("go").textContent = "Patkan…";
+  $("go").textContent = "Compiling…";
+  $("assumed").textContent = "";
+  $("clarifiers").innerHTML = "";
+  $("out").textContent = localScaffold(text, { persona, dialect, intensity });
   const res = await chrome.runtime.sendMessage({
     type: "PATKAN_TRANSFORM",
-    payload: { text, persona, customInstruction: $("template").value || null },
+    payload: { text, persona, dialect, intensity, customInstruction: $("template").value || null },
   });
   $("go").disabled = false;
   $("go").textContent = "Patkan it";
@@ -78,6 +111,25 @@ $("go").addEventListener("click", async () => {
   $("out").textContent = output;
   $("copy").disabled = false;
   $("insert").disabled = false;
+  if (res.assumptions?.length) $("assumed").textContent = "Assumed: " + res.assumptions.join(" · ");
+  for (const c of res.clarifiers || []) {
+    const b = document.createElement("button");
+    b.textContent = "+ " + c.label;
+    b.addEventListener("click", async () => {
+      b.disabled = true;
+      const again = await chrome.runtime.sendMessage({
+        type: "PATKAN_TRANSFORM",
+        payload: { text, persona, dialect, intensity, refinement: c.refinement },
+      });
+      b.disabled = false;
+      if (again?.ok) {
+        output = again.prompt;
+        $("out").textContent = output;
+        setUsage(again.used, again.limit);
+      }
+    });
+    $("clarifiers").appendChild(b);
+  }
   setUsage(res.used, res.limit);
 });
 
