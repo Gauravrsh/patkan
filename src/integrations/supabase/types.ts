@@ -14,7 +14,90 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      profiles: {
+        Row: {
+          created_at: string
+          display_name: string | null
+          email: string | null
+          id: string
+          tier: string
+          updated_at: string
+          zero_data_mode: boolean
+        }
+        Insert: {
+          created_at?: string
+          display_name?: string | null
+          email?: string | null
+          id: string
+          tier?: string
+          updated_at?: string
+          zero_data_mode?: boolean
+        }
+        Update: {
+          created_at?: string
+          display_name?: string | null
+          email?: string | null
+          id?: string
+          tier?: string
+          updated_at?: string
+          zero_data_mode?: boolean
+        }
+        Relationships: []
+      }
+      prompt_templates: {
+        Row: {
+          created_at: string
+          id: string
+          is_public: boolean
+          system_instruction: string
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_public?: boolean
+          system_instruction: string
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_public?: boolean
+          system_instruction?: string
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      usage_counters: {
+        Row: {
+          count: number
+          day: string
+          id: string
+          subject_key: string
+          updated_at: string
+        }
+        Insert: {
+          count?: number
+          day?: string
+          id?: string
+          subject_key: string
+          updated_at?: string
+        }
+        Update: {
+          count?: number
+          day?: string
+          id?: string
+          subject_key?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

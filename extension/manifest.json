@@ -1,0 +1,42 @@
+{
+  "manifest_version": 3,
+  "name": "Patkan — instant expert prompts",
+  "version": "1.0.0",
+  "description": "Type a rough sentence, end it with // and Patkan rewrites it into a structured role/context/task/constraints prompt.",
+  "permissions": ["storage", "sidePanel", "activeTab", "clipboardWrite"],
+  "host_permissions": [
+    "https://chatgpt.com/*",
+    "https://chat.openai.com/*",
+    "https://claude.ai/*",
+    "https://gemini.google.com/*",
+    "https://patkan.lovable.app/*"
+  ],
+  "background": { "service_worker": "background.js", "type": "module" },
+  "action": { "default_title": "Patkan", "default_icon": { "128": "icon128.png" } },
+  "side_panel": { "default_path": "sidepanel.html" },
+  "options_page": "options.html",
+  "icons": { "128": "icon128.png" },
+  "commands": {
+    "patkan-transform": {
+      "suggested_key": { "default": "Ctrl+Shift+K", "mac": "Command+Shift+K" },
+      "description": "Patkan the current text box"
+    }
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://chatgpt.com/*",
+        "https://chat.openai.com/*",
+        "https://claude.ai/*",
+        "https://gemini.google.com/*"
+      ],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": ["https://patkan.lovable.app/*"],
+      "js": ["web-connect.js"],
+      "run_at": "document_idle"
+    }
+  ]
+}
