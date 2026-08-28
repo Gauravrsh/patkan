@@ -12,6 +12,7 @@ async function getSettings() {
     "session",
     "disabledHosts",
     "usage",
+    "intensity",
   ]);
   return {
     apiBase: stored.apiBase || DEFAULT_API_BASE,
@@ -20,6 +21,7 @@ async function getSettings() {
     session: stored.session || null,
     disabledHosts: stored.disabledHosts || [],
     usage: stored.usage || null,
+    intensity: stored.intensity || "standard",
   };
 }
 
@@ -31,7 +33,7 @@ async function getDeviceId() {
   return id;
 }
 
-async function transform({ text, persona, customInstruction }) {
+async function transform({ text, persona, dialect, intensity, customInstruction, refinement }) {
   const settings = await getSettings();
   const deviceId = await getDeviceId();
   const headers = { "content-type": "application/json", "x-patkan-device": deviceId };
@@ -47,8 +49,12 @@ async function transform({ text, persona, customInstruction }) {
       body: JSON.stringify({
         text,
         persona: getPersona(persona || settings.persona).id,
+        dialect: dialect || "markdown",
+        intensity: intensity || settings.intensity,
         deviceId,
         customInstruction: customInstruction || null,
+        refinement: refinement || null,
+        stream: false,
       }),
     });
   } catch {
@@ -72,7 +78,14 @@ async function transform({ text, persona, customInstruction }) {
   }
 
   await chrome.storage.local.set({ usage: { used: data.used, limit: data.limit, day: new Date().toISOString().slice(0, 10) } });
-  return { ok: true, prompt: data.prompt, used: data.used, limit: data.limit };
+  return {
+    ok: true,
+    prompt: data.prompt,
+    assumptions: data.assumptions || [],
+    clarifiers: data.clarifiers || [],
+    used: data.used,
+    limit: data.limit,
+  };
 }
 
 chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
