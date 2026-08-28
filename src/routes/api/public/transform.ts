@@ -3,9 +3,13 @@ import { createFileRoute } from "@tanstack/react-router";
 import {
   DAILY_FREE_LIMIT,
   MAX_INPUT_CHARS,
-  META_SYSTEM_PROMPT,
+  buildMetaSystemPrompt,
   buildMetaUserMessage,
+  classifyLocal,
+  getDialect,
   getPersona,
+  splitMeta,
+  type Intensity,
 } from "@/lib/patkan-core";
 
 const CORS_HEADERS: Record<string, string> = {
@@ -44,19 +48,25 @@ async function resolveUserId(authHeader: string | null): Promise<string | null> 
   }
 }
 
+interface Payload {
+  text?: string;
+  persona?: string;
+  dialect?: string;
+  intensity?: Intensity;
+  deviceId?: string;
+  customInstruction?: string | null;
+  refinement?: string | null;
+  stream?: boolean;
+}
+
 export const Route = createFileRoute("/api/public/transform")({
   server: {
     handlers: {
       OPTIONS: () => new Response(null, { status: 204, headers: CORS_HEADERS }),
       POST: async ({ request }) => {
-        let payload: {
-          text?: string;
-          persona?: string;
-          deviceId?: string;
-          customInstruction?: string | null;
-        };
+        let payload: Payload;
         try {
-          payload = (await request.json()) as typeof payload;
+          payload = (await request.json()) as Payload;
         } catch {
           return json({ error: "Invalid JSON body." }, 400);
         }
@@ -104,29 +114,42 @@ export const Route = createFileRoute("/api/public/transform")({
         if (!apiKey) return json({ error: "AI is not configured." }, 500);
 
         const persona = getPersona(payload.persona);
+        const dialect = getDialect(payload.dialect).id;
+        const intensity: Intensity = payload.intensity ?? "standard";
+        const { intent, complexity } = classifyLocal(text);
+        const wantsStream = payload.stream !== false;
+
+        const body = {
+          model: "google/gemini-3.7-flash",
+          stream: wantsStream,
+          messages: [
+            { role: "system", content: buildMetaSystemPrompt(dialect) },
+            {
+              role: "user",
+              content: buildMetaUserMessage(text, persona, {
+                intensity,
+                intent,
+                complexity,
+                customInstruction: payload.customInstruction,
+                refinement: payload.refinement,
+              }),
+            },
+          ],
+        };
 
         let res: Response;
         try {
           res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
             method: "POST",
-            headers: {
-              "content-type": "application/json",
-              Authorization: `Bearer ${apiKey}`,
-            },
-            body: JSON.stringify({
-              model: "google/gemini-3.7-flash",
-              messages: [
-                { role: "system", content: META_SYSTEM_PROMPT },
-                { role: "user", content: buildMetaUserMessage(text, persona, payload.customInstruction) },
-              ],
-            }),
+            headers: { "content-type": "application/json", Authorization: `Bearer ${apiKey}` },
+            body: JSON.stringify(body),
           });
         } catch (err) {
           console.error("patkan transform: gateway fetch failed", err);
           return json({ error: "Could not reach the AI service. Try again." }, 502);
         }
 
-        if (!res.ok) {
+        if (!res.ok || !res.body) {
           const detail = await res.text().catch(() => "");
           console.error("patkan transform: gateway error", res.status, detail);
           if (res.status === 429) {
@@ -138,33 +161,104 @@ export const Route = createFileRoute("/api/public/transform")({
           return json({ error: "The AI service failed to respond." }, 502);
         }
 
-        const data = (await res.json()) as {
-          choices?: Array<{ message?: { content?: string } }>;
+        const nextCount = used + 1;
+        const bumpUsage = async () => {
+          if (existing) {
+            await supabaseAdmin
+              .from("usage_counters")
+              .update({ count: nextCount, updated_at: new Date().toISOString() })
+              .eq("id", existing.id);
+          } else {
+            await supabaseAdmin.from("usage_counters").insert({ subject_key: subjectKey, day, count: 1 });
+          }
         };
-        let prompt = (data.choices?.[0]?.message?.content ?? "").trim();
-        prompt = prompt.replace(/^```[a-z]*\n?/i, "").replace(/```$/, "").trim();
 
-        if (!prompt) {
-          return json({ error: "The AI returned an empty prompt. Try again." }, 502);
+        if (!wantsStream) {
+          const data = (await res.json()) as { choices?: Array<{ message?: { content?: string } }> };
+          const raw = data.choices?.[0]?.message?.content ?? "";
+          const parsed = splitMeta(raw);
+          if (!parsed.prompt) return json({ error: "The AI returned an empty prompt. Try again." }, 502);
+          await bumpUsage();
+          return json({
+            ...parsed,
+            dialect,
+            intent,
+            intensity,
+            persona: persona.id,
+            used: nextCount,
+            limit: DAILY_FREE_LIMIT,
+            signedIn: Boolean(userId),
+          });
         }
 
-        if (existing) {
-          await supabaseAdmin
-            .from("usage_counters")
-            .update({ count: used + 1, updated_at: new Date().toISOString() })
-            .eq("id", existing.id);
-        } else {
-          await supabaseAdmin
-            .from("usage_counters")
-            .insert({ subject_key: subjectKey, day, count: 1 });
-        }
+        const encoder = new TextEncoder();
+        const decoder = new TextDecoder();
+        const upstream = res.body.getReader();
 
-        return json({
-          prompt,
-          persona: persona.id,
-          used: used + 1,
-          limit: DAILY_FREE_LIMIT,
-          signedIn: Boolean(userId),
+        const stream = new ReadableStream<Uint8Array>({
+          async start(controller) {
+            const send = (event: unknown) =>
+              controller.enqueue(encoder.encode(`data: ${JSON.stringify(event)}\n\n`));
+            send({ type: "meta", dialect, intent, intensity, persona: persona.id });
+
+            let buffer = "";
+            let full = "";
+            try {
+              for (;;) {
+                const { done, value } = await upstream.read();
+                if (done) break;
+                buffer += decoder.decode(value, { stream: true });
+                const lines = buffer.split("\n");
+                buffer = lines.pop() ?? "";
+                for (const line of lines) {
+                  const trimmed = line.trim();
+                  if (!trimmed.startsWith("data:")) continue;
+                  const chunk = trimmed.slice(5).trim();
+                  if (!chunk || chunk === "[DONE]") continue;
+                  try {
+                    const parsedChunk = JSON.parse(chunk) as {
+                      choices?: Array<{ delta?: { content?: string } }>;
+                    };
+                    const delta = parsedChunk.choices?.[0]?.delta?.content;
+                    if (delta) {
+                      full += delta;
+                      send({ type: "delta", delta });
+                    }
+                  } catch {
+                    /* ignore malformed chunk */
+                  }
+                }
+              }
+
+              const parsed = splitMeta(full);
+              if (!parsed.prompt) {
+                send({ type: "error", error: "The AI returned an empty prompt. Try again." });
+              } else {
+                await bumpUsage();
+                send({
+                  type: "done",
+                  ...parsed,
+                  used: nextCount,
+                  limit: DAILY_FREE_LIMIT,
+                  signedIn: Boolean(userId),
+                });
+              }
+            } catch (err) {
+              console.error("patkan transform: stream failed", err);
+              send({ type: "error", error: "The stream broke mid-transform. Try again." });
+            } finally {
+              controller.close();
+            }
+          },
+        });
+
+        return new Response(stream, {
+          headers: {
+            "content-type": "text/event-stream",
+            "cache-control": "no-store",
+            connection: "keep-alive",
+            ...CORS_HEADERS,
+          },
         });
       },
     },
