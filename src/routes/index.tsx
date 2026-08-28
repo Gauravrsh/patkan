@@ -5,7 +5,16 @@ import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { PERSONAS, localScaffold, DAILY_FREE_LIMIT } from "@/lib/patkan-core";
+import {
+  DAILY_FREE_LIMIT,
+  DIALECTS,
+  INTENSITIES,
+  PERSONAS,
+  localScaffold,
+  type Dialect,
+  type Intensity,
+} from "@/lib/patkan-core";
+import { streamTransform } from "@/lib/patkan-stream";
 import { useAuth } from "@/hooks/useAuth";
 
 export const Route = createFileRoute("/")({
@@ -15,14 +24,16 @@ export const Route = createFileRoute("/")({
       {
         name: "description",
         content:
-          "A browser extension that rewrites your rough sentence into a structured, role-and-constraint prompt right inside ChatGPT, Claude and Gemini.",
+          "A browser extension that compiles your rough sentence into an expert prompt — model-aware format, output contract and assumptions — inside ChatGPT, Claude and Gemini.",
       },
       { property: "og:title", content: "Patkan — lazy input in, expert prompt out" },
       {
         property: "og:description",
         content:
-          "A browser extension that rewrites your rough sentence into a structured, role-and-constraint prompt right inside ChatGPT, Claude and Gemini.",
+          "A browser extension that compiles your rough sentence into an expert prompt — model-aware format, output contract and assumptions — inside ChatGPT, Claude and Gemini.",
       },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: Landing,
@@ -43,49 +54,50 @@ const SAMPLE = "write a prd for redesigning our checkout";
 function Landing() {
   const { session } = useAuth();
   const [input, setInput] = useState(SAMPLE);
-  const [persona, setPersona] = useState("product-manager");
+  const [persona, setPersona] = useState("auto");
+  const [dialect, setDialect] = useState<Dialect>("markdown");
+  const [intensity, setIntensity] = useState<Intensity>("standard");
   const [output, setOutput] = useState("");
+  const [assumptions, setAssumptions] = useState<string[]>([]);
+  const [clarifiers, setClarifiers] = useState<{ label: string; refinement: string }[]>([]);
   const [busy, setBusy] = useState(false);
   const [copied, setCopied] = useState(false);
   const [usage, setUsage] = useState<{ used: number; limit: number } | null>(null);
   const outRef = useRef<HTMLPreElement>(null);
 
   useEffect(() => {
-    setOutput(localScaffold(SAMPLE, "product-manager"));
+    setOutput(localScaffold(SAMPLE, { persona: "auto", dialect: "markdown", intensity: "standard" }));
   }, []);
 
-  async function transform() {
+  async function transform(refinement?: string) {
     if (!input.trim() || busy) return;
     setBusy(true);
-    setOutput(localScaffold(input, persona));
+    setAssumptions([]);
+    setClarifiers([]);
+    setOutput(localScaffold(input, { persona, dialect, intensity }));
     try {
-      const res = await fetch("/api/public/transform", {
-        method: "POST",
-        headers: {
-          "content-type": "application/json",
-          ...(session ? { Authorization: `Bearer ${session.access_token}` } : {}),
+      const result = await streamTransform(
+        {
+          text: input,
+          persona,
+          dialect,
+          intensity,
+          deviceId: deviceId(),
+          accessToken: session?.access_token,
+          refinement: refinement ?? null,
         },
-        body: JSON.stringify({ text: input, persona, deviceId: deviceId() }),
-      });
-      const data = (await res.json()) as {
-        prompt?: string;
-        error?: string;
-        used?: number;
-        limit?: number;
-      };
-      if (!res.ok || !data.prompt) {
-        toast.error(data.error ?? "Transform failed.");
-      } else {
-        setOutput(data.prompt);
-        if (typeof data.used === "number" && typeof data.limit === "number") {
-          setUsage({ used: data.used, limit: data.limit });
-        }
+        (visible) => setOutput(visible),
+      );
+      setOutput(result.prompt);
+      setAssumptions(result.assumptions);
+      setClarifiers(result.clarifiers);
+      if (typeof result.used === "number" && typeof result.limit === "number") {
+        setUsage({ used: result.used, limit: result.limit });
       }
-    } catch {
-      toast.error("Network error. The instant draft above is still usable.");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Transform failed.");
     } finally {
       setBusy(false);
-      outRef.current?.scrollTo({ top: 0 });
     }
   }
 
@@ -110,6 +122,13 @@ function Landing() {
       })
       .catch((err: Error) => toast.error(err.message));
   }
+
+  const chip = (active: boolean) =>
+    `rounded-full border px-3 py-1 text-xs transition-colors ${
+      active
+        ? "border-primary bg-primary text-primary-foreground"
+        : "border-border text-muted-foreground hover:bg-muted"
+    }`;
 
   return (
     <div className="min-h-screen bg-background">
@@ -146,7 +165,8 @@ function Landing() {
           <p className="mt-5 max-w-xl text-base text-muted-foreground">
             Patkan sits inside ChatGPT, Claude and Gemini. Finish your rough sentence with{" "}
             <code className="rounded bg-muted px-1.5 py-0.5 font-mono text-[13px]">//</code> and it
-            rewrites in place — role, context, task and constraints, in XML the models actually respect.
+            compiles a prompt in the format that model actually respects — with a success criterion, an
+            output contract, and its assumptions on the record.
           </p>
           <div className="mt-7 flex flex-wrap gap-3">
             <Button onClick={download}>
@@ -175,50 +195,108 @@ function Landing() {
                 </span>
               </div>
               <Textarea
-                rows={5}
+                rows={4}
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 placeholder="draft a prd for checkout redesign"
                 className="mt-3 resize-none border-0 bg-transparent px-0 text-base shadow-none focus-visible:ring-0"
               />
-              <div className="mt-3 flex flex-wrap gap-1.5">
-                {PERSONAS.map((p) => (
-                  <button
-                    key={p.id}
-                    type="button"
-                    onClick={() => setPersona(p.id)}
-                    className={`rounded-full border px-3 py-1 text-xs transition-colors ${
-                      persona === p.id
-                        ? "border-primary bg-primary text-primary-foreground"
-                        : "border-border text-muted-foreground hover:bg-muted"
-                    }`}
-                  >
-                    {p.label}
-                  </button>
-                ))}
+
+              <div className="mt-4 space-y-3 border-t pt-4">
+                <div>
+                  <p className="text-[11px] uppercase tracking-widest text-muted-foreground">Target model</p>
+                  <div className="mt-2 flex flex-wrap gap-1.5">
+                    {DIALECTS.map((d) => (
+                      <button
+                        key={d.id}
+                        type="button"
+                        title={d.note}
+                        onClick={() => setDialect(d.id)}
+                        className={chip(dialect === d.id)}
+                      >
+                        {d.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                <div>
+                  <p className="text-[11px] uppercase tracking-widest text-muted-foreground">Intensity</p>
+                  <div className="mt-2 flex flex-wrap gap-1.5">
+                    {INTENSITIES.map((i) => (
+                      <button
+                        key={i.id}
+                        type="button"
+                        title={i.note}
+                        onClick={() => setIntensity(i.id)}
+                        className={chip(intensity === i.id)}
+                      >
+                        {i.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                <div>
+                  <p className="text-[11px] uppercase tracking-widest text-muted-foreground">Persona</p>
+                  <div className="mt-2 flex flex-wrap gap-1.5">
+                    {PERSONAS.map((p) => (
+                      <button
+                        key={p.id}
+                        type="button"
+                        onClick={() => setPersona(p.id)}
+                        className={chip(persona === p.id)}
+                      >
+                        {p.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
               </div>
-              <Button onClick={transform} disabled={busy} className="mt-4 w-full">
+
+              <Button onClick={() => void transform()} disabled={busy} className="mt-4 w-full">
                 {busy ? <Loader2 className="animate-spin" /> : <Sparkles />}
-                {busy ? "Transforming…" : "Patkan it"}
+                {busy ? "Compiling…" : "Patkan it"}
               </Button>
             </div>
 
             <div className="flex flex-col rounded-xl border bg-foreground/[0.03] p-5">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-medium uppercase tracking-widest text-muted-foreground">
-                  Structured prompt
+                  Compiled prompt
                 </span>
-                <Button variant="ghost" size="sm" onClick={copy} disabled={!output}>
+                <Button variant="ghost" size="sm" onClick={() => void copy()} disabled={!output}>
                   {copied ? <Check /> : <Copy />}
                   {copied ? "Copied" : "Copy"}
                 </Button>
               </div>
               <pre
                 ref={outRef}
-                className="mt-3 max-h-[22rem] overflow-auto whitespace-pre-wrap break-words font-mono text-[12.5px] leading-relaxed text-foreground/90"
+                className="mt-3 max-h-[22rem] flex-1 overflow-auto whitespace-pre-wrap break-words font-mono text-[12.5px] leading-relaxed text-foreground/90"
               >
                 {output}
               </pre>
+
+              {assumptions.length > 0 && (
+                <p className="mt-4 border-t pt-3 text-xs leading-relaxed text-muted-foreground">
+                  <span className="font-medium text-foreground">Assumed:</span>{" "}
+                  {assumptions.join(" · ")}
+                </p>
+              )}
+
+              {clarifiers.length > 0 && (
+                <div className="mt-3 flex flex-wrap gap-1.5">
+                  {clarifiers.map((c) => (
+                    <button
+                      key={c.label}
+                      type="button"
+                      disabled={busy}
+                      onClick={() => void transform(c.refinement)}
+                      className="rounded-full border border-dashed px-3 py-1 text-xs text-muted-foreground transition-colors hover:border-primary hover:text-foreground disabled:opacity-50"
+                    >
+                      + {c.label}
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         </section>
@@ -226,16 +304,16 @@ function Landing() {
         <section className="mt-20 grid gap-8 md:grid-cols-3">
           {[
             {
-              t: "Instant, then better",
-              d: "A structured draft appears with zero network delay, then the model's enriched version replaces it. You never watch a blank box.",
+              t: "Format that fits the model",
+              d: "XML for Claude, Markdown headings for GPT, plain sections for Gemini. The extension picks by the site you're on — because a tag style is only useful if the model was trained to respect it.",
             },
             {
-              t: "Never breaks your flow",
-              d: "It writes back into the site's own composer. If a site changes and injection fails, the prompt lands on your clipboard instead.",
+              t: "Restraint, not padding",
+              d: "A one-line question gets a sharpened one-liner, not a spec. Patkan classifies intent first and only compiles the blocks the task actually needs.",
             },
             {
-              t: "Your own frameworks",
-              d: "Save a framework once — 'Strict PRD', 'LinkedIn, no emoji' — and apply it from the extension on any device.",
+              t: "Legible magic",
+              d: "Every result names what it assumed, and offers up to three one-tap chips for the details that would genuinely change the answer.",
             },
           ].map((f) => (
             <div key={f.t}>
