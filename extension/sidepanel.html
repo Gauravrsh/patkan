@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Patkan</title>
+    <style>
+      :root {
+        --bg: #fffaf3;
+        --ink: #2c2119;
+        --muted: #7c6a58;
+        --line: rgba(120, 90, 60, 0.22);
+        --accent: #c2521a;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        padding: 14px;
+        background: var(--bg);
+        color: var(--ink);
+        font: 14px/1.45 ui-sans-serif, system-ui, -apple-system, sans-serif;
+      }
+      header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+      .brand { font-weight: 650; letter-spacing: -0.01em; }
+      .brand span { color: var(--accent); }
+      .muted { color: var(--muted); font-size: 12px; }
+      textarea, pre {
+        width: 100%;
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        background: #fff;
+        color: var(--ink);
+        padding: 10px;
+        font: inherit;
+      }
+      textarea { resize: vertical; min-height: 90px; }
+      pre {
+        white-space: pre-wrap;
+        word-break: break-word;
+        font: 12px/1.5 ui-monospace, SFMono-Regular, Menlo, monospace;
+        max-height: 46vh;
+        overflow: auto;
+        margin: 8px 0 0;
+      }
+      .personas { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0; }
+      .personas button {
+        border: 1px solid var(--line);
+        background: transparent;
+        color: var(--muted);
+        border-radius: 999px;
+        padding: 4px 10px;
+        font-size: 11px;
+        cursor: pointer;
+      }
+      .personas button[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: #fff; }
+      .row { display: flex; gap: 8px; margin-top: 10px; }
+      .btn {
+        flex: 1;
+        border: 1px solid var(--line);
+        background: #fff;
+        color: var(--ink);
+        border-radius: 10px;
+        padding: 9px 10px;
+        font: 500 13px/1 inherit;
+        cursor: pointer;
+      }
+      .btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+      .btn:disabled { opacity: 0.55; cursor: default; }
+      .note { margin-top: 12px; font-size: 11px; color: var(--muted); }
+      a { color: var(--accent); }
+      .tpl { margin-top: 14px; border-top: 1px solid var(--line); padding-top: 10px; }
+      .tpl select { width: 100%; padding: 7px; border-radius: 8px; border: 1px solid var(--line); background: #fff; }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="brand"><span>✦</span> Patkan</div>
+      <div class="muted" id="usage"></div>
+    </header>
+
+    <textarea id="input" placeholder="Type the rough version. e.g. write a prd for redesigning checkout"></textarea>
+    <div class="personas" id="personas"></div>
+
+    <div class="tpl">
+      <div class="muted" style="margin-bottom: 6px">Saved framework (optional)</div>
+      <select id="template"><option value="">None</option></select>
+    </div>
+
+    <div class="row">
+      <button class="btn primary" id="go">Patkan it</button>
+      <button class="btn" id="insert" disabled>Insert</button>
+    </div>
+    <div class="row">
+      <button class="btn" id="copy" disabled>Copy</button>
+      <button class="btn" id="options">Settings</button>
+    </div>
+
+    <pre id="out"></pre>
+    <div class="note" id="note"></div>
+
+    <script type="module" src="sidepanel.js"></script>
+  </body>
+</html>
