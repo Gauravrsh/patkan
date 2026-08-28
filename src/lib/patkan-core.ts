@@ -248,7 +248,7 @@ function indent(body: string): string {
  */
 export function localScaffold(
   rawInput: string,
-  opts?: { persona?: string; dialect?: Dialect; intensity?: Intensity },
+  opts?: { persona?: string | undefined; dialect?: Dialect | undefined; intensity?: Intensity | undefined },
 ): string {
   const text = stripTrigger(rawInput);
   if (!text) return "";
@@ -331,11 +331,11 @@ export function buildMetaUserMessage(
   rawInput: string,
   persona: Persona,
   opts: {
-    intensity?: Intensity;
-    intent?: Intent;
-    complexity?: Complexity;
-    customInstruction?: string | null;
-    refinement?: string | null;
+    intensity?: Intensity | undefined;
+    intent?: Intent | undefined;
+    complexity?: Complexity | undefined;
+    customInstruction?: string | null | undefined;
+    refinement?: string | null | undefined;
   } = {},
 ): string {
   const clean = stripTrigger(rawInput);
