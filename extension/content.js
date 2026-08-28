@@ -5,16 +5,19 @@
   const HOSTS = [
     {
       id: "chatgpt",
+      dialect: "markdown",
       match: /(^|\.)chatgpt\.com$|(^|\.)chat\.openai\.com$/,
       selectors: ["#prompt-textarea", "div.ProseMirror[contenteditable='true']", "textarea[data-id]"],
     },
     {
       id: "claude",
+      dialect: "xml",
       match: /(^|\.)claude\.ai$/,
       selectors: ["div.ProseMirror[contenteditable='true']", "div[contenteditable='true']"],
     },
     {
       id: "gemini",
+      dialect: "sectioned",
       match: /(^|\.)gemini\.google\.com$/,
       selectors: ["div.ql-editor[contenteditable='true']", "rich-textarea div[contenteditable='true']"],
     },
@@ -194,14 +197,29 @@
     showChip(false);
 
     const settings = await chrome.runtime.sendMessage({ type: "PATKAN_GET_SETTINGS" });
+
+    // Progressive disclosure: a zero-network scaffold lands instantly so the
+    // composer is never empty while the model works.
+    const scaffold = await chrome.runtime.sendMessage({
+      type: "PATKAN_SCAFFOLD",
+      payload: { text: raw, persona: settings?.persona, dialect: host.dialect, intensity: settings?.intensity },
+    });
+    if (scaffold?.text) writeText(target, scaffold.text);
+
     const res = await chrome.runtime.sendMessage({
       type: "PATKAN_TRANSFORM",
-      payload: { text: raw, persona: settings?.persona },
+      payload: {
+        text: raw,
+        persona: settings?.persona,
+        dialect: host.dialect,
+        intensity: settings?.intensity,
+      },
     });
 
     setBusy(false);
 
     if (!res || !res.ok) {
+      if (lastOriginal != null) writeText(target, lastOriginal);
       const msg = res?.error || "Patkan failed.";
       toast(res?.requiresSignIn ? msg + " Open the Patkan panel to sign in." : msg);
       return;
@@ -224,6 +242,7 @@
     setTimeout(() => {
       target.style.backgroundColor = prev;
     }, 600);
+    if (res.assumptions?.length) toast("Assumed: " + res.assumptions.join(" · "));
     showChip(true);
     setTimeout(() => showChip(false), 8000);
   }

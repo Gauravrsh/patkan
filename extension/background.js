@@ -1,4 +1,4 @@
-import { DEFAULT_API_BASE, getPersona } from "./patkan-core.js";
+import { DEFAULT_API_BASE, getPersona, localScaffold } from "./patkan-core.js";
 
 chrome.runtime.onInstalled.addListener(() => {
   chrome.sidePanel.setPanelBehavior({ openPanelOnActionClick: true }).catch(() => {});
@@ -92,6 +92,11 @@ chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
   if (msg?.type === "PATKAN_TRANSFORM") {
     transform(msg.payload).then(sendResponse);
     return true;
+  }
+  if (msg?.type === "PATKAN_SCAFFOLD") {
+    const p = msg.payload || {};
+    sendResponse({ text: localScaffold(p.text, { persona: p.persona, dialect: p.dialect, intensity: p.intensity }) });
+    return false;
   }
   if (msg?.type === "PATKAN_GET_SETTINGS") {
     getSettings().then(sendResponse);
