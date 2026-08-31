@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Patkan — instant expert prompts",
   "version": "1.0.0",
-  "description": "Type a rough sentence, end it with // and Patkan rewrites it into a structured role/context/task/constraints prompt.",
+  "description": "Type a rough sentence, end it with /// and Patkan rewrites it into a structured role/context/task/constraints prompt.",
   "permissions": ["storage", "sidePanel", "activeTab", "clipboardWrite"],
   "host_permissions": [
     "https://chatgpt.com/*",

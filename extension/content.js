@@ -189,7 +189,7 @@
 
   async function run() {
     if (busy || !target) return;
-    const raw = readText(target).replace(/\/\/\s*$/, "").trim();
+    const raw = readText(target).replace(/\/\/\/\s*$/, "").trim();
     if (raw.length < 3) return;
 
     lastOriginal = readText(target);
@@ -295,7 +295,7 @@
       target = el;
       maybeShowPill();
       const text = readText(el);
-      if (/\/\/\s*$/.test(text)) {
+      if (/\/\/\/\s*$/.test(text)) {
         run();
       }
     },
