@@ -84,7 +84,7 @@ export const INTENSITIES = [
 
 export function stripTrigger(raw) {
   return String(raw || "")
-    .replace(/\/\/\s*$/, "")
+    .replace(/\/\/\/\s*$/, "")
     .trim();
 }
 
