@@ -164,7 +164,7 @@ function Landing() {
           </h1>
           <p className="mt-5 max-w-xl text-base text-muted-foreground">
             Patkan sits inside ChatGPT, Claude and Gemini. Finish your rough sentence with{" "}
-            <code className="rounded bg-muted px-1.5 py-0.5 font-mono text-[13px]">///</code> and it
+            <code className="rounded bg-muted px-1.5 py-0.5 font-mono text-[13px]">//</code> and it
             compiles a prompt in the format that model actually respects — with a success criterion, an
             output contract, and its assumptions on the record.
           </p>
@@ -334,7 +334,7 @@ function Landing() {
               "Open chrome://extensions in your browser.",
               "Turn on Developer mode (top right).",
               "Click 'Load unpacked' and pick the unzipped folder.",
-              "Open ChatGPT, type a rough sentence, end it with /// — or click the Patkan icon for the side panel.",
+              "Open ChatGPT, type a rough sentence, end it with // — or click the Patkan icon for the side panel.",
             ].map((step, i) => (
               <li key={step} className="flex gap-3">
                 <span className="mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full bg-muted font-mono text-[11px]">

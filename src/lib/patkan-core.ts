@@ -176,7 +176,7 @@ export function classifyLocal(rawInput: string): { intent: Intent; complexity: C
 
 export function stripTrigger(rawInput: string): string {
   return String(rawInput ?? "")
-    .replace(/\/\/\/\s*$/, "")
+    .replace(/\/\/\s*$/, "")
     .trim();
 }
 
