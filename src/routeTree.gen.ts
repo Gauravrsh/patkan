@@ -13,6 +13,9 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as ConnectRouteImport } from './routes/connect'
+import { Route as McpRouteImport } from './routes/mcp'
+import { Route as McpConsentRouteImport } from './routes/mcp-consent'
+import { Route as Char91DotwellKnownChar93OauthProtectedResourceRouteImport } from './routes/[.well-known]/oauth-protected-resource'
 import { Route as AuthenticatedLibraryRouteImport } from './routes/_authenticated/library'
 import { Route as ApiPublicTemplatesRouteImport } from './routes/api/public/templates'
 import { Route as ApiPublicTransformRouteImport } from './routes/api/public/transform'
@@ -36,6 +39,22 @@ const ConnectRoute = ConnectRouteImport.update({
   path: '/connect',
   getParentRoute: () => rootRouteImport,
 } as any)
+const McpRoute = McpRouteImport.update({
+  id: '/mcp',
+  path: '/mcp',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const McpConsentRoute = McpConsentRouteImport.update({
+  id: '/mcp-consent',
+  path: '/mcp-consent',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const Char91DotwellKnownChar93OauthProtectedResourceRoute =
+  Char91DotwellKnownChar93OauthProtectedResourceRouteImport.update({
+    id: '/.well-known/oauth-protected-resource',
+    path: '/.well-known/oauth-protected-resource',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const AuthenticatedLibraryRoute = AuthenticatedLibraryRouteImport.update({
   id: '/library',
   path: '/library',
@@ -56,6 +75,9 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/connect': typeof ConnectRoute
+  '/mcp': typeof McpRoute
+  '/mcp-consent': typeof McpConsentRoute
+  '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/library': typeof AuthenticatedLibraryRoute
   '/api/public/templates': typeof ApiPublicTemplatesRoute
   '/api/public/transform': typeof ApiPublicTransformRoute
@@ -64,6 +86,9 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/connect': typeof ConnectRoute
+  '/mcp': typeof McpRoute
+  '/mcp-consent': typeof McpConsentRoute
+  '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/library': typeof AuthenticatedLibraryRoute
   '/api/public/templates': typeof ApiPublicTemplatesRoute
   '/api/public/transform': typeof ApiPublicTransformRoute
@@ -74,6 +99,9 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
   '/connect': typeof ConnectRoute
+  '/mcp': typeof McpRoute
+  '/mcp-consent': typeof McpConsentRoute
+  '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/_authenticated/library': typeof AuthenticatedLibraryRoute
   '/api/public/templates': typeof ApiPublicTemplatesRoute
   '/api/public/transform': typeof ApiPublicTransformRoute
@@ -84,6 +112,9 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/connect'
+    | '/mcp'
+    | '/mcp-consent'
+    | '/.well-known/oauth-protected-resource'
     | '/library'
     | '/api/public/templates'
     | '/api/public/transform'
@@ -92,6 +123,9 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/connect'
+    | '/mcp'
+    | '/mcp-consent'
+    | '/.well-known/oauth-protected-resource'
     | '/library'
     | '/api/public/templates'
     | '/api/public/transform'
@@ -101,6 +135,9 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/auth'
     | '/connect'
+    | '/mcp'
+    | '/mcp-consent'
+    | '/.well-known/oauth-protected-resource'
     | '/_authenticated/library'
     | '/api/public/templates'
     | '/api/public/transform'
@@ -111,6 +148,9 @@ export interface RootRouteChildren {
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
   ConnectRoute: typeof ConnectRoute
+  McpRoute: typeof McpRoute
+  McpConsentRoute: typeof McpConsentRoute
+  Char91DotwellKnownChar93OauthProtectedResourceRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   ApiPublicTemplatesRoute: typeof ApiPublicTemplatesRoute
   ApiPublicTransformRoute: typeof ApiPublicTransformRoute
 }
@@ -143,6 +183,27 @@ declare module '@tanstack/react-router' {
       path: '/connect'
       fullPath: '/connect'
       preLoaderRoute: typeof ConnectRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/mcp': {
+      id: '/mcp'
+      path: '/mcp'
+      fullPath: '/mcp'
+      preLoaderRoute: typeof McpRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/mcp-consent': {
+      id: '/mcp-consent'
+      path: '/mcp-consent'
+      fullPath: '/mcp-consent'
+      preLoaderRoute: typeof McpConsentRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/.well-known/oauth-protected-resource': {
+      id: '/.well-known/oauth-protected-resource'
+      path: '/.well-known/oauth-protected-resource'
+      fullPath: '/.well-known/oauth-protected-resource'
+      preLoaderRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/library': {
@@ -185,6 +246,10 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
   ConnectRoute: ConnectRoute,
+  McpRoute: McpRoute,
+  McpConsentRoute: McpConsentRoute,
+  Char91DotwellKnownChar93OauthProtectedResourceRoute:
+    Char91DotwellKnownChar93OauthProtectedResourceRoute,
   ApiPublicTemplatesRoute: ApiPublicTemplatesRoute,
   ApiPublicTransformRoute: ApiPublicTransformRoute,
 }

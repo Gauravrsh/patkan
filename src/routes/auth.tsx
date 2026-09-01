@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
@@ -27,7 +27,6 @@ export const Route = createFileRoute("/auth")({
 });
 
 function AuthPage() {
-  const navigate = useNavigate();
   const { session, loading } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -35,16 +34,29 @@ function AuthPage() {
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
 
+  function safeNext() {
+    const value = new URLSearchParams(window.location.search).get("next");
+    if (!value) return "/library";
+    try {
+      const url = new URL(value, window.location.origin);
+      if (url.origin !== window.location.origin || !url.pathname.startsWith("/")) return "/library";
+      return `${url.pathname}${url.search}${url.hash}`;
+    } catch {
+      return "/library";
+    }
+  }
+
   useEffect(() => {
     if (!loading && session) {
-      void navigate({ to: "/library" });
+      window.location.assign(safeNext());
     }
-  }, [loading, session, navigate]);
+  }, [loading, session]);
 
   async function withGoogle() {
     setMessage(null);
+    const next = safeNext();
     const result = await lovable.auth.signInWithOAuth("google", {
-      redirect_uri: window.location.origin + "/auth",
+      redirect_uri: `${window.location.origin}/auth?next=${encodeURIComponent(next)}`,
     });
     if (result.error) setMessage(result.error.message);
   }
@@ -59,7 +71,7 @@ function AuthPage() {
         : supabase.auth.signUp({
             email,
             password,
-            options: { emailRedirectTo: `${window.location.origin}/auth` },
+            options: { emailRedirectTo: `${window.location.origin}/auth?next=${encodeURIComponent(safeNext())}` },
           });
     const { error } = await fn;
     setBusy(false);
