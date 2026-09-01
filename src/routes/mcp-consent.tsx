@@ -10,7 +10,7 @@ export const Route = createFileRoute("/mcp-consent")({
   component: McpConsentPage,
 });
 
-function McpConsentPage() {
+export function McpConsentPage() {
   const { session, loading } = useAuth();
   const [authorizationId, setAuthorizationId] = useState<string | null>(null);
   const [clientName, setClientName] = useState("MCP client");
@@ -24,7 +24,7 @@ function McpConsentPage() {
     if (!id) return;
     if (loading) return;
     if (!session) {
-      const next = `/mcp-consent?authorization_id=${encodeURIComponent(id)}`;
+      const next = `${window.location.pathname}?authorization_id=${encodeURIComponent(id)}`;
       window.location.assign(`/auth?next=${encodeURIComponent(next)}`);
       return;
     }

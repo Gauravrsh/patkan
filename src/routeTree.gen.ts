@@ -17,6 +17,7 @@ import { Route as McpRouteImport } from './routes/mcp'
 import { Route as McpConsentRouteImport } from './routes/mcp-consent'
 import { Route as Char91DotwellKnownChar93OauthProtectedResourceRouteImport } from './routes/[.well-known]/oauth-protected-resource'
 import { Route as AuthenticatedLibraryRouteImport } from './routes/_authenticated/library'
+import { Route as OauthConsentRouteImport } from './routes/oauth/consent'
 import { Route as ApiPublicTemplatesRouteImport } from './routes/api/public/templates'
 import { Route as ApiPublicTransformRouteImport } from './routes/api/public/transform'
 
@@ -60,6 +61,11 @@ const AuthenticatedLibraryRoute = AuthenticatedLibraryRouteImport.update({
   path: '/library',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const OauthConsentRoute = OauthConsentRouteImport.update({
+  id: '/oauth/consent',
+  path: '/oauth/consent',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicTemplatesRoute = ApiPublicTemplatesRouteImport.update({
   id: '/api/public/templates',
   path: '/api/public/templates',
@@ -79,6 +85,7 @@ export interface FileRoutesByFullPath {
   '/mcp-consent': typeof McpConsentRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/library': typeof AuthenticatedLibraryRoute
+  '/oauth/consent': typeof OauthConsentRoute
   '/api/public/templates': typeof ApiPublicTemplatesRoute
   '/api/public/transform': typeof ApiPublicTransformRoute
 }
@@ -90,6 +97,7 @@ export interface FileRoutesByTo {
   '/mcp-consent': typeof McpConsentRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/library': typeof AuthenticatedLibraryRoute
+  '/oauth/consent': typeof OauthConsentRoute
   '/api/public/templates': typeof ApiPublicTemplatesRoute
   '/api/public/transform': typeof ApiPublicTransformRoute
 }
@@ -103,6 +111,7 @@ export interface FileRoutesById {
   '/mcp-consent': typeof McpConsentRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/_authenticated/library': typeof AuthenticatedLibraryRoute
+  '/oauth/consent': typeof OauthConsentRoute
   '/api/public/templates': typeof ApiPublicTemplatesRoute
   '/api/public/transform': typeof ApiPublicTransformRoute
 }
@@ -116,6 +125,7 @@ export interface FileRouteTypes {
     | '/mcp-consent'
     | '/.well-known/oauth-protected-resource'
     | '/library'
+    | '/oauth/consent'
     | '/api/public/templates'
     | '/api/public/transform'
   fileRoutesByTo: FileRoutesByTo
@@ -127,6 +137,7 @@ export interface FileRouteTypes {
     | '/mcp-consent'
     | '/.well-known/oauth-protected-resource'
     | '/library'
+    | '/oauth/consent'
     | '/api/public/templates'
     | '/api/public/transform'
   id:
@@ -139,6 +150,7 @@ export interface FileRouteTypes {
     | '/mcp-consent'
     | '/.well-known/oauth-protected-resource'
     | '/_authenticated/library'
+    | '/oauth/consent'
     | '/api/public/templates'
     | '/api/public/transform'
   fileRoutesById: FileRoutesById
@@ -151,6 +163,7 @@ export interface RootRouteChildren {
   McpRoute: typeof McpRoute
   McpConsentRoute: typeof McpConsentRoute
   Char91DotwellKnownChar93OauthProtectedResourceRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
+  OauthConsentRoute: typeof OauthConsentRoute
   ApiPublicTemplatesRoute: typeof ApiPublicTemplatesRoute
   ApiPublicTransformRoute: typeof ApiPublicTransformRoute
 }
@@ -213,6 +226,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedLibraryRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/oauth/consent': {
+      id: '/oauth/consent'
+      path: '/oauth/consent'
+      fullPath: '/oauth/consent'
+      preLoaderRoute: typeof OauthConsentRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/templates': {
       id: '/api/public/templates'
       path: '/api/public/templates'
@@ -250,6 +270,7 @@ const rootRouteChildren: RootRouteChildren = {
   McpConsentRoute: McpConsentRoute,
   Char91DotwellKnownChar93OauthProtectedResourceRoute:
     Char91DotwellKnownChar93OauthProtectedResourceRoute,
+  OauthConsentRoute: OauthConsentRoute,
   ApiPublicTemplatesRoute: ApiPublicTemplatesRoute,
   ApiPublicTransformRoute: ApiPublicTransformRoute,
 }
