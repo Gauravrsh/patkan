@@ -1,62 +1,152 @@
-# Patkan — Auto-first controls
+# Patkan Mobile: PRD + a straight answer on MCP
 
-Fixes the two inconsistencies: dialect is advertised as auto but shown as a manual picker on the web,
-and intensity is a three-way choice the user has no basis to make.
+## Answering Q1 and Q2 first, because they change the product
 
-## Principle
+### Q1. Does prompt rewriting still add value?
 
-Every engine decision is made automatically and shown as a **result**, not a question. Overrides exist,
-but they live behind the result, not in front of it.
+Partly. Be honest about which part.
 
-## 1. Dialect — auto everywhere, override behind the result
+What frontier models already do well (and keep getting better at):
+- Filling in obvious missing context inside one thread.
+- Asking a clarifying question when the ask is ambiguous.
+- Producing decent structure without being told to.
 
-- Add `"auto"` as a real dialect value and make it the default on all three surfaces
-  (web demo, side panel, content script).
-- Resolution order: explicit user override → host detection (`dialectForHost`) → intent/persona default → Markdown.
-- Web demo has no host, so it gets a **destination** selector instead of a format selector:
-  "Where will you paste this? ChatGPT / Claude / Gemini / Somewhere else". That maps to a dialect internally.
-  Users think in destinations, not in XML-vs-Markdown.
-- The chips move out of the input area. Under the generated prompt, one line:
-  `Markdown format — matched to ChatGPT. Change`. `Change` reveals the three chips inline.
+What they still do badly, and will keep doing badly because it is not a model
+capability problem:
+- They cannot know facts you never typed: your stack, your audience, your
+  constraints, your definition of done, your house style, what you rejected
+  last time.
+- Cold starts. Turn 1 of a new chat has zero context, and mobile use is
+  overwhelmingly cold-start, one-shot, short-session.
+- They optimise for a pleasant answer, not for a *falsifiable* one. Nobody
+  volunteers success criteria and output contracts.
 
-## 2. Intensity — derived, with a single escape hatch
+So the defensible value is **not** "we add XML tags." Tag scaffolding is
+commodity and shrinking. The defensible value is **your persistent context and
+standards, injected into someone else's cold chat.** That is a memory product
+with a formatting side effect, not a formatter.
 
-- Remove the Light/Standard/Surgical chip row from the primary flow.
-- Intensity is derived from the classifier: `trivial → light`, `standard → standard`,
-  `deep` or an explicit reusable/spec signal → `surgical`.
-- Replace the dial with **one** action under the result: `Go deeper` (bumps one level and re-compiles) and,
-  once bumped, `Simplify` to step back down. Two states the user can feel, instead of three labels they must
-  interpret in advance.
-- Power users keep the explicit default in extension Settings (`options.html`) — unchanged there.
+Verdict: the formatting half of Patkan is depreciating. The memory/standards
+half is appreciating. Mobile should be built around the second one, or skipped.
 
-## 3. Confidence line absorbs both
+### Q2. Is MCP the right route to "@patkan" inside mobile apps?
 
-The existing `Assumed:` line becomes the single place all auto decisions surface:
+No. Not for the stated goal. Two independent reasons.
 
-```text
-Markdown for ChatGPT · standard depth · assumed B2B SaaS audience    [Change] [Go deeper]
-```
+**Reason 1 — distribution. The surface does not exist on most of the targets.**
 
-One line, legible, actionable. This is what makes the automation feel deliberate rather than opaque.
+| App (mobile) | Can an end user add a third-party remote MCP server? |
+| --- | --- |
+| Claude | Yes, custom connectors, paid tiers, desktop-ish setup flow |
+| ChatGPT | Partially, developer-mode connectors, not a consumer path |
+| Gemini | No user-installable MCP |
+| Grok | No |
+| Perplexity | No |
 
-## Tradeoffs accepted
+Three of the five named targets have no path at all. The one that works
+requires a settings flow no everyday user completes on a phone.
 
-- Auto dialect will occasionally be wrong when someone drafts in the web app and pastes into a model we
-  didn't detect. The destination selector plus the visible `Change` affordance covers this.
-- Removing the intensity dial costs power users one click when they always want Surgical. The Settings
-  default plus `Go deeper` covers it, and the median user gains a decision they never had to make.
-- `Go deeper` re-compiles, so it costs a second transform against the 10/day quota. Acceptable: it is an
-  explicit user action, and the quota already covers clarify-chip refinements the same way.
+**Reason 2 — mechanism. MCP fires too late to do the job.**
+
+The Patkan desktop magic is *pre-send interception*: it edits the text box
+before the model ever sees it. An MCP tool is *post-send*: the sloppy sentence
+is already in context, the model has already interpreted it, and it decides
+whether to call your tool. You get "the model asks Patkan to rewrite something
+it already understood," which is a slower, more expensive round trip for a
+result the model would have produced anyway. Worse, invocation is
+non-deterministic, so the "magic" fails randomly.
+
+The one thing MCP *does* do well here is Reason 1's exception: it is a clean
+way to expose your **saved frameworks and library** to Claude/ChatGPT as
+retrievable context. That is the memory half from Q1, and it is worth keeping
+the existing server for exactly that. It is not the mobile answer.
+
+**Verdict:** the current MCP server stays as a Claude/ChatGPT power-user
+integration. Mobile "@patkan" is built at the **keyboard and OS text layer**,
+which is the only place on a phone where you can intercept text before send,
+and which works identically across Gemini, Grok, Perplexity, Claude and every
+other app.
+
+---
+
+## PRD — Patkan Mobile
+
+### Goal
+A user typing a sloppy one-liner into any AI app on their phone gets a
+surgical prompt in the composer before they hit send, with no app switching.
+
+### Non-goals
+- Being invoked as `@patkan` inside those apps. Not technically available;
+  the trigger lives in the keyboard, not in the host app's mention system.
+- Rebuilding chat UI in the mobile app. The mobile app is a settings and
+  library shell.
+
+### The mechanism, per platform
+
+| Platform | Primary surface | Trigger | Fallback |
+| --- | --- | --- | --- |
+| Android | Custom IME (keyboard) | `//` at end of text, plus a Patkan key | Text-selection "Patkan" action (`PROCESS_TEXT`), share sheet |
+| iOS | Custom keyboard extension (Full Access) | `//` plus a Patkan key | Share sheet extension, Shortcut on the Action button, clipboard |
+
+Android's IME can read and replace composer text directly, so it reproduces the
+desktop experience almost exactly. iOS keyboard extensions cannot read the
+field's existing content, so the iOS flow is: user types, taps the Patkan key,
+the keyboard deletes back over what it saw typed and inserts the rewrite.
+Ship Android first; iOS is a materially weaker experience and should be
+validated separately.
+
+### Core flow
+1. User types "write a cold email for my saas" and ends with `//`.
+2. Patkan keyboard shows an inline chip: rewriting.
+3. Local scaffold lands within ~50ms so the field is never empty.
+4. Server call returns the enriched prompt and swaps it in, one undo tap available.
+5. An assumptions line appears above the keyboard: "assumed B2B SaaS,
+   founder-led sales. Change."
+
+### What makes it not a formatter
+Every rewrite is conditioned on the user's stored profile: their work, stack,
+audience, tone, and their saved frameworks from the Library. This is the same
+context the MCP server exposes to Claude. One memory, three delivery surfaces
+(desktop extension, mobile keyboard, MCP).
+
+### Scope, v1
+- Android IME with `//` trigger, Patkan key, undo, assumptions line.
+- Sign-in that reuses the existing web session; guest mode with the existing
+  daily quota.
+- Profile capture: three questions at onboarding that feed every rewrite.
+- Library read access from the keyboard, one tap to apply a saved framework.
+- Existing transform endpoint reused as-is; add a mobile client id for analytics.
+
+### Out of scope, v1
+iOS keyboard, voice input, per-app dialect detection beyond a simple
+foreground-package hint, offline model.
+
+### Success criteria
+- Time from `//` to swapped text under 1.2s at p75 on 4G.
+- Rewrite acceptance (not undone, message sent) above 70%.
+- Week-4 retention of installers above 25%. Below that, the mobile bet is dead
+  and the desktop extension plus MCP is the whole product.
+
+### Kill criteria, stated up front
+If acceptance is high but retention is low, users liked the trick, not the
+tool, which means Q1's pessimistic case is true and Patkan should collapse into
+a context/memory layer rather than a rewriter.
+
+---
 
 ## Technical notes
 
-- `src/lib/patkan-core.ts` and the byte-identical `extension/patkan-core.js`: add `"auto"` to `DIALECTS`,
-  add `resolveDialect({ override, hostname, intent })` and `resolveIntensity({ override, complexity, intent })`.
-  `localScaffold` takes the resolved values, so its signature is unchanged.
-- `src/routes/api/public/transform.ts`: accepts `dialect: "auto"`, resolves server-side, and returns the
-  resolved `dialect` and `intensity` in the response so the UI can label them. No quota logic changes.
-- `src/routes/index.tsx`: chips replaced by the destination selector plus the post-result control line.
-- `extension/sidepanel.js`: dialect/intensity chip rows removed from the top; the same control line renders
-  under the output. Host detection already exists and stays.
-- `extension/content.js`: unchanged behaviour, it already auto-picks by host.
-- `extension/options.js`: keeps persona, dialect and intensity defaults, with `auto` as the default option.
+- The keyboard is a native Android module, not part of this TanStack app. This
+  repo keeps serving `/api/public/transform`, `/api/public/templates`, auth,
+  the Library, and `/mcp`.
+- Add a device-scoped token exchange so the keyboard can hold a long-lived
+  credential without shipping a browser session.
+- Add a stored user profile (role, domain, defaults) read by transform on every
+  call, so all three surfaces share one context.
+- No change to the MCP server is required for mobile; the recommendation is to
+  keep it and market it as the Claude/ChatGPT integration, not as the phone story.
+
+## What I would not build
+An `@patkan` mention inside Gemini or Perplexity. There is no extension point,
+and a workaround that asks users to paste a magic string is a worse version of
+just opening the Patkan app.
