@@ -282,20 +282,42 @@ function Landing() {
 
             <div className="flex flex-col rounded-xl border bg-foreground/[0.03] p-5">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-medium uppercase tracking-widest text-muted-foreground">
-                  Compiled prompt
+                <span className="flex items-center gap-2 text-xs font-medium uppercase tracking-widest text-muted-foreground">
+                  {!settled && (
+                    <span className="size-1.5 animate-pulse rounded-full bg-primary" aria-hidden />
+                  )}
+                  {PHASE_LABEL[phase]}
                 </span>
-                <Button variant="ghost" size="sm" onClick={() => void copy()} disabled={!output}>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => void copy()}
+                  disabled={!output || !settled}
+                >
                   {copied ? <Check /> : <Copy />}
                   {copied ? "Copied" : "Copy"}
                 </Button>
               </div>
               <pre
                 ref={outRef}
-                className="mt-3 max-h-[22rem] flex-1 overflow-auto whitespace-pre-wrap break-words font-mono text-[12.5px] leading-relaxed text-foreground/90"
+                aria-busy={!settled}
+                className={`mt-3 max-h-[22rem] flex-1 overflow-auto whitespace-pre-wrap break-words font-mono text-[12.5px] leading-relaxed transition-opacity duration-300 ${
+                  settled ? "text-foreground/90 opacity-100" : "text-foreground/70 opacity-60"
+                }`}
               >
                 {output}
               </pre>
+
+              <p className="mt-3 text-xs text-muted-foreground">
+                {phase === "drafting" && "Instant draft — hold on, this gets sharpened."}
+                {phase === "sharpening" && "Rewriting in place. Copy unlocks the moment it's done."}
+                {phase === "ready" &&
+                  (engine === "hermes"
+                    ? "Ready — Hermes"
+                    : engine === "fallback"
+                      ? "Ready — fallback engine"
+                      : "Ready — offline draft")}
+              </p>
 
               {assumptions.length > 0 && (
                 <p className="mt-4 border-t pt-3 text-xs leading-relaxed text-muted-foreground">
@@ -303,6 +325,7 @@ function Landing() {
                   {assumptions.join(" · ")}
                 </p>
               )}
+
 
               {clarifiers.length > 0 && (
                 <div className="mt-3 flex flex-wrap gap-1.5">
