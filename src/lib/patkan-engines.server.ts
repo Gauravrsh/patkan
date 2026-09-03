@@ -89,7 +89,13 @@ async function openStream(attempt: Attempt, messages: EngineMessage[]): Promise<
               "Lovable-API-Key": attempt.key,
               "X-Lovable-AIG-SDK": "fetch",
             },
-      body: JSON.stringify({ model: attempt.model, stream: true, messages }),
+      body: JSON.stringify({
+        model: attempt.model,
+        stream: true,
+        messages,
+        // Short rewrites don't need chain-of-thought; it only adds latency.
+        ...(attempt.authHeader === "bearer" ? { reasoning: { enabled: false } } : {}),
+      }),
     });
     if (!res.ok || !res.body) {
       const detail = await res.text().catch(() => "");
