@@ -11,6 +11,13 @@ import {
   splitMeta,
   type Intensity,
 } from "@/lib/patkan-core";
+import {
+  hasEngine,
+  streamCompile,
+  type EngineId,
+  type EngineMessage,
+} from "@/lib/patkan-engines.server";
+
 
 const CORS_HEADERS: Record<string, string> = {
   "Access-Control-Allow-Origin": "*",
