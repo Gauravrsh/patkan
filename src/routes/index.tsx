@@ -51,6 +51,15 @@ function deviceId() {
 
 const SAMPLE = "write a prd for redesigning our checkout";
 
+type Phase = "idle" | "drafting" | "sharpening" | "ready";
+
+const PHASE_LABEL: Record<Phase, string> = {
+  idle: "Compiled prompt",
+  drafting: "Drafting…",
+  sharpening: "Hermes is sharpening this…",
+  ready: "Ready",
+};
+
 function Landing() {
   const { session } = useAuth();
   const [input, setInput] = useState(SAMPLE);
@@ -58,6 +67,8 @@ function Landing() {
   const [dialect, setDialect] = useState<Dialect>("markdown");
   const [intensity, setIntensity] = useState<Intensity>("standard");
   const [output, setOutput] = useState("");
+  const [phase, setPhase] = useState<Phase>("idle");
+  const [engine, setEngine] = useState<"hermes" | "fallback" | "local">("local");
   const [assumptions, setAssumptions] = useState<string[]>([]);
   const [clarifiers, setClarifiers] = useState<{ label: string; refinement: string }[]>([]);
   const [busy, setBusy] = useState(false);
@@ -72,6 +83,7 @@ function Landing() {
   async function transform(refinement?: string) {
     if (!input.trim() || busy) return;
     setBusy(true);
+    setPhase("drafting");
     setAssumptions([]);
     setClarifiers([]);
     setOutput(localScaffold(input, { persona, dialect, intensity }));
@@ -86,26 +98,36 @@ function Landing() {
           accessToken: session?.access_token,
           refinement: refinement ?? null,
         },
-        (visible) => setOutput(visible),
+        (visible) => {
+          setPhase("sharpening");
+          setOutput(visible);
+        },
       );
       setOutput(result.prompt);
+      setEngine(result.engine);
+      setPhase("ready");
       setAssumptions(result.assumptions);
       setClarifiers(result.clarifiers);
       if (typeof result.used === "number" && typeof result.limit === "number") {
         setUsage({ used: result.used, limit: result.limit });
       }
     } catch (err) {
+      setPhase("ready");
+      setEngine("local");
       toast.error(err instanceof Error ? err.message : "Transform failed.");
     } finally {
       setBusy(false);
     }
   }
 
+  const settled = phase === "ready" || phase === "idle";
+
   async function copy() {
     await navigator.clipboard.writeText(output);
     setCopied(true);
     setTimeout(() => setCopied(false), 1500);
   }
+
 
   function download() {
     fetch("/patkan-extension.zip")
