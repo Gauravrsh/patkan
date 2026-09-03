@@ -169,13 +169,13 @@
     pill.querySelector(".ico").innerHTML = spinning ? '<span class="spin">◠</span>' : "✦";
     let label = restingLabel;
     if (phase === "drafting") label = "Drafting…";
-    else if (phase === "sharpening") label = "Hermes is sharpening — one moment";
+    else if (phase === "sharpening") label = "Sharpening — one moment";
     else if (phase === "ready") {
       label =
-        engine === "hermes"
-          ? "Ready — Hermes"
+        engine === "primary"
+          ? "Ready"
           : engine === "fallback"
-            ? "Ready — fallback engine"
+            ? "Ready — backup engine"
             : "Ready — offline draft";
     }
     pill.querySelector(".lbl").textContent = label;
@@ -350,7 +350,7 @@
         if (el === target) {
           e.preventDefault();
           e.stopPropagation();
-          toast("Almost there — Hermes is still sharpening this prompt.");
+          toast("Almost there — Patkan is still sharpening this prompt.");
           showSendAnyway();
           return;
         }
