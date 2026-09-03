@@ -110,8 +110,7 @@ export const Route = createFileRoute("/api/public/transform")({
           );
         }
 
-        const apiKey = process.env["LOVABLE_API_KEY"];
-        if (!apiKey) return json({ error: "AI is not configured." }, 500);
+        if (!hasEngine()) return json({ error: "AI is not configured." }, 500);
 
         const persona = getPersona(payload.persona);
         const dialect = getDialect(payload.dialect).id;
@@ -119,47 +118,19 @@ export const Route = createFileRoute("/api/public/transform")({
         const { intent, complexity } = classifyLocal(text);
         const wantsStream = payload.stream !== false;
 
-        const body = {
-          model: "google/gemini-3.7-flash",
-          stream: wantsStream,
-          messages: [
-            { role: "system", content: buildMetaSystemPrompt(dialect) },
-            {
-              role: "user",
-              content: buildMetaUserMessage(text, persona, {
-                intensity,
-                intent,
-                complexity,
-                customInstruction: payload.customInstruction,
-                refinement: payload.refinement,
-              }),
-            },
-          ],
-        };
-
-        let res: Response;
-        try {
-          res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-            method: "POST",
-            headers: { "content-type": "application/json", Authorization: `Bearer ${apiKey}` },
-            body: JSON.stringify(body),
-          });
-        } catch (err) {
-          console.error("patkan transform: gateway fetch failed", err);
-          return json({ error: "Could not reach the AI service. Try again." }, 502);
-        }
-
-        if (!res.ok || !res.body) {
-          const detail = await res.text().catch(() => "");
-          console.error("patkan transform: gateway error", res.status, detail);
-          if (res.status === 429) {
-            return json({ error: "The AI service is rate limited right now. Try again in a moment." }, 429);
-          }
-          if (res.status === 402) {
-            return json({ error: "Patkan's AI credits are exhausted. The owner needs to top up." }, 402);
-          }
-          return json({ error: "The AI service failed to respond." }, 502);
-        }
+        const messages: EngineMessage[] = [
+          { role: "system", content: buildMetaSystemPrompt(dialect) },
+          {
+            role: "user",
+            content: buildMetaUserMessage(text, persona, {
+              intensity,
+              intent,
+              complexity,
+              customInstruction: payload.customInstruction,
+              refinement: payload.refinement,
+            }),
+          },
+        ];
 
         const nextCount = used + 1;
         const bumpUsage = async () => {
@@ -174,9 +145,13 @@ export const Route = createFileRoute("/api/public/transform")({
         };
 
         if (!wantsStream) {
-          const data = (await res.json()) as { choices?: Array<{ message?: { content?: string } }> };
-          const raw = data.choices?.[0]?.message?.content ?? "";
-          const parsed = splitMeta(raw);
+          let full = "";
+          let engine: EngineId = "local";
+          for await (const chunk of streamCompile(messages)) {
+            engine = chunk.engine;
+            full += chunk.delta;
+          }
+          const parsed = splitMeta(full);
           if (!parsed.prompt) return json({ error: "The AI returned an empty prompt. Try again." }, 502);
           await bumpUsage();
           return json({
@@ -184,6 +159,7 @@ export const Route = createFileRoute("/api/public/transform")({
             dialect,
             intent,
             intensity,
+            engine,
             persona: persona.id,
             used: nextCount,
             limit: DAILY_FREE_LIMIT,
@@ -192,8 +168,6 @@ export const Route = createFileRoute("/api/public/transform")({
         }
 
         const encoder = new TextEncoder();
-        const decoder = new TextDecoder();
-        const upstream = res.body.getReader();
 
         const stream = new ReadableStream<Uint8Array>({
           async start(controller) {
@@ -201,33 +175,16 @@ export const Route = createFileRoute("/api/public/transform")({
               controller.enqueue(encoder.encode(`data: ${JSON.stringify(event)}\n\n`));
             send({ type: "meta", dialect, intent, intensity, persona: persona.id });
 
-            let buffer = "";
             let full = "";
+            let engine: EngineId = "local";
             try {
-              for (;;) {
-                const { done, value } = await upstream.read();
-                if (done) break;
-                buffer += decoder.decode(value, { stream: true });
-                const lines = buffer.split("\n");
-                buffer = lines.pop() ?? "";
-                for (const line of lines) {
-                  const trimmed = line.trim();
-                  if (!trimmed.startsWith("data:")) continue;
-                  const chunk = trimmed.slice(5).trim();
-                  if (!chunk || chunk === "[DONE]") continue;
-                  try {
-                    const parsedChunk = JSON.parse(chunk) as {
-                      choices?: Array<{ delta?: { content?: string } }>;
-                    };
-                    const delta = parsedChunk.choices?.[0]?.delta?.content;
-                    if (delta) {
-                      full += delta;
-                      send({ type: "delta", delta });
-                    }
-                  } catch {
-                    /* ignore malformed chunk */
-                  }
+              for await (const chunk of streamCompile(messages)) {
+                if (chunk.engine !== engine) {
+                  engine = chunk.engine;
+                  send({ type: "engine", engine });
                 }
+                full += chunk.delta;
+                send({ type: "delta", delta: chunk.delta });
               }
 
               const parsed = splitMeta(full);
@@ -238,6 +195,7 @@ export const Route = createFileRoute("/api/public/transform")({
                 send({
                   type: "done",
                   ...parsed,
+                  engine,
                   used: nextCount,
                   limit: DAILY_FREE_LIMIT,
                   signedIn: Boolean(userId),
@@ -264,3 +222,4 @@ export const Route = createFileRoute("/api/public/transform")({
     },
   },
 });
+
