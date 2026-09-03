@@ -56,7 +56,7 @@ type Phase = "idle" | "drafting" | "sharpening" | "ready";
 const PHASE_LABEL: Record<Phase, string> = {
   idle: "Compiled prompt",
   drafting: "Drafting…",
-  sharpening: "Hermes is sharpening this…",
+  sharpening: "Sharpening this…",
   ready: "Ready",
 };
 
@@ -68,7 +68,7 @@ function Landing() {
   const [intensity, setIntensity] = useState<Intensity>("standard");
   const [output, setOutput] = useState("");
   const [phase, setPhase] = useState<Phase>("idle");
-  const [engine, setEngine] = useState<"hermes" | "fallback" | "local">("local");
+  const [engine, setEngine] = useState<"primary" | "fallback" | "local">("local");
   const [assumptions, setAssumptions] = useState<string[]>([]);
   const [clarifiers, setClarifiers] = useState<{ label: string; refinement: string }[]>([]);
   const [busy, setBusy] = useState(false);
@@ -276,7 +276,7 @@ function Landing() {
 
               <Button onClick={() => void transform()} disabled={busy} className="mt-4 w-full">
                 {busy ? <Loader2 className="animate-spin" /> : <Sparkles />}
-                {busy ? "Hermes is sharpening…" : "Patkan it"}
+                {busy ? "Sharpening…" : "Patkan it"}
               </Button>
 
             </div>
@@ -313,10 +313,10 @@ function Landing() {
                 {phase === "drafting" && "Instant draft — hold on, this gets sharpened."}
                 {phase === "sharpening" && "Rewriting in place. Copy unlocks the moment it's done."}
                 {phase === "ready" &&
-                  (engine === "hermes"
-                    ? "Ready — Hermes"
+                  (engine === "primary"
+                    ? "Ready"
                     : engine === "fallback"
-                      ? "Ready — fallback engine"
+                      ? "Ready — backup engine"
                       : "Ready — offline draft")}
               </p>
 
