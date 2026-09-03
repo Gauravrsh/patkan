@@ -265,7 +265,7 @@
     }
 
     const wrote = writeText(target, res.prompt);
-    setPhase("ready", res.engine || "hermes");
+    setPhase("ready", res.engine || "primary");
     if (!wrote) {
       try {
         await navigator.clipboard.writeText(res.prompt);
