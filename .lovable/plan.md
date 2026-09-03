@@ -1,62 +1,88 @@
-# Patkan — Auto-first controls
+# PRD — Hermes as Patkan's prompt engine
 
-Fixes the two inconsistencies: dialect is advertised as auto but shown as a manual picker on the web,
-and intensity is a three-way choice the user has no basis to make.
+## 1. Why
 
-## Principle
+Patkan's single job is turning lazy text into an expert prompt. That job currently runs on a general-purpose
+model with a hand-written meta-prompt. Moving it to **Hermes (Nous Research)** makes the engine an explicit,
+named, swappable component instead of an implementation detail — and Hermes' steerability on
+instruction-following/meta-prompting is a better fit for prompt compilation than a generic chat model.
 
-Every engine decision is made automatically and shown as a **result**, not a question. Overrides exist,
-but they live behind the result, not in front of it.
+Scope: **web demo + browser extension**. The MCP `transform_prompt` tool stays on the current path this round.
 
-## 1. Dialect — auto everywhere, override behind the result
+## 2. Product principle
 
-- Add `"auto"` as a real dialect value and make it the default on all three surfaces
-  (web demo, side panel, content script).
-- Resolution order: explicit user override → host detection (`dialectForHost`) → intent/persona default → Markdown.
-- Web demo has no host, so it gets a **destination** selector instead of a format selector:
-  "Where will you paste this? ChatGPT / Claude / Gemini / Somewhere else". That maps to a dialect internally.
-  Users think in destinations, not in XML-vs-Markdown.
-- The chips move out of the input area. Under the generated prompt, one line:
-  `Markdown format — matched to ChatGPT. Change`. `Change` reveals the three chips inline.
+The user never waits at a blank screen, and never wonders whether it's done. Every second of the transform is
+narrated. Quality is not traded for speed — the two are separated in time.
 
-## 2. Intensity — derived, with a single escape hatch
+## 3. The three-beat experience
 
-- Remove the Light/Standard/Surgical chip row from the primary flow.
-- Intensity is derived from the classifier: `trivial → light`, `standard → standard`,
-  `deep` or an explicit reusable/spec signal → `surgical`.
-- Replace the dial with **one** action under the result: `Go deeper` (bumps one level and re-compiles) and,
-  once bumped, `Simplify` to step back down. Two states the user can feel, instead of three labels they must
-  interpret in advance.
-- Power users keep the explicit default in extension Settings (`options.html`) — unchanged there.
-
-## 3. Confidence line absorbs both
-
-The existing `Assumed:` line becomes the single place all auto decisions surface:
+This is the core of the spec. One transform, three visible beats, no ambiguity at any point.
 
 ```text
-Markdown for ChatGPT · standard depth · assumed B2B SaaS audience    [Change] [Go deeper]
+beat 1  (0 ms)      Draft appears instantly, dimmed, tagged "Drafting…"
+beat 2  (~200 ms)   Label flips to "Hermes is sharpening this…"; text rewrites live over the draft
+beat 3  (on finish) Text goes solid, label becomes "Ready — Hermes"; Send/Copy unlocks
 ```
 
-One line, legible, actionable. This is what makes the automation feel deliberate rather than opaque.
+Rules that remove the confusion the user named:
 
-## Tradeoffs accepted
+- **One prompt, never two.** Hermes rewrites *in place* over the draft. The user never sees a second block
+  appear underneath. What was dim becomes sharp.
+- **The draft is visibly provisional.** Dimmed text, a subtle shimmer on the edited region, and an explicit
+  `Drafting…` label. Nothing about it reads as finished.
+- **Send is locked while sharpening.** In the extension, the host composer's own Send is out of our control,
+  so we guard it: while Hermes is running, the Patkan pill reads `Hermes is sharpening — one moment` and we
+  intercept `Enter` on the composer, showing `Almost there…` instead of submitting. First `Enter` after
+  completion sends normally. An explicit `Send anyway` escape exists on the pill for anyone who won't wait.
+- **Completion is loud enough to feel, quiet enough not to annoy.** Text settles from dim to solid, a single
+  1-second `Ready` state on the pill, then it fades to the resting label.
 
-- Auto dialect will occasionally be wrong when someone drafts in the web app and pastes into a model we
-  didn't detect. The destination selector plus the visible `Change` affordance covers this.
-- Removing the intensity dial costs power users one click when they always want Surgical. The Settings
-  default plus `Go deeper` covers it, and the median user gains a decision they never had to make.
-- `Go deeper` re-compiles, so it costs a second transform against the 10/day quota. Acceptable: it is an
-  explicit user action, and the quota already covers clarify-chip refinements the same way.
+Failure beat: if Hermes fails, the draft simply goes solid with `Ready — offline draft`. The user is never
+blocked, never shown a raw error mid-typing.
 
-## Technical notes
+## 4. Engine behaviour
 
-- `src/lib/patkan-core.ts` and the byte-identical `extension/patkan-core.js`: add `"auto"` to `DIALECTS`,
-  add `resolveDialect({ override, hostname, intent })` and `resolveIntensity({ override, complexity, intent })`.
-  `localScaffold` takes the resolved values, so its signature is unchanged.
-- `src/routes/api/public/transform.ts`: accepts `dialect: "auto"`, resolves server-side, and returns the
-  resolved `dialect` and `intensity` in the response so the UI can label them. No quota logic changes.
-- `src/routes/index.tsx`: chips replaced by the destination selector plus the post-result control line.
-- `extension/sidepanel.js`: dialect/intensity chip rows removed from the top; the same control line renders
-  under the output. Host detection already exists and stays.
-- `extension/content.js`: unchanged behaviour, it already auto-picks by host.
-- `extension/options.js`: keeps persona, dialect and intensity defaults, with `auto` as the default option.
+| Layer | Role |
+| --- | --- |
+| Local scaffold (on-device) | Instant beat-1 draft. No network, no cost, no quota. |
+| Hermes (Nous Research) | The real transform. Streams token-by-token over the draft. |
+| Current Gemini path | Silent fallback if Hermes errors, times out, or is rate limited. |
+| Local scaffold (again) | Final fallback. The user always ends with a usable prompt. |
+
+Fallbacks are silent to the user in the flow. The engine that produced the result is named in the small
+confidence line under the prompt (`Ready — Hermes` / `Ready — fallback engine`), so it is honest without
+being alarming.
+
+Quota, personas, dialects, intensity and clarifier chips are unchanged. Hermes swaps in behind the same
+contract.
+
+## 5. Success criteria
+
+- Time to first visible text: under 100 ms, always (it's local).
+- No state in the flow where the screen is blank or the user can't tell what's happening.
+- Zero accidental sends of a half-sharpened prompt.
+- Hermes failure is invisible to task completion — the user still gets a prompt every time.
+
+## 6. Non-goals this round
+
+- MCP tool migration.
+- Letting users pick a model. The engine is Patkan's opinion, not a setting.
+- Changing the `//` trigger, quota, Library, or auth.
+
+## 7. Technical notes
+
+- **Access**: Nous Research API (OpenAI-compatible chat completions). Needs a `NOUS_API_KEY` secret — I'll
+  request it via the secure secret form before wiring the call. The Hermes model id gets confirmed against
+  the live Nous model list at build time rather than assumed.
+- `src/lib/patkan-engines.server.ts` (new): `runHermes()` and `runGemini()` behind one
+  `streamTransform()` signature returning an SSE-shaped async iterator. Ordered fallback lives here.
+- `src/routes/api/public/transform.ts`: calls `streamTransform()` instead of fetching the gateway directly.
+  Adds `engine: "hermes" | "gemini" | "local"` to the `meta` and `done` SSE events. Quota logic untouched.
+  Streaming stays on; no client-side abort timers (an aborted call still bills).
+- `src/routes/index.tsx`: draft rendered dimmed with a `Drafting…` badge; Hermes deltas replace it in place;
+  Copy/Export disabled until `done`; status line reads from the new `engine` field.
+- `extension/content.js`: reuse the existing shadow-DOM pill for the three labels; add an `Enter` capture
+  guard during the sharpening window plus a `Send anyway` action.
+- `extension/sidepanel.js`: same three beats in the panel output area.
+- `extension/background.js`: non-streaming path returns the resolved `engine` so the panel can label it.
+- No changes to `src/lib/patkan-core.ts` prompt contracts, `patkan-core.js`, MCP tools, or the schema.
