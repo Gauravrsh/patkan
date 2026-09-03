@@ -11,8 +11,11 @@ export interface TransformRequest {
   customInstruction?: string | null | undefined;
 }
 
+export type EngineId = "hermes" | "fallback" | "local";
+
 export interface TransformResult {
   prompt: string;
+  engine: EngineId;
   assumptions: string[];
   clarifiers: { label: string; refinement: string }[];
   used?: number | undefined;
@@ -26,6 +29,7 @@ export interface TransformResult {
 export async function streamTransform(
   req: TransformRequest,
   onText: (visible: string) => void,
+  onEngine?: (engine: EngineId) => void,
 ): Promise<TransformResult> {
   const res = await fetch("/api/public/transform", {
     method: "POST",
@@ -74,9 +78,12 @@ export async function streamTransform(
       if (event["type"] === "delta" && typeof event["delta"] === "string") {
         raw += event["delta"];
         onText(visiblePrompt(raw));
+      } else if (event["type"] === "engine") {
+        onEngine?.(event["engine"] as EngineId);
       } else if (event["type"] === "done") {
         result = {
           prompt: String(event["prompt"] ?? ""),
+          engine: (event["engine"] as EngineId) ?? "local",
           assumptions: Array.isArray(event["assumptions"]) ? (event["assumptions"] as string[]) : [],
           clarifiers: Array.isArray(event["clarifiers"])
             ? (event["clarifiers"] as { label: string; refinement: string }[])
