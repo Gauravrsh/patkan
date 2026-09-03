@@ -33,6 +33,8 @@
   let target = null;
   let lastOriginal = null;
   let busy = false;
+  let sendAnyway = false;
+  let restingLabel = "Type // to Patkan";
 
   /* ---------- text read / write ---------- */
 
@@ -159,12 +161,31 @@
     if (show) place(target);
   }
 
-  function setBusy(on) {
-    busy = on;
+  /* Beat labels. The user must never wonder whether Patkan is done. */
+  function setPhase(phase, engine) {
     ensureUI();
-    pill.querySelector(".ico").innerHTML = on ? '<span class="spin">◠</span>' : "✦";
-    pill.querySelector(".lbl").textContent = on ? "Patkan…" : "Type // to Patkan";
-    if (target) target.style.opacity = on ? "0.55" : "";
+    busy = phase === "drafting" || phase === "sharpening";
+    const spinning = busy;
+    pill.querySelector(".ico").innerHTML = spinning ? '<span class="spin">◠</span>' : "✦";
+    let label = restingLabel;
+    if (phase === "drafting") label = "Drafting…";
+    else if (phase === "sharpening") label = "Hermes is sharpening — one moment";
+    else if (phase === "ready") {
+      label =
+        engine === "hermes"
+          ? "Ready — Hermes"
+          : engine === "fallback"
+            ? "Ready — fallback engine"
+            : "Ready — offline draft";
+    }
+    pill.querySelector(".lbl").textContent = label;
+    pill.classList.toggle("show", busy || phase === "ready" || pill.classList.contains("show"));
+    if (target) target.style.opacity = busy ? "0.55" : "";
+    if (phase === "ready") {
+      setTimeout(() => {
+        if (!busy) pill.querySelector(".lbl").textContent = restingLabel;
+      }, 1000);
+    }
   }
 
   function toast(text) {
@@ -175,6 +196,23 @@
     el.textContent = text;
     shadow.appendChild(el);
     setTimeout(() => el.remove(), 3200);
+  }
+
+  function showSendAnyway() {
+    ensureUI();
+    if (shadow.querySelector(".sendAnyway")) return;
+    const el = document.createElement("div");
+    el.className = "pill show sendAnyway";
+    el.style.cssText += "left:50%;transform:translateX(-50%);top:64px;";
+    el.textContent = "Send anyway";
+    el.addEventListener("mousedown", (ev) => {
+      ev.preventDefault();
+      sendAnyway = true;
+      el.remove();
+      toast("Sending your draft as-is.");
+    });
+    shadow.appendChild(el);
+    setTimeout(() => el.remove(), 6000);
   }
 
   /* ---------- core action ---------- */
@@ -193,7 +231,8 @@
     if (raw.length < 3) return;
 
     lastOriginal = readText(target);
-    setBusy(true);
+    sendAnyway = false;
+    setPhase("drafting");
     showChip(false);
 
     const settings = await chrome.runtime.sendMessage({ type: "PATKAN_GET_SETTINGS" });
@@ -205,6 +244,7 @@
       payload: { text: raw, persona: settings?.persona, dialect: host.dialect, intensity: settings?.intensity },
     });
     if (scaffold?.text) writeText(target, scaffold.text);
+    setPhase("sharpening");
 
     const res = await chrome.runtime.sendMessage({
       type: "PATKAN_TRANSFORM",
@@ -216,9 +256,8 @@
       },
     });
 
-    setBusy(false);
-
     if (!res || !res.ok) {
+      setPhase("ready", "local");
       if (lastOriginal != null) writeText(target, lastOriginal);
       const msg = res?.error || "Patkan failed.";
       toast(res?.requiresSignIn ? msg + " Open the Patkan panel to sign in." : msg);
@@ -226,6 +265,7 @@
     }
 
     const wrote = writeText(target, res.prompt);
+    setPhase("ready", res.engine || "hermes");
     if (!wrote) {
       try {
         await navigator.clipboard.writeText(res.prompt);
@@ -305,6 +345,16 @@
   document.addEventListener(
     "keydown",
     (e) => {
+      if (busy && e.key === "Enter" && !e.shiftKey && !sendAnyway) {
+        const el = findComposer(e.target);
+        if (el === target) {
+          e.preventDefault();
+          e.stopPropagation();
+          toast("Almost there — Hermes is still sharpening this prompt.");
+          showSendAnyway();
+          return;
+        }
+      }
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "z" && lastOriginal != null) {
         const el = findComposer(document.activeElement);
         if (el === target) {

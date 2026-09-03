@@ -51,6 +51,15 @@ function deviceId() {
 
 const SAMPLE = "write a prd for redesigning our checkout";
 
+type Phase = "idle" | "drafting" | "sharpening" | "ready";
+
+const PHASE_LABEL: Record<Phase, string> = {
+  idle: "Compiled prompt",
+  drafting: "Drafting…",
+  sharpening: "Hermes is sharpening this…",
+  ready: "Ready",
+};
+
 function Landing() {
   const { session } = useAuth();
   const [input, setInput] = useState(SAMPLE);
@@ -58,6 +67,8 @@ function Landing() {
   const [dialect, setDialect] = useState<Dialect>("markdown");
   const [intensity, setIntensity] = useState<Intensity>("standard");
   const [output, setOutput] = useState("");
+  const [phase, setPhase] = useState<Phase>("idle");
+  const [engine, setEngine] = useState<"hermes" | "fallback" | "local">("local");
   const [assumptions, setAssumptions] = useState<string[]>([]);
   const [clarifiers, setClarifiers] = useState<{ label: string; refinement: string }[]>([]);
   const [busy, setBusy] = useState(false);
@@ -72,6 +83,7 @@ function Landing() {
   async function transform(refinement?: string) {
     if (!input.trim() || busy) return;
     setBusy(true);
+    setPhase("drafting");
     setAssumptions([]);
     setClarifiers([]);
     setOutput(localScaffold(input, { persona, dialect, intensity }));
@@ -86,26 +98,36 @@ function Landing() {
           accessToken: session?.access_token,
           refinement: refinement ?? null,
         },
-        (visible) => setOutput(visible),
+        (visible) => {
+          setPhase("sharpening");
+          setOutput(visible);
+        },
       );
       setOutput(result.prompt);
+      setEngine(result.engine);
+      setPhase("ready");
       setAssumptions(result.assumptions);
       setClarifiers(result.clarifiers);
       if (typeof result.used === "number" && typeof result.limit === "number") {
         setUsage({ used: result.used, limit: result.limit });
       }
     } catch (err) {
+      setPhase("ready");
+      setEngine("local");
       toast.error(err instanceof Error ? err.message : "Transform failed.");
     } finally {
       setBusy(false);
     }
   }
 
+  const settled = phase === "ready" || phase === "idle";
+
   async function copy() {
     await navigator.clipboard.writeText(output);
     setCopied(true);
     setTimeout(() => setCopied(false), 1500);
   }
+
 
   function download() {
     fetch("/patkan-extension.zip")
@@ -254,26 +276,49 @@ function Landing() {
 
               <Button onClick={() => void transform()} disabled={busy} className="mt-4 w-full">
                 {busy ? <Loader2 className="animate-spin" /> : <Sparkles />}
-                {busy ? "Compiling…" : "Patkan it"}
+                {busy ? "Hermes is sharpening…" : "Patkan it"}
               </Button>
+
             </div>
 
             <div className="flex flex-col rounded-xl border bg-foreground/[0.03] p-5">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-medium uppercase tracking-widest text-muted-foreground">
-                  Compiled prompt
+                <span className="flex items-center gap-2 text-xs font-medium uppercase tracking-widest text-muted-foreground">
+                  {!settled && (
+                    <span className="size-1.5 animate-pulse rounded-full bg-primary" aria-hidden />
+                  )}
+                  {PHASE_LABEL[phase]}
                 </span>
-                <Button variant="ghost" size="sm" onClick={() => void copy()} disabled={!output}>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => void copy()}
+                  disabled={!output || !settled}
+                >
                   {copied ? <Check /> : <Copy />}
                   {copied ? "Copied" : "Copy"}
                 </Button>
               </div>
               <pre
                 ref={outRef}
-                className="mt-3 max-h-[22rem] flex-1 overflow-auto whitespace-pre-wrap break-words font-mono text-[12.5px] leading-relaxed text-foreground/90"
+                aria-busy={!settled}
+                className={`mt-3 max-h-[22rem] flex-1 overflow-auto whitespace-pre-wrap break-words font-mono text-[12.5px] leading-relaxed transition-opacity duration-300 ${
+                  settled ? "text-foreground/90 opacity-100" : "text-foreground/70 opacity-60"
+                }`}
               >
                 {output}
               </pre>
+
+              <p className="mt-3 text-xs text-muted-foreground">
+                {phase === "drafting" && "Instant draft — hold on, this gets sharpened."}
+                {phase === "sharpening" && "Rewriting in place. Copy unlocks the moment it's done."}
+                {phase === "ready" &&
+                  (engine === "hermes"
+                    ? "Ready — Hermes"
+                    : engine === "fallback"
+                      ? "Ready — fallback engine"
+                      : "Ready — offline draft")}
+              </p>
 
               {assumptions.length > 0 && (
                 <p className="mt-4 border-t pt-3 text-xs leading-relaxed text-muted-foreground">
@@ -281,6 +326,7 @@ function Landing() {
                   {assumptions.join(" · ")}
                 </p>
               )}
+
 
               {clarifiers.length > 0 && (
                 <div className="mt-3 flex flex-wrap gap-1.5">

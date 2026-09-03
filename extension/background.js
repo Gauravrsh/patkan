@@ -81,6 +81,7 @@ async function transform({ text, persona, dialect, intensity, customInstruction,
   return {
     ok: true,
     prompt: data.prompt,
+    engine: data.engine || "local",
     assumptions: data.assumptions || [],
     clarifiers: data.clarifiers || [],
     used: data.used,
