@@ -1,15 +1,16 @@
 /**
  * Patkan's transform engines, in fallback order.
  *
- * 1. Hermes (Nous Research inference API) — the primary prompt compiler.
- * 2. Lovable AI gateway — silent fallback when Hermes errors or is rate limited.
+ * 1. Primary (Nous Research inference API, qwen3.7-flash) — the prompt compiler.
+ * 2. Quality fallback (Nous, glm-4.7-flash) — if the primary errors.
+ * 3. Lovable AI gateway — silent fallback when Nous is down or rate limited.
  *
- * Both endpoints are OpenAI-compatible, so one SSE reader serves both. The
- * caller receives deltas plus the name of the engine that actually produced
+ * All endpoints are OpenAI-compatible, so one SSE reader serves them. The
+ * caller receives deltas plus the id of the engine that actually produced
  * them, so the UI can label the result honestly.
  */
 
-export type EngineId = "hermes" | "fallback" | "local";
+export type EngineId = "primary" | "fallback" | "local";
 
 export interface EngineMessage {
   role: "system" | "user";
@@ -25,11 +26,12 @@ const NOUS_URL = "https://inference-api.nousresearch.com/v1/chat/completions";
 const GATEWAY_URL = "https://ai.gateway.lovable.dev/v1/chat/completions";
 
 /**
- * The Nous catalogue rotates model ids. `HERMES_MODEL` lets the engine be
- * repointed without a deploy; the constant is the current default.
+ * Model catalogues rotate ids. The env vars let the engines be repointed
+ * without a deploy; the constants are the current defaults.
  */
-const DEFAULT_HERMES_MODEL = "z-ai/glm-5.3";
-const FALLBACK_MODEL = "google/gemini-3.7-flash";
+const DEFAULT_PRIMARY_MODEL = "qwen/qwen3.7-flash";
+const DEFAULT_SECONDARY_MODEL = "z-ai/glm-4.7-flash";
+const GATEWAY_MODEL = "google/gemini-3.7-flash";
 
 interface Attempt {
   engine: EngineId;
@@ -44,10 +46,17 @@ function attempts(): Attempt[] {
   const nousKey = process.env["NOUS_API_KEY"];
   if (nousKey) {
     list.push({
-      engine: "hermes",
+      engine: "primary",
       url: NOUS_URL,
       key: nousKey,
-      model: process.env["HERMES_MODEL"] || DEFAULT_HERMES_MODEL,
+      model: process.env["PATKAN_ENGINE_MODEL"] || DEFAULT_PRIMARY_MODEL,
+      authHeader: "bearer",
+    });
+    list.push({
+      engine: "fallback",
+      url: NOUS_URL,
+      key: nousKey,
+      model: process.env["PATKAN_ENGINE_SECONDARY_MODEL"] || DEFAULT_SECONDARY_MODEL,
       authHeader: "bearer",
     });
   }
@@ -57,7 +66,7 @@ function attempts(): Attempt[] {
       engine: "fallback",
       url: GATEWAY_URL,
       key: lovableKey,
-      model: FALLBACK_MODEL,
+      model: GATEWAY_MODEL,
       authHeader: "lovable",
     });
   }
@@ -80,16 +89,22 @@ async function openStream(attempt: Attempt, messages: EngineMessage[]): Promise<
               "Lovable-API-Key": attempt.key,
               "X-Lovable-AIG-SDK": "fetch",
             },
-      body: JSON.stringify({ model: attempt.model, stream: true, messages }),
+      body: JSON.stringify({
+        model: attempt.model,
+        stream: true,
+        messages,
+        // Short rewrites don't need chain-of-thought; it only adds latency.
+        ...(attempt.authHeader === "bearer" ? { reasoning: { enabled: false } } : {}),
+      }),
     });
     if (!res.ok || !res.body) {
       const detail = await res.text().catch(() => "");
-      console.error(`patkan engine ${attempt.engine} failed`, res.status, detail.slice(0, 400));
+      console.error(`patkan engine ${attempt.engine} (${attempt.model}) failed`, res.status, detail.slice(0, 400));
       return null;
     }
     return res;
   } catch (err) {
-    console.error(`patkan engine ${attempt.engine} unreachable`, err);
+    console.error(`patkan engine ${attempt.engine} (${attempt.model}) unreachable`, err);
     return null;
   }
 }
@@ -136,7 +151,7 @@ export async function* streamCompile(messages: EngineMessage[]): AsyncGenerator<
         }
       }
     } catch (err) {
-      console.error(`patkan engine ${attempt.engine} stream broke`, err);
+      console.error(`patkan engine ${attempt.engine} (${attempt.model}) stream broke`, err);
     }
 
     // Only fall through to the next engine when this one produced nothing at

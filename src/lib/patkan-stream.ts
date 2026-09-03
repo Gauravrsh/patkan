@@ -11,7 +11,7 @@ export interface TransformRequest {
   customInstruction?: string | null | undefined;
 }
 
-export type EngineId = "hermes" | "fallback" | "local";
+export type EngineId = "primary" | "fallback" | "local";
 
 export interface TransformResult {
   prompt: string;

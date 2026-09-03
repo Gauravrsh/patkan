@@ -93,7 +93,7 @@ $("go").addEventListener("click", async () => {
   const text = $("input").value.trim();
   if (text.length < 3) return;
   $("go").disabled = true;
-  $("go").textContent = "Hermes is sharpening…";
+  $("go").textContent = "Sharpening…";
   $("assumed").textContent = "";
   $("clarifiers").innerHTML = "";
   $("copy").disabled = true;
@@ -101,7 +101,7 @@ $("go").addEventListener("click", async () => {
   // Beat 1: instant local draft, visibly provisional.
   $("out").textContent = localScaffold(text, { persona, dialect, intensity });
   $("out").style.opacity = "0.6";
-  $("note").textContent = "Drafting… Hermes is sharpening this, hold on.";
+  $("note").textContent = "Drafting… sharpening this, hold on.";
   const res = await chrome.runtime.sendMessage({
     type: "PATKAN_TRANSFORM",
     payload: { text, persona, dialect, intensity, customInstruction: $("template").value || null },
@@ -118,10 +118,10 @@ $("go").addEventListener("click", async () => {
   output = res.prompt;
   $("out").textContent = output;
   $("note").textContent =
-    res.engine === "hermes"
-      ? "Ready — Hermes"
+    res.engine === "primary"
+      ? "Ready"
       : res.engine === "fallback"
-        ? "Ready — fallback engine"
+        ? "Ready — backup engine"
         : "Ready — offline draft";
   $("copy").disabled = false;
   $("insert").disabled = false;
