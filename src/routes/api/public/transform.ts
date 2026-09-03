@@ -116,6 +116,78 @@ export const Route = createFileRoute("/api/public/transform")({
         const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
         const day = today();
 
+        const persona = getPersona(payload.persona);
+        const dialect = getDialect(payload.dialect).id;
+        const intensity: Intensity = payload.intensity ?? "standard";
+        const { intent, complexity } = classifyLocal(text);
+        const wantsStream = payload.stream !== false;
+
+        // Exact-match cache: identical inputs replay instantly, free of quota.
+        const hash = await cacheKey({
+          text,
+          persona: persona.id,
+          dialect,
+          intensity,
+          customInstruction: payload.customInstruction,
+          refinement: payload.refinement,
+        });
+        const { data: cached } = await supabaseAdmin
+          .from("prompt_cache")
+          .select("id, output_text, engine, hit_count")
+          .eq("input_hash", hash)
+          .maybeSingle();
+
+        if (cached) {
+          void supabaseAdmin
+            .from("prompt_cache")
+            .update({ hit_count: cached.hit_count + 1, last_hit_at: new Date().toISOString() })
+            .eq("id", cached.id);
+          const parsed = splitMeta(cached.output_text);
+          if (parsed.prompt) {
+            if (!wantsStream) {
+              return json({
+                ...parsed,
+                dialect,
+                intent,
+                intensity,
+                engine: cached.engine,
+                cached: true,
+                persona: persona.id,
+                used: 0,
+                limit: DAILY_FREE_LIMIT,
+                signedIn: Boolean(userId),
+              });
+            }
+            const encoder = new TextEncoder();
+            const replay = new ReadableStream<Uint8Array>({
+              start(controller) {
+                const send = (event: unknown) =>
+                  controller.enqueue(encoder.encode(`data: ${JSON.stringify(event)}\n\n`));
+                send({ type: "meta", dialect, intent, intensity, persona: persona.id });
+                send({ type: "engine", engine: cached.engine });
+                send({ type: "delta", delta: cached.output_text });
+                send({
+                  type: "done",
+                  ...parsed,
+                  engine: cached.engine,
+                  used: 0,
+                  limit: DAILY_FREE_LIMIT,
+                  signedIn: Boolean(userId),
+                });
+                controller.close();
+              },
+            });
+            return new Response(replay, {
+              headers: {
+                "content-type": "text/event-stream",
+                "cache-control": "no-store",
+                connection: "keep-alive",
+                ...CORS_HEADERS,
+              },
+            });
+          }
+        }
+
         const { data: existing } = await supabaseAdmin
           .from("usage_counters")
           .select("id, count")
@@ -140,12 +212,6 @@ export const Route = createFileRoute("/api/public/transform")({
         }
 
         if (!hasEngine()) return json({ error: "AI is not configured." }, 500);
-
-        const persona = getPersona(payload.persona);
-        const dialect = getDialect(payload.dialect).id;
-        const intensity: Intensity = payload.intensity ?? "standard";
-        const { intent, complexity } = classifyLocal(text);
-        const wantsStream = payload.stream !== false;
 
         const messages: EngineMessage[] = [
           { role: "system", content: buildMetaSystemPrompt(dialect) },
