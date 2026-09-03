@@ -44,6 +44,39 @@ export type Database = {
         }
         Relationships: []
       }
+      prompt_cache: {
+        Row: {
+          created_at: string
+          engine: string
+          hit_count: number
+          id: string
+          input_hash: string
+          input_text: string
+          last_hit_at: string | null
+          output_text: string
+        }
+        Insert: {
+          created_at?: string
+          engine?: string
+          hit_count?: number
+          id?: string
+          input_hash: string
+          input_text: string
+          last_hit_at?: string | null
+          output_text: string
+        }
+        Update: {
+          created_at?: string
+          engine?: string
+          hit_count?: number
+          id?: string
+          input_hash?: string
+          input_text?: string
+          last_hit_at?: string | null
+          output_text?: string
+        }
+        Relationships: []
+      }
       prompt_templates: {
         Row: {
           created_at: string
