@@ -291,6 +291,10 @@ export const Route = createFileRoute("/api/public/transform")({
                 send({ type: "error", error: "The AI returned an empty prompt. Try again." });
               } else {
                 await bumpUsage();
+                await supabaseAdmin.from("prompt_cache").upsert(
+                  { input_hash: hash, input_text: text, output_text: full, engine },
+                  { onConflict: "input_hash" },
+                );
                 send({
                   type: "done",
                   ...parsed,
