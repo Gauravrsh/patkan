@@ -249,6 +249,10 @@ export const Route = createFileRoute("/api/public/transform")({
           const parsed = splitMeta(full);
           if (!parsed.prompt) return json({ error: "The AI returned an empty prompt. Try again." }, 502);
           await bumpUsage();
+          await supabaseAdmin.from("prompt_cache").upsert(
+            { input_hash: hash, input_text: text, output_text: full, engine },
+            { onConflict: "input_hash" },
+          );
           return json({
             ...parsed,
             dialect,
