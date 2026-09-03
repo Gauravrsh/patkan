@@ -28,7 +28,7 @@ const GATEWAY_URL = "https://ai.gateway.lovable.dev/v1/chat/completions";
  * The Nous catalogue rotates model ids. `HERMES_MODEL` lets the engine be
  * repointed without a deploy; the constant is the current default.
  */
-const DEFAULT_HERMES_MODEL = "moonshotai/kimi-k3";
+const DEFAULT_HERMES_MODEL = "z-ai/glm-5.3";
 const FALLBACK_MODEL = "google/gemini-3.7-flash";
 
 interface Attempt {
