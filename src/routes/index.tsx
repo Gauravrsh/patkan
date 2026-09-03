@@ -276,8 +276,9 @@ function Landing() {
 
               <Button onClick={() => void transform()} disabled={busy} className="mt-4 w-full">
                 {busy ? <Loader2 className="animate-spin" /> : <Sparkles />}
-                {busy ? "Compiling…" : "Patkan it"}
+                {busy ? "Hermes is sharpening…" : "Patkan it"}
               </Button>
+
             </div>
 
             <div className="flex flex-col rounded-xl border bg-foreground/[0.03] p-5">
