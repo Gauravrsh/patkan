@@ -93,22 +93,36 @@ $("go").addEventListener("click", async () => {
   const text = $("input").value.trim();
   if (text.length < 3) return;
   $("go").disabled = true;
-  $("go").textContent = "Compiling…";
+  $("go").textContent = "Hermes is sharpening…";
   $("assumed").textContent = "";
   $("clarifiers").innerHTML = "";
+  $("copy").disabled = true;
+  $("insert").disabled = true;
+  // Beat 1: instant local draft, visibly provisional.
   $("out").textContent = localScaffold(text, { persona, dialect, intensity });
+  $("out").style.opacity = "0.6";
+  $("note").textContent = "Drafting… Hermes is sharpening this, hold on.";
   const res = await chrome.runtime.sendMessage({
     type: "PATKAN_TRANSFORM",
     payload: { text, persona, dialect, intensity, customInstruction: $("template").value || null },
   });
   $("go").disabled = false;
   $("go").textContent = "Patkan it";
+  $("out").style.opacity = "1";
   if (!res?.ok) {
     $("note").textContent = res?.error || "Transform failed.";
+    $("copy").disabled = false;
+    $("insert").disabled = false;
     return;
   }
   output = res.prompt;
   $("out").textContent = output;
+  $("note").textContent =
+    res.engine === "hermes"
+      ? "Ready — Hermes"
+      : res.engine === "fallback"
+        ? "Ready — fallback engine"
+        : "Ready — offline draft";
   $("copy").disabled = false;
   $("insert").disabled = false;
   if (res.assumptions?.length) $("assumed").textContent = "Assumed: " + res.assumptions.join(" · ");
