@@ -72,8 +72,8 @@ async function cacheKey(input: {
   persona: string;
   dialect: string;
   intensity: string;
-  customInstruction?: string | null;
-  refinement?: string | null;
+  customInstruction?: string | null | undefined;
+  refinement?: string | null | undefined;
 }): Promise<string> {
   const normalized = input.text.toLowerCase().trim().replace(/\s+/g, " ");
   const material = [
