@@ -1,4 +1,11 @@
-# PRD — Hermes as Patkan's prompt engine
+# PRD — Patkan's prompt engine (originally scoped to Hermes)
+
+> **Update (post-implementation):** Hermes is retired on Nous Research — the live catalogue
+> contains no Hermes model id. The engine shipped as scoped, but the models behind it are
+> `qwen/qwen3.7-flash` (primary) and `z-ai/glm-4.7-flash` (secondary) on the Nous endpoint,
+> with the Lovable AI gateway as the last fallback. All UI strings are neutral (`Sharpening…`,
+> `Ready`, `Ready — offline draft`) and engine ids are `primary` / `fallback` / `local`.
+> Everywhere this document says "Hermes", read "the Patkan engine".
 
 ## 1. Why
 
