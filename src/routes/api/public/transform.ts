@@ -66,6 +66,28 @@ interface Payload {
   stream?: boolean;
 }
 
+/** Normalized exact-match cache key: identical sloppy inputs replay for free. */
+async function cacheKey(input: {
+  text: string;
+  persona: string;
+  dialect: string;
+  intensity: string;
+  customInstruction?: string | null;
+  refinement?: string | null;
+}): Promise<string> {
+  const normalized = input.text.toLowerCase().trim().replace(/\s+/g, " ");
+  const material = [
+    normalized,
+    input.persona,
+    input.dialect,
+    input.intensity,
+    (input.customInstruction ?? "").toLowerCase().trim().replace(/\s+/g, " "),
+    (input.refinement ?? "").toLowerCase().trim().replace(/\s+/g, " "),
+  ].join("|");
+  const { createHash } = await import("node:crypto");
+  return createHash("sha256").update(material, "utf8").digest("hex");
+}
+
 export const Route = createFileRoute("/api/public/transform")({
   server: {
     handlers: {
