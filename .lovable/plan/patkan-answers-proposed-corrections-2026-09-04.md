@@ -13,11 +13,11 @@
 
 Today: only on the website, at `/library` — a CRUD list of "frameworks" (title + system instruction, optionally public). Inside the extension it appears only as a dropdown in the side panel, populated from `/api/public/templates`.
 
-Does the user need it? Under the invisible-layer thesis, mostly no. A framework only matters when someone repeatedly wants a non-default house style. Recommendation: keep the concept, drop the web CRUD surface as a headline feature, and let a framework be saved from the extension itself ("save this style") — the website becomes an install/connect page, not a destination.
+Does the user need it? Under the invisible-layer thesis, mostly no. A framework only matters when someone repeatedly wants a non-default house style. Recommendation: keep the concept, drop the web CRUD surface as a headline feature, and let a framework be saved from the extension itself ("save this style") — the website becomes an install/connect page, not a destination.-------let it be as it is. We will come to it later. DO not make any changes for this point.
 
 ## 3. Invisible-layer consequence (what we stop building)
 
-If the user never leaves their LLM, these lose priority: the web transform playground as a product surface, the Library management UI, public/shared frameworks, persona chips, the intensity picker. What still matters: the in-place `//` trigger, latency, dialect auto-detection, quota, and a one-click connect. This plan assumes that direction unless you say otherwise.
+If the user never leaves their LLM, these lose priority: the web transform playground as a product surface, the Library management UI, public/shared frameworks, persona chips, the intensity picker. What still matters: the in-place `//` trigger, latency, dialect auto-detection, quota, and a one-click connect. This plan assumes that direction unless you say otherwise.--------no action on this question for now. We will come to it later.
 
 ## 4. Coverage: where Patkan runs today
 
@@ -35,6 +35,7 @@ Notably missing despite being in the PRD: Notion AI.
 ### Missing high-share desktop surfaces
 
 Global:
+
 - Microsoft Copilot (copilot.microsoft.com) and Copilot in Office/Edge sidebar
 - Perplexity (perplexity.ai)
 - Grok (grok.com, and x.com's Grok panel)
@@ -48,16 +49,17 @@ Global:
 
 India-specific weight (desktop): ChatGPT dominant, Gemini boosted by carrier bundling, Perplexity Pro bundled free with Airtel (very large installed base), Copilot via Windows/Edge default, DeepSeek and Meta AI meaningful. Krutrim and Sarvam exist but are low desktop share — skip.
 
-Proposed phase 1 additions: Perplexity, Copilot, Grok, DeepSeek, Meta AI, Le Chat, AI Studio. Phase 2: Notion AI, Poe, Kimi, Qwen. Each needs an editor adapter (contenteditable / ProseMirror / Lexical / plain textarea) plus a dialect mapping.
+Proposed phase 1 additions: Perplexity, Copilot, Grok, DeepSeek, Meta AI, Le Chat, AI Studio. Phase 2: Notion AI, Poe, Kimi, Qwen. Each needs an editor adapter (contenteditable / ProseMirror / Lexical / plain textarea) plus a dialect mapping.--------this is top priority enhancement to be done, right now.
 
 ## 5. Auth: what is actually wrong
 
 Confirmed from the signup request: the confirmation email's `redirect_to` was
 `https://id-preview--<project>.lovable.app/auth?next=/library`.
 
-That is the **editor preview host**, which sits behind Lovable's own preview access gate. So the confirmation link lands the user on a Lovable sign-in screen asking for email and password — a Lovable login, not a Patkan login. It is not a bug in Patkan's auth code; it is the wrong redirect origin for a shared email link.
+That is the **editor preview host**, which sits behind Lovable's own preview access gate. So the confirmation link lands the user on a Lovable sign-in screen asking for email and password — a Lovable login, not a Patkan login. It is not a bug in Patkan's auth code; it is the wrong redirect origin for a shared email link.-------okay, fix it. Send it to live patkan. Currently when I am trying to signup on [patkan.lovable.app](http://patkan.lovable.app) I never receive the email in my inbox.
 
 Two secondary issues:
+
 - Email confirmation is on, which forces a round trip through email before a first transform. For an invisible-layer tool this is friction with little value.
 - The confirmation email itself is sent from the default backend sender, so it reads as generic rather than as Patkan.
 
@@ -75,6 +77,6 @@ Two secondary issues:
 
 ## Open decisions for you
 
-- Auto-confirm email sign-up, or keep the confirmation step?
+- Auto-confirm email sign-up, or keep the confirmation step? ‐------keep it. Upon clicking the button in email, it should land back on patkan.
 - Which of the phase-1 hosts do you want in the first pass?
-- Keep the web Library page, or reduce the site to install + connect?
+- Keep the web Library page, or reduce the site to install + connect?-------keep it for now, we'll see what to do with it later.
