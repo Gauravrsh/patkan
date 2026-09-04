@@ -87,7 +87,7 @@ function AuthPage() {
         : supabase.auth.signUp({
             email,
             password,
-            options: { emailRedirectTo: `${window.location.origin}/auth?next=${encodeURIComponent(safeNext())}` },
+            options: { emailRedirectTo: `${authOrigin()}/auth?next=${encodeURIComponent(safeNext())}` },
           });
     const { error } = await fn;
     setBusy(false);
