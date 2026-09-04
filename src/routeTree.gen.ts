@@ -16,6 +16,7 @@ import { Route as ConnectRouteImport } from './routes/connect'
 import { Route as AuthenticatedLibraryRouteImport } from './routes/_authenticated/library'
 import { Route as ApiPublicTemplatesRouteImport } from './routes/api/public/templates'
 import { Route as ApiPublicTransformRouteImport } from './routes/api/public/transform'
+import { Route as ApiPublicUsageRouteImport } from './routes/api/public/usage'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -51,6 +52,11 @@ const ApiPublicTransformRoute = ApiPublicTransformRouteImport.update({
   path: '/api/public/transform',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicUsageRoute = ApiPublicUsageRouteImport.update({
+  id: '/api/public/usage',
+  path: '/api/public/usage',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -59,6 +65,7 @@ export interface FileRoutesByFullPath {
   '/library': typeof AuthenticatedLibraryRoute
   '/api/public/templates': typeof ApiPublicTemplatesRoute
   '/api/public/transform': typeof ApiPublicTransformRoute
+  '/api/public/usage': typeof ApiPublicUsageRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -67,6 +74,7 @@ export interface FileRoutesByTo {
   '/library': typeof AuthenticatedLibraryRoute
   '/api/public/templates': typeof ApiPublicTemplatesRoute
   '/api/public/transform': typeof ApiPublicTransformRoute
+  '/api/public/usage': typeof ApiPublicUsageRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -77,6 +85,7 @@ export interface FileRoutesById {
   '/_authenticated/library': typeof AuthenticatedLibraryRoute
   '/api/public/templates': typeof ApiPublicTemplatesRoute
   '/api/public/transform': typeof ApiPublicTransformRoute
+  '/api/public/usage': typeof ApiPublicUsageRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -87,6 +96,7 @@ export interface FileRouteTypes {
     | '/library'
     | '/api/public/templates'
     | '/api/public/transform'
+    | '/api/public/usage'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -95,6 +105,7 @@ export interface FileRouteTypes {
     | '/library'
     | '/api/public/templates'
     | '/api/public/transform'
+    | '/api/public/usage'
   id:
     | '__root__'
     | '/'
@@ -104,6 +115,7 @@ export interface FileRouteTypes {
     | '/_authenticated/library'
     | '/api/public/templates'
     | '/api/public/transform'
+    | '/api/public/usage'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -113,6 +125,7 @@ export interface RootRouteChildren {
   ConnectRoute: typeof ConnectRoute
   ApiPublicTemplatesRoute: typeof ApiPublicTemplatesRoute
   ApiPublicTransformRoute: typeof ApiPublicTransformRoute
+  ApiPublicUsageRoute: typeof ApiPublicUsageRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -166,6 +179,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicTransformRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/usage': {
+      id: '/api/public/usage'
+      path: '/api/public/usage'
+      fullPath: '/api/public/usage'
+      preLoaderRoute: typeof ApiPublicUsageRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -187,6 +207,7 @@ const rootRouteChildren: RootRouteChildren = {
   ConnectRoute: ConnectRoute,
   ApiPublicTemplatesRoute: ApiPublicTemplatesRoute,
   ApiPublicTransformRoute: ApiPublicTransformRoute,
+  ApiPublicUsageRoute: ApiPublicUsageRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
