@@ -14,6 +14,7 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as ConnectRouteImport } from './routes/connect'
 import { Route as AuthenticatedLibraryRouteImport } from './routes/_authenticated/library'
+import { Route as ApiPublicFeedbackRouteImport } from './routes/api/public/feedback'
 import { Route as ApiPublicTemplatesRouteImport } from './routes/api/public/templates'
 import { Route as ApiPublicTransformRouteImport } from './routes/api/public/transform'
 import { Route as ApiPublicUsageRouteImport } from './routes/api/public/usage'
@@ -42,6 +43,11 @@ const AuthenticatedLibraryRoute = AuthenticatedLibraryRouteImport.update({
   path: '/library',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const ApiPublicFeedbackRoute = ApiPublicFeedbackRouteImport.update({
+  id: '/api/public/feedback',
+  path: '/api/public/feedback',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicTemplatesRoute = ApiPublicTemplatesRouteImport.update({
   id: '/api/public/templates',
   path: '/api/public/templates',
@@ -63,6 +69,7 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/connect': typeof ConnectRoute
   '/library': typeof AuthenticatedLibraryRoute
+  '/api/public/feedback': typeof ApiPublicFeedbackRoute
   '/api/public/templates': typeof ApiPublicTemplatesRoute
   '/api/public/transform': typeof ApiPublicTransformRoute
   '/api/public/usage': typeof ApiPublicUsageRoute
@@ -72,6 +79,7 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/connect': typeof ConnectRoute
   '/library': typeof AuthenticatedLibraryRoute
+  '/api/public/feedback': typeof ApiPublicFeedbackRoute
   '/api/public/templates': typeof ApiPublicTemplatesRoute
   '/api/public/transform': typeof ApiPublicTransformRoute
   '/api/public/usage': typeof ApiPublicUsageRoute
@@ -83,6 +91,7 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/connect': typeof ConnectRoute
   '/_authenticated/library': typeof AuthenticatedLibraryRoute
+  '/api/public/feedback': typeof ApiPublicFeedbackRoute
   '/api/public/templates': typeof ApiPublicTemplatesRoute
   '/api/public/transform': typeof ApiPublicTransformRoute
   '/api/public/usage': typeof ApiPublicUsageRoute
@@ -94,6 +103,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/connect'
     | '/library'
+    | '/api/public/feedback'
     | '/api/public/templates'
     | '/api/public/transform'
     | '/api/public/usage'
@@ -103,6 +113,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/connect'
     | '/library'
+    | '/api/public/feedback'
     | '/api/public/templates'
     | '/api/public/transform'
     | '/api/public/usage'
@@ -113,6 +124,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/connect'
     | '/_authenticated/library'
+    | '/api/public/feedback'
     | '/api/public/templates'
     | '/api/public/transform'
     | '/api/public/usage'
@@ -123,6 +135,7 @@ export interface RootRouteChildren {
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
   ConnectRoute: typeof ConnectRoute
+  ApiPublicFeedbackRoute: typeof ApiPublicFeedbackRoute
   ApiPublicTemplatesRoute: typeof ApiPublicTemplatesRoute
   ApiPublicTransformRoute: typeof ApiPublicTransformRoute
   ApiPublicUsageRoute: typeof ApiPublicUsageRoute
@@ -165,6 +178,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedLibraryRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/api/public/feedback': {
+      id: '/api/public/feedback'
+      path: '/api/public/feedback'
+      fullPath: '/api/public/feedback'
+      preLoaderRoute: typeof ApiPublicFeedbackRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/templates': {
       id: '/api/public/templates'
       path: '/api/public/templates'
@@ -205,6 +225,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
   ConnectRoute: ConnectRoute,
+  ApiPublicFeedbackRoute: ApiPublicFeedbackRoute,
   ApiPublicTemplatesRoute: ApiPublicTemplatesRoute,
   ApiPublicTransformRoute: ApiPublicTransformRoute,
   ApiPublicUsageRoute: ApiPublicUsageRoute,
