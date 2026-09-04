@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as ConnectRouteImport } from './routes/connect'
+import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedLibraryRouteImport } from './routes/_authenticated/library'
 import { Route as ApiPublicFeedbackRouteImport } from './routes/api/public/feedback'
 import { Route as ApiPublicTemplatesRouteImport } from './routes/api/public/templates'
@@ -37,6 +38,11 @@ const ConnectRoute = ConnectRouteImport.update({
   id: '/connect',
   path: '/connect',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedLibraryRoute = AuthenticatedLibraryRouteImport.update({
   id: '/library',
@@ -68,6 +74,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/connect': typeof ConnectRoute
+  '/admin': typeof AuthenticatedAdminRoute
   '/library': typeof AuthenticatedLibraryRoute
   '/api/public/feedback': typeof ApiPublicFeedbackRoute
   '/api/public/templates': typeof ApiPublicTemplatesRoute
@@ -78,6 +85,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/connect': typeof ConnectRoute
+  '/admin': typeof AuthenticatedAdminRoute
   '/library': typeof AuthenticatedLibraryRoute
   '/api/public/feedback': typeof ApiPublicFeedbackRoute
   '/api/public/templates': typeof ApiPublicTemplatesRoute
@@ -90,6 +98,7 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
   '/connect': typeof ConnectRoute
+  '/_authenticated/admin': typeof AuthenticatedAdminRoute
   '/_authenticated/library': typeof AuthenticatedLibraryRoute
   '/api/public/feedback': typeof ApiPublicFeedbackRoute
   '/api/public/templates': typeof ApiPublicTemplatesRoute
@@ -102,6 +111,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/connect'
+    | '/admin'
     | '/library'
     | '/api/public/feedback'
     | '/api/public/templates'
@@ -112,6 +122,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/connect'
+    | '/admin'
     | '/library'
     | '/api/public/feedback'
     | '/api/public/templates'
@@ -123,6 +134,7 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/auth'
     | '/connect'
+    | '/_authenticated/admin'
     | '/_authenticated/library'
     | '/api/public/feedback'
     | '/api/public/templates'
@@ -171,6 +183,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ConnectRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/admin': {
+      id: '/_authenticated/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AuthenticatedAdminRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/library': {
       id: '/_authenticated/library'
       path: '/library'
@@ -210,10 +229,12 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
   AuthenticatedLibraryRoute: typeof AuthenticatedLibraryRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedAdminRoute: AuthenticatedAdminRoute,
   AuthenticatedLibraryRoute: AuthenticatedLibraryRoute,
 }
 
