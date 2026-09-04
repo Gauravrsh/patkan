@@ -26,6 +26,21 @@ export const Route = createFileRoute("/auth")({
   component: AuthPage,
 });
 
+const PUBLIC_ORIGIN = "https://patkan.lovable.app";
+
+/**
+ * Auth emails and OAuth callbacks must land on the public site. The editor
+ * preview host sits behind its own access gate, so a link pointing there asks
+ * the user for a completely unrelated login.
+ */
+function authOrigin() {
+  const origin = window.location.origin;
+  if (/^https?:\/\/localhost(:\d+)?$/.test(origin) || origin.startsWith("http://127.0.0.1")) {
+    return origin;
+  }
+  return origin.includes(".lovable.app") && origin !== PUBLIC_ORIGIN ? PUBLIC_ORIGIN : origin;
+}
+
 function AuthPage() {
   const { session, loading } = useAuth();
   const [email, setEmail] = useState("");
@@ -45,6 +60,7 @@ function AuthPage() {
       return "/library";
     }
   }
+
 
   useEffect(() => {
     if (!loading && session) {
@@ -71,7 +87,7 @@ function AuthPage() {
         : supabase.auth.signUp({
             email,
             password,
-            options: { emailRedirectTo: `${window.location.origin}/auth?next=${encodeURIComponent(safeNext())}` },
+            options: { emailRedirectTo: `${authOrigin()}/auth?next=${encodeURIComponent(safeNext())}` },
           });
     const { error } = await fn;
     setBusy(false);

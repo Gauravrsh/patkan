@@ -2,6 +2,8 @@
 (() => {
   "use strict";
 
+  const GENERIC = ["textarea", "div[contenteditable='true']", "[role='textbox'][contenteditable='true']"];
+
   const HOSTS = [
     {
       id: "chatgpt",
@@ -21,7 +23,77 @@
       match: /(^|\.)gemini\.google\.com$/,
       selectors: ["div.ql-editor[contenteditable='true']", "rich-textarea div[contenteditable='true']"],
     },
+    {
+      id: "aistudio",
+      dialect: "sectioned",
+      match: /(^|\.)aistudio\.google\.com$/,
+      selectors: ["textarea[aria-label*='prompt' i]", "ms-autosize-textarea textarea", ...GENERIC],
+    },
+    {
+      id: "perplexity",
+      dialect: "markdown",
+      match: /(^|\.)perplexity\.ai$/,
+      selectors: ["textarea[placeholder]", "div#ask-input[contenteditable='true']", ...GENERIC],
+    },
+    {
+      id: "copilot",
+      dialect: "markdown",
+      match: /(^|\.)copilot\.microsoft\.com$/,
+      selectors: ["textarea#userInput", "textarea[data-testid='composer-input']", ...GENERIC],
+    },
+    {
+      id: "grok",
+      dialect: "markdown",
+      match: /(^|\.)grok\.com$/,
+      selectors: ["textarea[aria-label*='Ask' i]", ...GENERIC],
+    },
+    {
+      id: "deepseek",
+      dialect: "markdown",
+      match: /(^|\.)chat\.deepseek\.com$/,
+      selectors: ["textarea#chat-input", ...GENERIC],
+    },
+    {
+      id: "metaai",
+      dialect: "sectioned",
+      match: /(^|\.)meta\.ai$/,
+      selectors: ["div[contenteditable='true'][role='textbox']", ...GENERIC],
+    },
+    {
+      id: "lechat",
+      dialect: "markdown",
+      match: /(^|\.)chat\.mistral\.ai$/,
+      selectors: ["div.ProseMirror[contenteditable='true']", ...GENERIC],
+    },
+    {
+      id: "poe",
+      dialect: "markdown",
+      match: /(^|\.)poe\.com$/,
+      selectors: ["textarea[class*='GrowingTextArea']", ...GENERIC],
+    },
+    {
+      id: "notion",
+      dialect: "markdown",
+      match: /(^|\.)notion\.so$/,
+      selectors: [
+        "div[contenteditable='true'][data-content-editable-leaf='true']",
+        "div[role='textbox'][contenteditable='true']",
+      ],
+    },
+    {
+      id: "kimi",
+      dialect: "markdown",
+      match: /(^|\.)kimi\.com$/,
+      selectors: ["div[contenteditable='true'].chat-input-editor", ...GENERIC],
+    },
+    {
+      id: "qwen",
+      dialect: "markdown",
+      match: /(^|\.)chat\.qwen\.ai$/,
+      selectors: ["textarea#chat-input", ...GENERIC],
+    },
   ];
+
 
   const host = HOSTS.find((h) => h.match.test(location.hostname));
   if (!host) return;
