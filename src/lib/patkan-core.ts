@@ -109,13 +109,26 @@ export const DIALECTS: DialectSpec[] = [
     id: "markdown",
     label: "Markdown",
     note: "GPT — OpenAI's own guidance leans on headings, not tags.",
-    hosts: ["chatgpt.com", "chat.openai.com"],
+    hosts: [
+      "chatgpt.com",
+      "chat.openai.com",
+      "perplexity.ai",
+      "copilot.microsoft.com",
+      "grok.com",
+      "chat.deepseek.com",
+      "chat.mistral.ai",
+      "poe.com",
+      "kimi.com",
+      "chat.qwen.ai",
+      "notion.so",
+    ],
   },
   {
     id: "sectioned",
     label: "Sectioned",
     note: "Gemini and everything else — plain headers with an explicit contract.",
-    hosts: ["gemini.google.com"],
+    hosts: ["gemini.google.com", "aistudio.google.com", "meta.ai"],
+
   },
 ];
 

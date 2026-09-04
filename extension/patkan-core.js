@@ -64,9 +64,30 @@ export function getPersona(id) {
 
 export const DIALECTS = [
   { id: "xml", label: "XML", hosts: ["claude.ai"] },
-  { id: "markdown", label: "Markdown", hosts: ["chatgpt.com", "chat.openai.com"] },
-  { id: "sectioned", label: "Sectioned", hosts: ["gemini.google.com"] },
+  {
+    id: "markdown",
+    label: "Markdown",
+    hosts: [
+      "chatgpt.com",
+      "chat.openai.com",
+      "perplexity.ai",
+      "copilot.microsoft.com",
+      "grok.com",
+      "chat.deepseek.com",
+      "chat.mistral.ai",
+      "poe.com",
+      "kimi.com",
+      "chat.qwen.ai",
+      "notion.so",
+    ],
+  },
+  {
+    id: "sectioned",
+    label: "Sectioned",
+    hosts: ["gemini.google.com", "aistudio.google.com", "meta.ai"],
+  },
 ];
+
 
 export function dialectForHost(hostname) {
   const h = String(hostname || "").toLowerCase();
