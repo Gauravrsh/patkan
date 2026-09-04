@@ -1,11 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
 
 import {
-  DAILY_FREE_LIMIT,
   MAX_INPUT_CHARS,
   buildMetaSystemPrompt,
   buildMetaUserMessage,
   classifyLocal,
+  dailyLimitFor,
   getDialect,
   getPersona,
   splitMeta,
@@ -17,6 +17,7 @@ import {
   type EngineId,
   type EngineMessage,
 } from "@/lib/patkan-engines.server";
+import { recordEvent, type Outcome } from "@/lib/patkan-telemetry.server";
 
 
 const CORS_HEADERS: Record<string, string> = {
@@ -64,6 +65,8 @@ interface Payload {
   customInstruction?: string | null;
   refinement?: string | null;
   stream?: boolean;
+  host?: string | null;
+  surface?: string | null;
 }
 
 /** Normalized exact-match cache key: identical sloppy inputs replay for free. */
@@ -93,6 +96,7 @@ export const Route = createFileRoute("/api/public/transform")({
     handlers: {
       OPTIONS: () => new Response(null, { status: 204, headers: CORS_HEADERS }),
       POST: async ({ request }) => {
+        const startedAt = Date.now();
         let payload: Payload;
         try {
           payload = (await request.json()) as Payload;
@@ -112,6 +116,10 @@ export const Route = createFileRoute("/api/public/transform")({
           return json({ error: "Missing device identifier." }, 400);
         }
         const subjectKey = userId ? `user:${userId}` : `device:${deviceId}`;
+        const subjectKind = userId ? "user" : "device";
+        const limit = dailyLimitFor(Boolean(userId));
+        const host = (payload.host ?? "").slice(0, 80) || null;
+        const surface = (payload.surface ?? "web").slice(0, 40);
 
         const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
         const day = today();
@@ -121,6 +129,33 @@ export const Route = createFileRoute("/api/public/transform")({
         const intensity: Intensity = payload.intensity ?? "standard";
         const { intent, complexity } = classifyLocal(text);
         const wantsStream = payload.stream !== false;
+
+        const telemetry = (
+          extra: Partial<Parameters<typeof recordEvent>[1]> & { outcome: Outcome },
+        ) =>
+          void recordEvent(supabaseAdmin, {
+            subjectKind,
+            subjectKey,
+            host,
+            surface,
+            persona: persona.id,
+            dialect,
+            intensity,
+            intent,
+            inputChars: text.length,
+            latencyMs: Date.now() - startedAt,
+            ...extra,
+          });
+
+        // When a ghost signs in mid-day, their device usage follows them so the
+        // limit can't be reset by simply signing in.
+        if (userId && deviceId) {
+          void supabaseAdmin.rpc("merge_device_usage", {
+            _device_key: `device:${deviceId}`,
+            _user_key: subjectKey,
+            _day: day,
+          });
+        }
 
         // Exact-match cache: identical inputs replay instantly, free of quota.
         const hash = await cacheKey({
@@ -137,6 +172,14 @@ export const Route = createFileRoute("/api/public/transform")({
           .eq("input_hash", hash)
           .maybeSingle();
 
+        const { data: counter } = await supabaseAdmin
+          .from("usage_counters")
+          .select("count")
+          .eq("subject_key", subjectKey)
+          .eq("day", day)
+          .maybeSingle();
+        const usedBefore = counter?.count ?? 0;
+
         if (cached) {
           void supabaseAdmin
             .from("prompt_cache")
@@ -144,6 +187,12 @@ export const Route = createFileRoute("/api/public/transform")({
             .eq("id", cached.id);
           const parsed = splitMeta(cached.output_text);
           if (parsed.prompt) {
+            telemetry({
+              outcome: "ok",
+              cached: true,
+              engine: cached.engine,
+              outputChars: parsed.prompt.length,
+            });
             if (!wantsStream) {
               return json({
                 ...parsed,
@@ -153,8 +202,8 @@ export const Route = createFileRoute("/api/public/transform")({
                 engine: cached.engine,
                 cached: true,
                 persona: persona.id,
-                used: 0,
-                limit: DAILY_FREE_LIMIT,
+                used: usedBefore,
+                limit,
                 signedIn: Boolean(userId),
               });
             }
@@ -170,8 +219,9 @@ export const Route = createFileRoute("/api/public/transform")({
                   type: "done",
                   ...parsed,
                   engine: cached.engine,
-                  used: 0,
-                  limit: DAILY_FREE_LIMIT,
+                  cached: true,
+                  used: usedBefore,
+                  limit,
                   signedIn: Boolean(userId),
                 });
                 controller.close();
@@ -188,30 +238,50 @@ export const Route = createFileRoute("/api/public/transform")({
           }
         }
 
-        const { data: existing } = await supabaseAdmin
-          .from("usage_counters")
-          .select("id, count")
-          .eq("subject_key", subjectKey)
-          .eq("day", day)
-          .maybeSingle();
+        // Atomic claim: two simultaneous requests can never both pass the wall.
+        const { data: quota, error: quotaError } = await supabaseAdmin.rpc("consume_quota", {
+          _subject_key: subjectKey,
+          _day: day,
+          _limit: limit,
+        });
+        if (quotaError) {
+          console.error("patkan quota: rpc failed", quotaError);
+          return json({ error: "Couldn't check your daily allowance. Try again." }, 500);
+        }
+        const row = Array.isArray(quota) ? quota[0] : quota;
+        const allowed = Boolean(row?.allowed);
+        const nextCount = row?.used ?? usedBefore;
 
-        const used = existing?.count ?? 0;
-        if (used >= DAILY_FREE_LIMIT) {
+        if (!allowed) {
+          telemetry({ outcome: "limited" });
           return json(
             {
               error: userId
-                ? `You've used all ${DAILY_FREE_LIMIT} transforms for today. The counter resets at midnight UTC.`
-                : `You've used all ${DAILY_FREE_LIMIT} free transforms for today. Sign in to keep going tomorrow, or wait for the reset.`,
+                ? `You've used all ${limit} transforms for today. The counter resets at midnight UTC.`
+                : `You've used all ${limit} free transforms for today. Sign in for ${dailyLimitFor(true)} a day, or wait for the reset.`,
               limitReached: true,
               requiresSignIn: !userId,
-              used,
-              limit: DAILY_FREE_LIMIT,
+              used: nextCount,
+              limit,
             },
             429,
           );
         }
 
-        if (!hasEngine()) return json({ error: "AI is not configured." }, 500);
+        /** Give a claimed transform back when it never produced a prompt. */
+        const refund = async () => {
+          await supabaseAdmin
+            .from("usage_counters")
+            .update({ count: Math.max(0, nextCount - 1), updated_at: new Date().toISOString() })
+            .eq("subject_key", subjectKey)
+            .eq("day", day);
+        };
+
+        if (!hasEngine()) {
+          await refund();
+          telemetry({ outcome: "error" });
+          return json({ error: "AI is not configured." }, 500);
+        }
 
         const messages: EngineMessage[] = [
           { role: "system", content: buildMetaSystemPrompt(dialect) },
@@ -227,32 +297,31 @@ export const Route = createFileRoute("/api/public/transform")({
           },
         ];
 
-        const nextCount = used + 1;
-        const bumpUsage = async () => {
-          if (existing) {
-            await supabaseAdmin
-              .from("usage_counters")
-              .update({ count: nextCount, updated_at: new Date().toISOString() })
-              .eq("id", existing.id);
-          } else {
-            await supabaseAdmin.from("usage_counters").insert({ subject_key: subjectKey, day, count: 1 });
-          }
-        };
-
         if (!wantsStream) {
           let full = "";
           let engine: EngineId = "local";
+          let ttfb: number | undefined;
           for await (const chunk of streamCompile(messages)) {
+            ttfb ??= Date.now() - startedAt;
             engine = chunk.engine;
             full += chunk.delta;
           }
           const parsed = splitMeta(full);
-          if (!parsed.prompt) return json({ error: "The AI returned an empty prompt. Try again." }, 502);
-          await bumpUsage();
+          if (!parsed.prompt) {
+            await refund();
+            telemetry({ outcome: "empty", engine, ttfbMs: ttfb });
+            return json({ error: "The AI returned an empty prompt. Try again." }, 502);
+          }
           await supabaseAdmin.from("prompt_cache").upsert(
             { input_hash: hash, input_text: text, output_text: full, engine },
             { onConflict: "input_hash" },
           );
+          telemetry({
+            outcome: "ok",
+            engine,
+            ttfbMs: ttfb,
+            outputChars: parsed.prompt.length,
+          });
           return json({
             ...parsed,
             dialect,
@@ -261,7 +330,7 @@ export const Route = createFileRoute("/api/public/transform")({
             engine,
             persona: persona.id,
             used: nextCount,
-            limit: DAILY_FREE_LIMIT,
+            limit,
             signedIn: Boolean(userId),
           });
         }
@@ -276,8 +345,10 @@ export const Route = createFileRoute("/api/public/transform")({
 
             let full = "";
             let engine: EngineId = "local";
+            let ttfb: number | undefined;
             try {
               for await (const chunk of streamCompile(messages)) {
+                ttfb ??= Date.now() - startedAt;
                 if (chunk.engine !== engine) {
                   engine = chunk.engine;
                   send({ type: "engine", engine });
@@ -288,24 +359,33 @@ export const Route = createFileRoute("/api/public/transform")({
 
               const parsed = splitMeta(full);
               if (!parsed.prompt) {
+                await refund();
+                telemetry({ outcome: "empty", engine, ttfbMs: ttfb });
                 send({ type: "error", error: "The AI returned an empty prompt. Try again." });
               } else {
-                await bumpUsage();
                 await supabaseAdmin.from("prompt_cache").upsert(
                   { input_hash: hash, input_text: text, output_text: full, engine },
                   { onConflict: "input_hash" },
                 );
+                telemetry({
+                  outcome: "ok",
+                  engine,
+                  ttfbMs: ttfb,
+                  outputChars: parsed.prompt.length,
+                });
                 send({
                   type: "done",
                   ...parsed,
                   engine,
                   used: nextCount,
-                  limit: DAILY_FREE_LIMIT,
+                  limit,
                   signedIn: Boolean(userId),
                 });
               }
             } catch (err) {
               console.error("patkan transform: stream failed", err);
+              await refund();
+              telemetry({ outcome: "error", engine, ttfbMs: ttfb });
               send({ type: "error", error: "The stream broke mid-transform. Try again." });
             } finally {
               controller.close();
@@ -325,4 +405,3 @@ export const Route = createFileRoute("/api/public/transform")({
     },
   },
 });
-

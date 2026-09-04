@@ -423,5 +423,12 @@ export function visiblePrompt(streamed: string): string {
   return head.replace(/=+P?A?T?K?A?N?_?M?E?T?A?=*\s*$/, "").replace(/^```[a-z]*\n?/i, "");
 }
 
+/** Ghost (device-only) daily allowance. */
 export const DAILY_FREE_LIMIT = 10;
+/** Signed-in daily allowance — the reason to create an account. */
+export const DAILY_SIGNED_IN_LIMIT = 50;
+export function dailyLimitFor(signedIn: boolean): number {
+  return signedIn ? DAILY_SIGNED_IN_LIMIT : DAILY_FREE_LIMIT;
+}
 export const MAX_INPUT_CHARS = 4000;
+

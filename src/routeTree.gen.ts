@@ -13,9 +13,13 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as ConnectRouteImport } from './routes/connect'
+import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedLibraryRouteImport } from './routes/_authenticated/library'
+import { Route as ApiPublicFeedbackRouteImport } from './routes/api/public/feedback'
 import { Route as ApiPublicTemplatesRouteImport } from './routes/api/public/templates'
 import { Route as ApiPublicTransformRouteImport } from './routes/api/public/transform'
+import { Route as ApiPublicUsageRouteImport } from './routes/api/public/usage'
+import { Route as ApiPublicCronHealthRouteImport } from './routes/api/public/cron/health'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -36,10 +40,20 @@ const ConnectRoute = ConnectRouteImport.update({
   path: '/connect',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedLibraryRoute = AuthenticatedLibraryRouteImport.update({
   id: '/library',
   path: '/library',
   getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const ApiPublicFeedbackRoute = ApiPublicFeedbackRouteImport.update({
+  id: '/api/public/feedback',
+  path: '/api/public/feedback',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const ApiPublicTemplatesRoute = ApiPublicTemplatesRouteImport.update({
   id: '/api/public/templates',
@@ -51,22 +65,40 @@ const ApiPublicTransformRoute = ApiPublicTransformRouteImport.update({
   path: '/api/public/transform',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicUsageRoute = ApiPublicUsageRouteImport.update({
+  id: '/api/public/usage',
+  path: '/api/public/usage',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicCronHealthRoute = ApiPublicCronHealthRouteImport.update({
+  id: '/api/public/cron/health',
+  path: '/api/public/cron/health',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/connect': typeof ConnectRoute
+  '/admin': typeof AuthenticatedAdminRoute
   '/library': typeof AuthenticatedLibraryRoute
+  '/api/public/feedback': typeof ApiPublicFeedbackRoute
   '/api/public/templates': typeof ApiPublicTemplatesRoute
   '/api/public/transform': typeof ApiPublicTransformRoute
+  '/api/public/usage': typeof ApiPublicUsageRoute
+  '/api/public/cron/health': typeof ApiPublicCronHealthRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/connect': typeof ConnectRoute
+  '/admin': typeof AuthenticatedAdminRoute
   '/library': typeof AuthenticatedLibraryRoute
+  '/api/public/feedback': typeof ApiPublicFeedbackRoute
   '/api/public/templates': typeof ApiPublicTemplatesRoute
   '/api/public/transform': typeof ApiPublicTransformRoute
+  '/api/public/usage': typeof ApiPublicUsageRoute
+  '/api/public/cron/health': typeof ApiPublicCronHealthRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -74,9 +106,13 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
   '/connect': typeof ConnectRoute
+  '/_authenticated/admin': typeof AuthenticatedAdminRoute
   '/_authenticated/library': typeof AuthenticatedLibraryRoute
+  '/api/public/feedback': typeof ApiPublicFeedbackRoute
   '/api/public/templates': typeof ApiPublicTemplatesRoute
   '/api/public/transform': typeof ApiPublicTransformRoute
+  '/api/public/usage': typeof ApiPublicUsageRoute
+  '/api/public/cron/health': typeof ApiPublicCronHealthRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -84,26 +120,38 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/connect'
+    | '/admin'
     | '/library'
+    | '/api/public/feedback'
     | '/api/public/templates'
     | '/api/public/transform'
+    | '/api/public/usage'
+    | '/api/public/cron/health'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/auth'
     | '/connect'
+    | '/admin'
     | '/library'
+    | '/api/public/feedback'
     | '/api/public/templates'
     | '/api/public/transform'
+    | '/api/public/usage'
+    | '/api/public/cron/health'
   id:
     | '__root__'
     | '/'
     | '/_authenticated'
     | '/auth'
     | '/connect'
+    | '/_authenticated/admin'
     | '/_authenticated/library'
+    | '/api/public/feedback'
     | '/api/public/templates'
     | '/api/public/transform'
+    | '/api/public/usage'
+    | '/api/public/cron/health'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -111,8 +159,11 @@ export interface RootRouteChildren {
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
   ConnectRoute: typeof ConnectRoute
+  ApiPublicFeedbackRoute: typeof ApiPublicFeedbackRoute
   ApiPublicTemplatesRoute: typeof ApiPublicTemplatesRoute
   ApiPublicTransformRoute: typeof ApiPublicTransformRoute
+  ApiPublicUsageRoute: typeof ApiPublicUsageRoute
+  ApiPublicCronHealthRoute: typeof ApiPublicCronHealthRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -145,12 +196,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ConnectRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/admin': {
+      id: '/_authenticated/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AuthenticatedAdminRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/library': {
       id: '/_authenticated/library'
       path: '/library'
       fullPath: '/library'
       preLoaderRoute: typeof AuthenticatedLibraryRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/api/public/feedback': {
+      id: '/api/public/feedback'
+      path: '/api/public/feedback'
+      fullPath: '/api/public/feedback'
+      preLoaderRoute: typeof ApiPublicFeedbackRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/api/public/templates': {
       id: '/api/public/templates'
@@ -166,14 +231,30 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicTransformRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/usage': {
+      id: '/api/public/usage'
+      path: '/api/public/usage'
+      fullPath: '/api/public/usage'
+      preLoaderRoute: typeof ApiPublicUsageRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/cron/health': {
+      id: '/api/public/cron/health'
+      path: '/api/public/cron/health'
+      fullPath: '/api/public/cron/health'
+      preLoaderRoute: typeof ApiPublicCronHealthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
   AuthenticatedLibraryRoute: typeof AuthenticatedLibraryRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedAdminRoute: AuthenticatedAdminRoute,
   AuthenticatedLibraryRoute: AuthenticatedLibraryRoute,
 }
 
@@ -185,8 +266,11 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
   ConnectRoute: ConnectRoute,
+  ApiPublicFeedbackRoute: ApiPublicFeedbackRoute,
   ApiPublicTemplatesRoute: ApiPublicTemplatesRoute,
   ApiPublicTransformRoute: ApiPublicTransformRoute,
+  ApiPublicUsageRoute: ApiPublicUsageRoute,
+  ApiPublicCronHealthRoute: ApiPublicCronHealthRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

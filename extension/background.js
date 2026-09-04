@@ -33,7 +33,7 @@ async function getDeviceId() {
   return id;
 }
 
-async function transform({ text, persona, dialect, intensity, customInstruction, refinement }) {
+async function transform({ text, persona, dialect, intensity, customInstruction, refinement, host, surface }) {
   const settings = await getSettings();
   const deviceId = await getDeviceId();
   const headers = { "content-type": "application/json", "x-patkan-device": deviceId };
@@ -54,6 +54,8 @@ async function transform({ text, persona, dialect, intensity, customInstruction,
         deviceId,
         customInstruction: customInstruction || null,
         refinement: refinement || null,
+        host: host || null,
+        surface: surface || "extension-panel",
         stream: false,
       }),
     });
@@ -69,11 +71,18 @@ async function transform({ text, persona, dialect, intensity, customInstruction,
   }
 
   if (!res.ok || !data.prompt) {
+    if (typeof data.used === "number") {
+      await chrome.storage.local.set({
+        usage: { used: data.used, limit: data.limit, day: new Date().toISOString().slice(0, 10) },
+      });
+    }
     return {
       ok: false,
       error: data.error || "Transform failed.",
       limitReached: Boolean(data.limitReached),
       requiresSignIn: Boolean(data.requiresSignIn),
+      used: data.used,
+      limit: data.limit,
     };
   }
 
@@ -87,6 +96,59 @@ async function transform({ text, persona, dialect, intensity, customInstruction,
     used: data.used,
     limit: data.limit,
   };
+}
+
+/** Live allowance read, so "N left today" is right before the first transform. */
+async function fetchUsage() {
+  const settings = await getSettings();
+  const deviceId = await getDeviceId();
+  const headers = { "x-patkan-device": deviceId };
+  if (settings.session?.access_token) {
+    headers.Authorization = "Bearer " + settings.session.access_token;
+  }
+  try {
+    const res = await fetch(
+      settings.apiBase.replace(/\/$/, "") + "/api/public/usage?deviceId=" + encodeURIComponent(deviceId),
+      { headers },
+    );
+    const data = await res.json();
+    if (typeof data.used !== "number") return null;
+    const usage = {
+      used: data.used,
+      limit: data.limit,
+      remaining: data.remaining,
+      signedIn: Boolean(data.signedIn),
+      day: new Date().toISOString().slice(0, 10),
+    };
+    await chrome.storage.local.set({ usage });
+    return usage;
+  } catch {
+    return null;
+  }
+}
+
+/** Did the user keep the rewritten prompt? Only the client can know. */
+async function reportFeedback(accepted) {
+  const settings = await getSettings();
+  const deviceId = await getDeviceId();
+  const headers = { "content-type": "application/json", "x-patkan-device": deviceId };
+  if (settings.session?.access_token) {
+    headers.Authorization = "Bearer " + settings.session.access_token;
+  }
+  try {
+    await fetch(settings.apiBase.replace(/\/$/, "") + "/api/public/feedback", {
+      method: "POST",
+      headers,
+      body: JSON.stringify({ deviceId, accepted: Boolean(accepted) }),
+    });
+  } catch {
+    /* telemetry is best-effort */
+  }
+}
+
+async function openSignIn() {
+  const settings = await getSettings();
+  await chrome.tabs.create({ url: settings.apiBase.replace(/\/$/, "") + "/connect" });
 }
 
 chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
@@ -103,6 +165,18 @@ chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
     getSettings().then(sendResponse);
     return true;
   }
+  if (msg?.type === "PATKAN_FETCH_USAGE") {
+    fetchUsage().then(sendResponse);
+    return true;
+  }
+  if (msg?.type === "PATKAN_FEEDBACK") {
+    reportFeedback(msg.payload?.accepted).then(() => sendResponse({ ok: true }));
+    return true;
+  }
+  if (msg?.type === "PATKAN_OPEN_SIGNIN") {
+    openSignIn().then(() => sendResponse({ ok: true }));
+    return true;
+  }
   if (msg?.type === "PATKAN_SET_SESSION") {
     chrome.storage.local.set({ session: msg.payload }).then(() => sendResponse({ ok: true }));
     return true;
@@ -116,6 +190,7 @@ chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
   }
   return false;
 });
+
 
 chrome.commands.onCommand.addListener(async (command) => {
   if (command !== "patkan-transform") return;

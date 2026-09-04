@@ -107,6 +107,69 @@ export type Database = {
         }
         Relationships: []
       }
+      transform_events: {
+        Row: {
+          accepted: boolean | null
+          cached: boolean
+          created_at: string
+          dialect: string | null
+          engine: string | null
+          host: string | null
+          id: string
+          input_chars: number
+          intensity: string | null
+          intent: string | null
+          latency_ms: number | null
+          outcome: string
+          output_chars: number
+          persona: string | null
+          subject_hash: string
+          subject_kind: string
+          surface: string
+          ttfb_ms: number | null
+        }
+        Insert: {
+          accepted?: boolean | null
+          cached?: boolean
+          created_at?: string
+          dialect?: string | null
+          engine?: string | null
+          host?: string | null
+          id?: string
+          input_chars?: number
+          intensity?: string | null
+          intent?: string | null
+          latency_ms?: number | null
+          outcome?: string
+          output_chars?: number
+          persona?: string | null
+          subject_hash: string
+          subject_kind: string
+          surface?: string
+          ttfb_ms?: number | null
+        }
+        Update: {
+          accepted?: boolean | null
+          cached?: boolean
+          created_at?: string
+          dialect?: string | null
+          engine?: string | null
+          host?: string | null
+          id?: string
+          input_chars?: number
+          intensity?: string | null
+          intent?: string | null
+          latency_ms?: number | null
+          outcome?: string
+          output_chars?: number
+          persona?: string | null
+          subject_hash?: string
+          subject_kind?: string
+          surface?: string
+          ttfb_ms?: number | null
+        }
+        Relationships: []
+      }
       usage_counters: {
         Row: {
           count: number
@@ -131,16 +194,55 @@ export type Database = {
         }
         Relationships: []
       }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
+      consume_quota: {
+        Args: { _day: string; _limit: number; _subject_key: string }
+        Returns: {
+          allowed: boolean
+          used: number
+        }[]
+      }
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
       is_valid_field_value: { Args: { _value: string }; Returns: boolean }
+      merge_device_usage: {
+        Args: { _day: string; _device_key: string; _user_key: string }
+        Returns: number
+      }
       normalize_field_value: { Args: { _value: string }; Returns: string }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "user"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -267,6 +369,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "user"],
+    },
   },
 } as const
