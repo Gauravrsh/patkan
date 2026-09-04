@@ -19,6 +19,7 @@ import { Route as ApiPublicFeedbackRouteImport } from './routes/api/public/feedb
 import { Route as ApiPublicTemplatesRouteImport } from './routes/api/public/templates'
 import { Route as ApiPublicTransformRouteImport } from './routes/api/public/transform'
 import { Route as ApiPublicUsageRouteImport } from './routes/api/public/usage'
+import { Route as ApiPublicCronHealthRouteImport } from './routes/api/public/cron/health'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -69,6 +70,11 @@ const ApiPublicUsageRoute = ApiPublicUsageRouteImport.update({
   path: '/api/public/usage',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicCronHealthRoute = ApiPublicCronHealthRouteImport.update({
+  id: '/api/public/cron/health',
+  path: '/api/public/cron/health',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -80,6 +86,7 @@ export interface FileRoutesByFullPath {
   '/api/public/templates': typeof ApiPublicTemplatesRoute
   '/api/public/transform': typeof ApiPublicTransformRoute
   '/api/public/usage': typeof ApiPublicUsageRoute
+  '/api/public/cron/health': typeof ApiPublicCronHealthRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -91,6 +98,7 @@ export interface FileRoutesByTo {
   '/api/public/templates': typeof ApiPublicTemplatesRoute
   '/api/public/transform': typeof ApiPublicTransformRoute
   '/api/public/usage': typeof ApiPublicUsageRoute
+  '/api/public/cron/health': typeof ApiPublicCronHealthRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -104,6 +112,7 @@ export interface FileRoutesById {
   '/api/public/templates': typeof ApiPublicTemplatesRoute
   '/api/public/transform': typeof ApiPublicTransformRoute
   '/api/public/usage': typeof ApiPublicUsageRoute
+  '/api/public/cron/health': typeof ApiPublicCronHealthRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -117,6 +126,7 @@ export interface FileRouteTypes {
     | '/api/public/templates'
     | '/api/public/transform'
     | '/api/public/usage'
+    | '/api/public/cron/health'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -128,6 +138,7 @@ export interface FileRouteTypes {
     | '/api/public/templates'
     | '/api/public/transform'
     | '/api/public/usage'
+    | '/api/public/cron/health'
   id:
     | '__root__'
     | '/'
@@ -140,6 +151,7 @@ export interface FileRouteTypes {
     | '/api/public/templates'
     | '/api/public/transform'
     | '/api/public/usage'
+    | '/api/public/cron/health'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -151,6 +163,7 @@ export interface RootRouteChildren {
   ApiPublicTemplatesRoute: typeof ApiPublicTemplatesRoute
   ApiPublicTransformRoute: typeof ApiPublicTransformRoute
   ApiPublicUsageRoute: typeof ApiPublicUsageRoute
+  ApiPublicCronHealthRoute: typeof ApiPublicCronHealthRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -225,6 +238,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicUsageRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/cron/health': {
+      id: '/api/public/cron/health'
+      path: '/api/public/cron/health'
+      fullPath: '/api/public/cron/health'
+      preLoaderRoute: typeof ApiPublicCronHealthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -250,6 +270,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicTemplatesRoute: ApiPublicTemplatesRoute,
   ApiPublicTransformRoute: ApiPublicTransformRoute,
   ApiPublicUsageRoute: ApiPublicUsageRoute,
+  ApiPublicCronHealthRoute: ApiPublicCronHealthRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
