@@ -150,11 +150,6 @@ const SLIDES: Slide[] = [
     headline: "just type your rough thought in your AI chat, and end the sentence with  //",
     body: "see the magic for yourself.",
   },
-  {
-    label: "\n",
-    headline: "patkan.in",
-    body: "\n",
-  },
   /* --- final slide: poster layout with mast-sized tile --- */
   { label: "\n", headline: "patkan.in", logoLayout: "e" },
 ];
@@ -256,11 +251,13 @@ function CarouselPage() {
                   )}
                 </div>
 
-                <div className="slide-swipe">
-                  <span className="dot" />
-                  <span className="word">swipe</span>
-                  <span className="arrow">→</span>
-                </div>
+                {i !== total - 1 && (
+                  <div className="slide-swipe">
+                    <span className="dot" />
+                    <span className="word">swipe</span>
+                    <span className="arrow">→</span>
+                  </div>
+                )}
 
                 <div className="slide-footer">
                    <div className="footer-left">{"\n"}</div>
@@ -428,8 +425,8 @@ const CAROUSEL_CSS = `
 .pk-slide .logo-slide.layout-d .logo-word { font-size: 12.5cqw; order: -1; }
 .pk-slide .logo-slide.layout-d .logo-tile { width: 30cqw; height: 30cqw; }
 
-/* E — poster: tile centered with wordmark beneath, orange underline accent (tile size from layout C) */
+/* E — poster: tile centered with wordmark beneath, orange underline accent */
 .pk-slide .logo-slide.layout-e { flex-direction: column; align-items: center; justify-content: center; gap: 5cqw; text-align: center; }
-.pk-slide .logo-slide.layout-e .logo-tile { width: 26cqw; height: 26cqw; }
-.pk-slide .logo-slide.layout-e .logo-word { font-size: 8.5cqw; border-bottom: 1.2cqw solid var(--orange); padding-bottom: 1.4cqw; }
+.pk-slide .logo-slide.layout-e .logo-tile { width: 20cqw; height: 20cqw; }
+.pk-slide .logo-slide.layout-e .logo-word { font-size: 10cqw; border-bottom: 1.2cqw solid var(--orange); padding-bottom: 1.4cqw; }
 `;
