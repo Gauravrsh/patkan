@@ -103,7 +103,7 @@ const SLIDES: Slide[] = [
     headline: "writing a good opening prompt is a game changer for any work with AI",
   },
   {
-    label: "what it gives",
+    label: "\n",
     headline: "it gives right context,\nguardrails, \ndo's and don'ts, \noutput format to AI.",
   },
   {
