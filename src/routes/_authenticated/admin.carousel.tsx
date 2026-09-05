@@ -157,6 +157,13 @@ const SLIDES: Slide[] = [
 
 const pad = (n: number) => String(n).padStart(2, "0");
 
+/** Splits on ** markers and renders the marked runs as <strong>. */
+function renderEmphasis(text: string) {
+  return text.split("**").map((part, i) =>
+    i % 2 === 1 ? <strong key={i}>{part}</strong> : <span key={i}>{part}</span>,
+  );
+}
+
 function CarouselPage() {
   const total = SLIDES.length;
   const [current, setCurrent] = useState(0);
