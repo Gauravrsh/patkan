@@ -9,6 +9,7 @@ import {
   Headphones,
   Loader2,
   LockKeyhole,
+  Menu,
   MousePointer2,
   ShieldCheck,
   Sparkles,
