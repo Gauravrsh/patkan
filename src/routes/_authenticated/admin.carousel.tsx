@@ -218,7 +218,9 @@ function CarouselPage() {
                   <span className="label">{slide.label}</span>
                 </div>
 
-                <div className="slide-body">
+                <div
+                  className={`slide-body${slide.accent || slide.logoLayout ? " centered" : ""}`}
+                >
                   {slide.logoLayout ? (
                     <div className={`logo-slide layout-${slide.logoLayout}`}>
                       <img
@@ -232,7 +234,7 @@ function CarouselPage() {
                     </div>
                   ) : (
                     <>
-                      <div className={`content-headline size-${size}`}>
+                      <div className={`content-headline size-${size}${slide.accent ? " accent" : ""}`}>
                         {renderEmphasis(slide.headline)}
                       </div>
                       {slide.body && (
