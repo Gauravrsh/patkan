@@ -426,7 +426,7 @@ function Landing() {
     <div className="min-h-screen bg-background text-foreground">
       <header className="sticky top-0 z-30 border-b bg-background/85 backdrop-blur-md">
         <div className={`${shell} grid h-14 grid-cols-[minmax(0,1fr)_auto] items-center gap-3 sm:h-16`}>
-          <div className="flex min-w-0 items-center gap-2.5">
+          <div className="flex min-w-0 items-center gap-2 sm:gap-2.5">
             <img
               src={patkanMark}
               alt="Patkan"
@@ -435,12 +435,12 @@ function Landing() {
               className="size-8 shrink-0 rounded-[0.55rem] sm:size-9"
             />
             <span className="truncate text-lg font-semibold tracking-tight sm:text-xl">Patkan</span>
-            <span className="hidden shrink-0 rounded-full border bg-muted px-2.5 py-1 font-mono text-[11px] text-muted-foreground sm:inline">
+            <span className="shrink-0 rounded-full border bg-muted px-2 py-0.5 font-mono text-[10px] text-muted-foreground sm:px-2.5 sm:py-1 sm:text-[11px]">
               /पट्कन/
             </span>
           </div>
-          <div className="flex items-center gap-4 sm:gap-6">
-            <div className="hidden items-center gap-6 text-sm text-muted-foreground lg:flex">
+          <div className="flex items-center gap-3 sm:gap-6">
+            <div className="hidden items-center gap-5 text-sm text-muted-foreground md:flex lg:gap-6">
               <a href="#playground" className="transition-colors hover:text-foreground">
                 Playground
               </a>
@@ -462,9 +462,60 @@ function Landing() {
               <span className="sm:hidden">Get</span>
               <ArrowDownToLine className="size-4" aria-hidden />
             </button>
+            <Sheet open={menuOpen} onOpenChange={setMenuOpen}>
+              <SheetTrigger asChild>
+                <button
+                  aria-label="Open menu"
+                  className="inline-flex size-9 shrink-0 items-center justify-center rounded-md border text-foreground transition-colors hover:bg-muted md:hidden"
+                >
+                  <Menu className="size-5" aria-hidden />
+                </button>
+              </SheetTrigger>
+              <SheetContent side="right" className="w-[17rem]">
+                <SheetHeader>
+                  <SheetTitle>Menu</SheetTitle>
+                </SheetHeader>
+                <nav className="flex flex-col gap-1 px-4 pb-6 text-base">
+                  <a
+                    href="#playground"
+                    onClick={() => setMenuOpen(false)}
+                    className="rounded-md px-2 py-2.5 transition-colors hover:bg-muted"
+                  >
+                    Playground
+                  </a>
+                  <a
+                    href="#install"
+                    onClick={() => setMenuOpen(false)}
+                    className="rounded-md px-2 py-2.5 transition-colors hover:bg-muted"
+                  >
+                    Install Guide
+                  </a>
+                  {session ? null : (
+                    <Link
+                      to="/auth"
+                      onClick={() => setMenuOpen(false)}
+                      className="rounded-md px-2 py-2.5 transition-colors hover:bg-muted"
+                    >
+                      Sign in
+                    </Link>
+                  )}
+                  <button
+                    onClick={() => {
+                      setMenuOpen(false);
+                      getExtension();
+                    }}
+                    className="mt-2 inline-flex h-10 items-center justify-center gap-2 rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground"
+                  >
+                    Get Extension
+                    <ArrowDownToLine className="size-4" aria-hidden />
+                  </button>
+                </nav>
+              </SheetContent>
+            </Sheet>
           </div>
         </div>
       </header>
+
 
       <main>
         {/* Hero */}
