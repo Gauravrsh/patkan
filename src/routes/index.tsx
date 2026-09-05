@@ -29,6 +29,13 @@ import {
 import { streamTransform, type EngineId } from "@/lib/patkan-stream";
 import { useAuth } from "@/hooks/useAuth";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 import patkanMark from "@/assets/patkan-mark.png";
 
 export const Route = createFileRoute("/")({
