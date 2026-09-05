@@ -220,6 +220,24 @@ function Landing() {
     }
   }, [input]);
 
+  // The allowance shown on load must be the real one, not an optimistic 10.
+  useEffect(() => {
+    let cancelled = false;
+    const token = session?.access_token;
+    fetch(`/api/public/usage?deviceId=${encodeURIComponent(deviceId())}`, {
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+    })
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data: { used?: number; limit?: number } | null) => {
+        if (cancelled || !data || typeof data.used !== "number" || typeof data.limit !== "number") return;
+        setUsage({ used: data.used, limit: data.limit });
+      })
+      .catch(() => undefined);
+    return () => {
+      cancelled = true;
+    };
+  }, [session?.access_token]);
+
   async function transform(refinement?: string) {
     if (!input.trim() || busy) return;
     setBusy(true);
@@ -237,8 +255,10 @@ function Landing() {
           deviceId: deviceId(),
           accessToken: session?.access_token,
           refinement: refinement ?? null,
+          customInstruction,
           surface: "web",
         },
+
         (visible) => {
           setPhase("sharpening");
           setOutput(visible);
