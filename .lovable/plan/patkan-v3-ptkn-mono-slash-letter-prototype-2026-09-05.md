@@ -28,7 +28,7 @@ Create a new isolated route at `/v3` that is a pixel-for-pixel copy of the curre
 3. **Header mast**: replace the PNG mark + "Patkan" wordmark with the `ptkn` SVG mark and wordmark; keep the `/पट्कन/` phonetic badge.
 4. **Browser mockup extension card**: replace the Patkan PNG mark with the `ptkn` SVG mark inside the selected extension card.
 5. **Mobile connector / bridge**: replace the PNG mark with the `ptkn` SVG mark if it appears between playground panels.
-6. **Footer**: keep the "✦ Patkan — quickly." line unchanged (copy must not change).
+6. **Footer**: keep the "✦ Patkan — quickly." line unchanged (copy must not change).-----change the icon to 
 7. **Route metadata**: update title, description, og:url, and canonical to `/v3`.
 
 ## Files to create / modify
