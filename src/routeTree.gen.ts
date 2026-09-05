@@ -12,12 +12,13 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthRouteImport } from './routes/auth'
-import { Route as CarouselRouteImport } from './routes/carousel'
 import { Route as ClaudePromptGeneratorRouteImport } from './routes/claude-prompt-generator'
 import { Route as ConnectRouteImport } from './routes/connect'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedLibraryRouteImport } from './routes/_authenticated/library'
+import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
+import { Route as AuthenticatedAdminCarouselRouteImport } from './routes/_authenticated/admin.carousel'
 import { Route as ApiPublicFeedbackRouteImport } from './routes/api/public/feedback'
 import { Route as ApiPublicTemplatesRouteImport } from './routes/api/public/templates'
 import { Route as ApiPublicTransformRouteImport } from './routes/api/public/transform'
@@ -36,11 +37,6 @@ const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const CarouselRoute = CarouselRouteImport.update({
-  id: '/carousel',
-  path: '/carousel',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ClaudePromptGeneratorRoute = ClaudePromptGeneratorRouteImport.update({
@@ -68,6 +64,17 @@ const AuthenticatedLibraryRoute = AuthenticatedLibraryRouteImport.update({
   path: '/library',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AuthenticatedAdminRoute,
+} as any)
+const AuthenticatedAdminCarouselRoute =
+  AuthenticatedAdminCarouselRouteImport.update({
+    id: '/carousel',
+    path: '/carousel',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 const ApiPublicFeedbackRoute = ApiPublicFeedbackRouteImport.update({
   id: '/api/public/feedback',
   path: '/api/public/feedback',
@@ -97,31 +104,32 @@ const ApiPublicCronHealthRoute = ApiPublicCronHealthRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
-  '/carousel': typeof CarouselRoute
   '/claude-prompt-generator': typeof ClaudePromptGeneratorRoute
   '/connect': typeof ConnectRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
-  '/admin': typeof AuthenticatedAdminRoute
+  '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/library': typeof AuthenticatedLibraryRoute
+  '/admin/carousel': typeof AuthenticatedAdminCarouselRoute
   '/api/public/feedback': typeof ApiPublicFeedbackRoute
   '/api/public/templates': typeof ApiPublicTemplatesRoute
   '/api/public/transform': typeof ApiPublicTransformRoute
   '/api/public/usage': typeof ApiPublicUsageRoute
+  '/admin/': typeof AuthenticatedAdminIndexRoute
   '/api/public/cron/health': typeof ApiPublicCronHealthRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
-  '/carousel': typeof CarouselRoute
   '/claude-prompt-generator': typeof ClaudePromptGeneratorRoute
   '/connect': typeof ConnectRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
-  '/admin': typeof AuthenticatedAdminRoute
   '/library': typeof AuthenticatedLibraryRoute
+  '/admin/carousel': typeof AuthenticatedAdminCarouselRoute
   '/api/public/feedback': typeof ApiPublicFeedbackRoute
   '/api/public/templates': typeof ApiPublicTemplatesRoute
   '/api/public/transform': typeof ApiPublicTransformRoute
   '/api/public/usage': typeof ApiPublicUsageRoute
+  '/admin': typeof AuthenticatedAdminIndexRoute
   '/api/public/cron/health': typeof ApiPublicCronHealthRoute
 }
 export interface FileRoutesById {
@@ -129,16 +137,17 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
-  '/carousel': typeof CarouselRoute
   '/claude-prompt-generator': typeof ClaudePromptGeneratorRoute
   '/connect': typeof ConnectRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
-  '/_authenticated/admin': typeof AuthenticatedAdminRoute
+  '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
   '/_authenticated/library': typeof AuthenticatedLibraryRoute
+  '/_authenticated/admin/carousel': typeof AuthenticatedAdminCarouselRoute
   '/api/public/feedback': typeof ApiPublicFeedbackRoute
   '/api/public/templates': typeof ApiPublicTemplatesRoute
   '/api/public/transform': typeof ApiPublicTransformRoute
   '/api/public/usage': typeof ApiPublicUsageRoute
+  '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/api/public/cron/health': typeof ApiPublicCronHealthRoute
 }
 export interface FileRouteTypes {
@@ -146,47 +155,49 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/auth'
-    | '/carousel'
     | '/claude-prompt-generator'
     | '/connect'
     | '/sitemap.xml'
     | '/admin'
     | '/library'
+    | '/admin/carousel'
     | '/api/public/feedback'
     | '/api/public/templates'
     | '/api/public/transform'
     | '/api/public/usage'
+    | '/admin/'
     | '/api/public/cron/health'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/auth'
-    | '/carousel'
     | '/claude-prompt-generator'
     | '/connect'
     | '/sitemap.xml'
-    | '/admin'
     | '/library'
+    | '/admin/carousel'
     | '/api/public/feedback'
     | '/api/public/templates'
     | '/api/public/transform'
     | '/api/public/usage'
+    | '/admin'
     | '/api/public/cron/health'
   id:
     | '__root__'
     | '/'
     | '/_authenticated'
     | '/auth'
-    | '/carousel'
     | '/claude-prompt-generator'
     | '/connect'
     | '/sitemap.xml'
     | '/_authenticated/admin'
     | '/_authenticated/library'
+    | '/_authenticated/admin/carousel'
     | '/api/public/feedback'
     | '/api/public/templates'
     | '/api/public/transform'
     | '/api/public/usage'
+    | '/_authenticated/admin/'
     | '/api/public/cron/health'
   fileRoutesById: FileRoutesById
 }
@@ -194,7 +205,6 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
-  CarouselRoute: typeof CarouselRoute
   ClaudePromptGeneratorRoute: typeof ClaudePromptGeneratorRoute
   ConnectRoute: typeof ConnectRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
@@ -226,13 +236,6 @@ declare module '@tanstack/react-router' {
       path: '/auth'
       fullPath: '/auth'
       preLoaderRoute: typeof AuthRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/carousel': {
-      id: '/carousel'
-      path: '/carousel'
-      fullPath: '/carousel'
-      preLoaderRoute: typeof CarouselRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/claude-prompt-generator': {
@@ -269,6 +272,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/library'
       preLoaderRoute: typeof AuthenticatedLibraryRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/admin/': {
+      id: '/_authenticated/admin/'
+      path: '/'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AuthenticatedAdminIndexRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/carousel': {
+      id: '/_authenticated/admin/carousel'
+      path: '/carousel'
+      fullPath: '/admin/carousel'
+      preLoaderRoute: typeof AuthenticatedAdminCarouselRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
     }
     '/api/public/feedback': {
       id: '/api/public/feedback'
@@ -308,13 +325,26 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface AuthenticatedAdminRouteChildren {
+  AuthenticatedAdminCarouselRoute: typeof AuthenticatedAdminCarouselRoute
+  AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
+}
+
+const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
+  AuthenticatedAdminCarouselRoute: AuthenticatedAdminCarouselRoute,
+  AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
+}
+
+const AuthenticatedAdminRouteWithChildren =
+  AuthenticatedAdminRoute._addFileChildren(AuthenticatedAdminRouteChildren)
+
 interface AuthenticatedRouteRouteChildren {
-  AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
+  AuthenticatedAdminRoute: typeof AuthenticatedAdminRouteWithChildren
   AuthenticatedLibraryRoute: typeof AuthenticatedLibraryRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
-  AuthenticatedAdminRoute: AuthenticatedAdminRoute,
+  AuthenticatedAdminRoute: AuthenticatedAdminRouteWithChildren,
   AuthenticatedLibraryRoute: AuthenticatedLibraryRoute,
 }
 
@@ -325,7 +355,6 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
-  CarouselRoute: CarouselRoute,
   ClaudePromptGeneratorRoute: ClaudePromptGeneratorRoute,
   ConnectRoute: ConnectRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
