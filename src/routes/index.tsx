@@ -484,6 +484,14 @@ function Landing() {
 
             </div>
             <button
+              onClick={sharePatkan}
+              aria-label="Share Patkan"
+              className="inline-flex h-9 shrink-0 items-center gap-2 rounded-md border px-3 text-sm font-medium text-foreground transition-colors hover:bg-muted"
+            >
+              <Share2 className="size-4" aria-hidden />
+              <span className="hidden sm:inline">Share</span>
+            </button>
+            <button
               onClick={getExtension}
               className="inline-flex h-9 shrink-0 items-center gap-2 rounded-md bg-primary px-3 text-sm font-medium text-primary-foreground shadow-sm transition-colors hover:bg-primary/90 sm:px-4"
             >
