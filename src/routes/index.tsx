@@ -519,8 +519,9 @@ function Landing() {
                 </h2>
               </div>
               <p className="max-w-md text-sm leading-relaxed text-muted-foreground">
-                Works across all major desktop browsers. Not in stores yet, so it installs directly unpacked.
+                Works across all major desktop browsers*. Not in stores yet, so it installs directly unpacked.
               </p>
+
             </div>
 
             <div className="relative mt-10">
