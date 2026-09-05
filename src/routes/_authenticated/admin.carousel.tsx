@@ -99,7 +99,7 @@ const SLIDES: Slide[] = [
     body: "I surely am.",
   },
   {
-    label: "the premise",
+    label: "\n",
     headline: "writing a good opening prompt is a game changer for any work with AI",
   },
   {
