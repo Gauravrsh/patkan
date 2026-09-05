@@ -79,8 +79,10 @@ type Slide = {
   label: string;
   headline: string;
   body?: string;
+  definition?: string;
   bullets?: string[];
   accent?: boolean;
+  size?: "xl" | "lg" | "md" | "sm";
   logoLayout?: "a" | "b" | "c" | "d" | "e";
 };
 
@@ -88,51 +90,61 @@ const SLIDES: Slide[] = [
   {
     label: "\n",
     headline: "Kya ch***ya hai ye AI!!",
+    size: "xl",
     body: "...with an exhausted sigh!!",
   },
-  { label: "\n", headline: "OR", accent: true },
+  { label: "\n", headline: "OR", accent: true, size: "xl" },
   {
     label: "\n",
     headline: "This AI sucks!!",
+    size: "xl",
     body: "if you are more Maya than Monisha\n#IFKYK",
   },
   {
     label: "\n",
     headline: "is that you, more often than not?",
+    size: "lg",
     body: "i surely am.",
   },
   {
     label: "\n",
+    size: "md",
     headline: "writing a good [[opening prompt]] is a game changer for any work with AI",
   },
   {
     label: "\n",
+    size: "md",
     headline: "it gives right context, persona, task, guardrails, do's & don'ts, output format to AI.",
   },
   {
     label: "\n",
+    size: "md",
     headline: "it can ask you all the right questions before even getting started.",
   },
     {
       label: "\n",
+    size: "md",
     headline: "the outputs suddenly starts to get so much...",
     bullets: ["how you always wanted it...", "how an AI should be..."],
   },
-  { label: "\n", headline: "intelligent!!" },
-  { label: "\n", headline: "so, what's the problem?" },
-  { label: "\n", headline: "bas ek." },
-  { label: "\n", headline: "Itna type kaun karega!!" },
+  { label: "\n", headline: "intelligent!!", size: "xl" },
+  { label: "\n", headline: "so, what's the problem?", size: "xl" },
+  { label: "\n", headline: "bas ek.", size: "xl" },
+  { label: "\n", headline: "Itna type kaun karega!!", size: "xl" },
   {
     label: "\n",
+    size: "md",
     headline:
       "what if your rough first idea converts into a surgical prompt,\neven before it goes into your AI chat?",
   },
   {
     label: "\n",
+    size: "md",
     headline: "and sets your session with AI on a totally different track.",
   },
   {
     label: "\n",
+    size: "md",
     headline: "the track that gets you 100X from your AI.",
     bullets: [
       "things that you had not thought of.",
@@ -143,17 +155,21 @@ const SLIDES: Slide[] = [
   {
     label: "\n",
     headline: "patkan",
+    size: "xl",
     body: "/pʌtˈkʌn/ · verb",
-    bullets: ["to perform, execute or complete an action [[instantly, promptly, and without delay]], in a single swift motion "],
+    definition:
+      "to perform, execute or complete an action [[instantly, promptly]], and [[without delay]], in a single swift motion",
   },
   {
     label: "\n",
-    headline: "just type your rough thought in your AI chat, and end the sentence with  //",
+    size: "md",
+    headline: "just type your rough thought in your AI chat, and end the sentence with  //",
     body: "see the magic for yourself.",
   },
   /* --- final slide: poster layout with mast-sized tile --- */
   { label: "\n", headline: "patkan.in", logoLayout: "e" },
 ];
+
 
 const pad = (n: number) => String(n).padStart(2, "0");
 
@@ -206,7 +222,9 @@ function CarouselPage() {
         <div className="pk-slides">
           {SLIDES.map((slide, i) => {
             const len = slide.headline.length;
-            const size = len <= 18 ? "xl" : len <= 45 ? "lg" : len <= 80 ? "md" : "sm";
+            const size =
+              slide.size ??
+              (len <= 18 ? "xl" : len <= 45 ? "lg" : len <= 80 ? "md" : "sm");
             return (
               <div
                 key={i}
@@ -219,7 +237,7 @@ function CarouselPage() {
                 </div>
 
                 <div
-                  className={`slide-body${slide.accent || slide.logoLayout ? " centered" : ""}`}
+                  className={`slide-body${slide.logoLayout ? " centered" : ""}`}
                 >
                   {slide.logoLayout ? (
                     <div className={`logo-slide layout-${slide.logoLayout}`}>
@@ -240,6 +258,11 @@ function CarouselPage() {
                       {slide.body && (
                         <div className="content-body">{renderEmphasis(slide.body)}</div>
                       )}
+                      {slide.definition && (
+                        <div className="content-definition">
+                          {renderEmphasis(slide.definition)}
+                        </div>
+                      )}
                       {slide.bullets && (
                         <ul className="content-bullets">
                           {slide.bullets.map((b, bi) => (
@@ -253,6 +276,7 @@ function CarouselPage() {
                     </>
                   )}
                 </div>
+
 
                 {i !== total - 1 && (
                   <div className="slide-swipe">
@@ -268,7 +292,15 @@ function CarouselPage() {
                     {pad(i + 1)} / {pad(total)}
                   </div>
                 </div>
+
+                <div className="slide-progress">
+                  <span
+                    className="slide-progress-fill"
+                    style={{ width: `${((i + 1) / total) * 100}%` }}
+                  />
+                </div>
               </div>
+
             );
           })}
         </div>
@@ -374,7 +406,9 @@ const CAROUSEL_CSS = `
 .pk-slide .content-headline.size-lg { font-size: 8.5cqw; }
 .pk-slide .content-headline.size-md { font-size: 7.2cqw; }
 .pk-slide .content-headline.size-sm { font-size: 6.2cqw; }
-.pk-slide .content-headline.accent { color: var(--orange); text-align: center; width: 100%; }
+.pk-slide .content-headline.accent { color: var(--orange); }
+.pk-slide .content-definition { font-family: 'Fraunces', serif; font-style: italic; font-weight: 400; font-size: 4.6cqw; line-height: 1.35; color: var(--ink); margin-top: 4.5cqw; max-width: 100%; }
+
 .pk-slide .content-body { font-size: 3.1cqw; line-height: 1.5; color: var(--ink); white-space: pre-line; max-width: 100%; margin-top: 3.4cqw; }
 .pk-slide .content-bullets { list-style: none; margin: 4cqw 0 0; padding: 0; display: flex; flex-direction: column; gap: 2.4cqw; }
 .pk-slide .content-bullets li { display: flex; align-items: baseline; gap: 2cqw; font-size: 3cqw; line-height: 1.4; color: var(--ink); }
@@ -382,10 +416,15 @@ const CAROUSEL_CSS = `
 
 .pk-slide .content-headline strong,
 .pk-slide .content-body strong,
-.pk-slide .content-bullets strong { font-weight: inherit; color: var(--orange); }
+.pk-slide .content-bullets strong,
+.pk-slide .content-definition strong { font-weight: inherit; font-style: inherit; color: var(--orange); }
 
-.pk-slide .slide-swipe { display: flex; align-items: center; justify-content: flex-end; gap: 1.1cqw; margin: 4cqw 0 3cqw; font-size: 2.6cqw; color: var(--muted); letter-spacing: 0.02em; }
-.pk-slide .slide-swipe .dot { flex: none; width: 1.5cqw; height: 1.5cqw; border-radius: 50%; background: var(--orange); }
+
+.pk-slide .slide-swipe { display: flex; align-items: center; justify-content: flex-end; gap: 1.2cqw; margin: 4cqw 0 3cqw; font-size: 3.1cqw; color: var(--muted); letter-spacing: 0.02em; }
+.pk-slide .slide-progress { position: absolute; left: 0; right: 0; bottom: 0; height: 0.28cqw; min-height: 2px; background: rgba(28, 25, 23, 0.12); }
+.pk-slide .slide-progress-fill { display: block; height: 100%; background: var(--orange); }
+
+.pk-slide .slide-swipe .dot { flex: none; width: 1.8cqw; height: 1.8cqw; border-radius: 50%; background: var(--orange); }
 .pk-slide .slide-swipe .word { text-transform: lowercase; }
 .pk-slide .slide-swipe .arrow { color: var(--ink); }
 
