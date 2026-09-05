@@ -420,7 +420,7 @@ function Landing() {
         {/* Pillars */}
         <section className={`${shell} py-16 sm:py-20 md:py-24`}>
           <div aria-hidden className="h-[3px] w-full bg-primary" />
-          <div className="border-b border-border md:grid md:grid-cols-3 md:divide-x md:divide-border">
+          <div className="border-b border-border md:grid md:grid-cols-[1fr_1.35fr_1fr] md:divide-x md:divide-border">
             {pillars.map(({ number, icon: Icon, heading, body }) => (
               <article
                 key={heading}
