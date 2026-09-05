@@ -416,7 +416,9 @@ const CAROUSEL_CSS = `
 
 .pk-slide .content-headline strong,
 .pk-slide .content-body strong,
-.pk-slide .content-bullets strong { font-weight: inherit; color: var(--orange); }
+.pk-slide .content-bullets strong,
+.pk-slide .content-definition strong { font-weight: inherit; font-style: inherit; color: var(--orange); }
+
 
 .pk-slide .slide-swipe { display: flex; align-items: center; justify-content: flex-end; gap: 1.2cqw; margin: 4cqw 0 3cqw; font-size: 3.1cqw; color: var(--muted); letter-spacing: 0.02em; }
 .pk-slide .slide-progress { position: absolute; left: 0; right: 0; bottom: 0; height: 0.28cqw; min-height: 2px; background: rgba(28, 25, 23, 0.12); }
