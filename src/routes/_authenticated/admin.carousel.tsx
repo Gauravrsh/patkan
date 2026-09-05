@@ -134,7 +134,7 @@ const SLIDES: Slide[] = [
     bullets: [
       "things that you had not thought of.",
       "areas which you had overlooked.",
-      "scenarios you had not imagined.",
+      "scenarios that you had not imagined.",
     ],
   },
   {
