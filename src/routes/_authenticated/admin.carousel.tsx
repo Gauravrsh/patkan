@@ -210,19 +210,27 @@ function CarouselPage() {
 
                 <div className="slide-body">
                   <div className={`content-headline size-${size}`}>
-                    {slide.headline}
+                    {renderEmphasis(slide.headline)}
                   </div>
-                  {slide.body && <div className="content-body">{slide.body}</div>}
+                  {slide.body && (
+                    <div className="content-body">{renderEmphasis(slide.body)}</div>
+                  )}
                   {slide.bullets && (
                     <ul className="content-bullets">
                       {slide.bullets.map((b, bi) => (
                         <li key={bi}>
                           <span className="marker" />
-                          <span>{b}</span>
+                          <span>{renderEmphasis(b)}</span>
                         </li>
                       ))}
                     </ul>
                   )}
+                </div>
+
+                <div className="slide-swipe">
+                  <span className="dot" />
+                  <span className="word">swipe</span>
+                  <span className="arrow">→</span>
                 </div>
 
                 <div className="slide-footer">
