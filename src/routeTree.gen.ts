@@ -14,7 +14,6 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as ConnectRouteImport } from './routes/connect'
 import { Route as V2RouteImport } from './routes/v2'
-import { Route as V3RouteImport } from './routes/v3'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedLibraryRouteImport } from './routes/_authenticated/library'
 import { Route as ApiPublicFeedbackRouteImport } from './routes/api/public/feedback'
@@ -45,11 +44,6 @@ const ConnectRoute = ConnectRouteImport.update({
 const V2Route = V2RouteImport.update({
   id: '/v2',
   path: '/v2',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const V3Route = V3RouteImport.update({
-  id: '/v3',
-  path: '/v3',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
@@ -93,7 +87,6 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/connect': typeof ConnectRoute
   '/v2': typeof V2Route
-  '/v3': typeof V3Route
   '/admin': typeof AuthenticatedAdminRoute
   '/library': typeof AuthenticatedLibraryRoute
   '/api/public/feedback': typeof ApiPublicFeedbackRoute
@@ -107,7 +100,6 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/connect': typeof ConnectRoute
   '/v2': typeof V2Route
-  '/v3': typeof V3Route
   '/admin': typeof AuthenticatedAdminRoute
   '/library': typeof AuthenticatedLibraryRoute
   '/api/public/feedback': typeof ApiPublicFeedbackRoute
@@ -123,7 +115,6 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/connect': typeof ConnectRoute
   '/v2': typeof V2Route
-  '/v3': typeof V3Route
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
   '/_authenticated/library': typeof AuthenticatedLibraryRoute
   '/api/public/feedback': typeof ApiPublicFeedbackRoute
@@ -139,7 +130,6 @@ export interface FileRouteTypes {
     | '/auth'
     | '/connect'
     | '/v2'
-    | '/v3'
     | '/admin'
     | '/library'
     | '/api/public/feedback'
@@ -153,7 +143,6 @@ export interface FileRouteTypes {
     | '/auth'
     | '/connect'
     | '/v2'
-    | '/v3'
     | '/admin'
     | '/library'
     | '/api/public/feedback'
@@ -168,7 +157,6 @@ export interface FileRouteTypes {
     | '/auth'
     | '/connect'
     | '/v2'
-    | '/v3'
     | '/_authenticated/admin'
     | '/_authenticated/library'
     | '/api/public/feedback'
@@ -184,7 +172,6 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   ConnectRoute: typeof ConnectRoute
   V2Route: typeof V2Route
-  V3Route: typeof V3Route
   ApiPublicFeedbackRoute: typeof ApiPublicFeedbackRoute
   ApiPublicTemplatesRoute: typeof ApiPublicTemplatesRoute
   ApiPublicTransformRoute: typeof ApiPublicTransformRoute
@@ -227,13 +214,6 @@ declare module '@tanstack/react-router' {
       path: '/v2'
       fullPath: '/v2'
       preLoaderRoute: typeof V2RouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/v3': {
-      id: '/v3'
-      path: '/v3'
-      fullPath: '/v3'
-      preLoaderRoute: typeof V3RouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/admin': {
@@ -307,7 +287,6 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   ConnectRoute: ConnectRoute,
   V2Route: V2Route,
-  V3Route: V3Route,
   ApiPublicFeedbackRoute: ApiPublicFeedbackRoute,
   ApiPublicTemplatesRoute: ApiPublicTemplatesRoute,
   ApiPublicTransformRoute: ApiPublicTransformRoute,
