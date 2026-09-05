@@ -150,7 +150,7 @@ const SLIDES: Slide[] = [
   },
   {
     label: "\n",
-    headline: "www.patkan.in",
+    headline: "patkan.in",
     body: "\n",
   },
 ];
