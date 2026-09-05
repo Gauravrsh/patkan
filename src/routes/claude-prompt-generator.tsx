@@ -273,8 +273,7 @@ function ClaudePromptGenerator() {
       </main>
 
       <footer className="border-t">
-        <div className={`${shell} flex flex-wrap items-center justify-between gap-3 py-8 text-xs text-muted-foreground`}>
-          <span>✦ Patkan — quickly.</span>
+        <div className={`${shell} flex flex-wrap items-center justify-end gap-3 py-8 text-xs text-muted-foreground`}>
           <Link to="/" className="transition-colors hover:text-foreground">
             Back to patkan.in
           </Link>
