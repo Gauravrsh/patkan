@@ -48,8 +48,11 @@ export async function streamTransform(
       deviceId: req.deviceId,
       refinement: req.refinement ?? null,
       customInstruction: req.customInstruction ?? null,
+      host: req.host ?? null,
+      surface: req.surface ?? "web",
     }),
   });
+
 
   if (!res.ok || !res.body) {
     const data = (await res.json().catch(() => ({}))) as { error?: string };
