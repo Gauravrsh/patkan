@@ -95,7 +95,7 @@ const SLIDES: Slide[] = [
   },
   {
     label: "the question",
-    headline: "is that you, more often than not?",
+    headline: "Is that you, more often than not?",
     body: "I surely am.",
   },
   {
