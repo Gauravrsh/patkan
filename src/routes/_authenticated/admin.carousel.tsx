@@ -129,7 +129,7 @@ const SLIDES: Slide[] = [
     headline: "and sets your conversation on a totally different track.",
   },
   {
-    label: "the payoff",
+    label: "\n",
     headline: "the track that gets you 100X from your AI.",
     bullets: [
       "things that you had not thought of.",
