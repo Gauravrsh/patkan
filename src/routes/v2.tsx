@@ -371,95 +371,126 @@ function ApprovedUrlsTrigger() {
   );
 }
 
+const chipRow =
+  "mt-3 flex gap-2 max-lg:flex-nowrap max-lg:overflow-x-auto max-lg:pb-1 max-lg:[mask-image:linear-gradient(to_right,black_86%,transparent)] lg:flex-wrap";
+
+function Chip({ name, active }: { name: string; active: boolean }) {
+  return (
+    <span
+      className={`shrink-0 rounded-full border px-3.5 py-1.5 text-xs ${
+        active ? "border-primary bg-primary text-primary-foreground" : "text-muted-foreground"
+      }`}
+    >
+      {name}
+    </span>
+  );
+}
+
 function Playground() {
   return (
     <div>
       <div className="mx-auto mb-8 max-w-xl text-center sm:mb-10">
         <p className="font-mono text-xs uppercase tracking-[0.18em] text-primary">Playground</p>
       </div>
-      <div className="grid gap-px overflow-hidden rounded-lg border bg-border shadow-sm lg:grid-cols-2">
-        <div className="bg-background p-5 sm:p-7">
+      <div className="relative flex flex-col lg:grid lg:grid-cols-[5fr_6fr] lg:gap-px lg:overflow-hidden lg:rounded-lg lg:border lg:bg-border lg:shadow-sm">
+        {/* Input card */}
+        <div className="rounded-lg border bg-background p-5 shadow-sm sm:p-7 lg:rounded-none lg:border-0 lg:shadow-none">
           <div className="flex items-center justify-between gap-3 text-xs">
             <span className="font-semibold tracking-wider">YOUR THOUGHTS</span>
             <span className="shrink-0 text-muted-foreground">10/day free</span>
           </div>
-          <div className="mt-5 min-h-24 border-b pb-6 text-base text-muted-foreground sm:min-h-28 sm:text-lg">
-            I want to..
+          <div className="mt-5 min-h-24 border-b border-dashed pb-6 sm:min-h-28">
+            <span className="text-base text-muted-foreground underline decoration-dotted underline-offset-8 sm:text-lg">
+              I want to..
+            </span>
+            <span className="ml-1 inline-block h-4 w-px animate-pulse bg-foreground align-middle sm:h-5" aria-hidden />
           </div>
           <div className="mt-6">
             <p className="font-mono text-[11px] tracking-widest text-muted-foreground">TARGET AI</p>
-            <div className="mt-3 flex flex-wrap gap-2">
+            <div className={chipRow}>
               {targetAis.map(([name], index) => (
-                <span
-                  key={name}
-                  className={`rounded-full border px-3.5 py-1.5 text-xs ${
-                    index === 0 ? "border-primary bg-primary text-primary-foreground" : "text-muted-foreground"
-                  }`}
-                >
-                  {name}
-                </span>
+                <Chip key={name} name={name} active={index === 0} />
               ))}
             </div>
-            <p className="mt-3 text-xs leading-relaxed text-muted-foreground sm:text-sm">{targetAis[0][1]}</p>
+            <p className="mt-3 truncate text-xs leading-relaxed text-muted-foreground sm:text-sm lg:whitespace-normal">
+              {targetAis[0][1]}
+            </p>
           </div>
           <div className="mt-6 border-t pt-6">
             <div className="flex flex-wrap items-center justify-between gap-2">
               <p className="font-mono text-[11px] tracking-widest text-muted-foreground">PERSONA</p>
               <span className="text-xs text-muted-foreground">Custom persona active</span>
             </div>
-            <div className="mt-3 flex flex-wrap gap-2">
+            <div className={chipRow}>
               {personas.map(([name], index) => (
-                <span
-                  key={name}
-                  className={`rounded-full border px-3.5 py-1.5 text-xs ${
-                    index === 0 ? "border-primary bg-primary text-primary-foreground" : "text-muted-foreground"
-                  }`}
-                >
-                  {name}
-                </span>
+                <Chip key={name} name={name} active={index === 0} />
               ))}
             </div>
-            <p className="mt-3 text-xs leading-relaxed text-muted-foreground sm:text-sm">{personas[0][1]}</p>
+            <p className="mt-3 truncate text-xs leading-relaxed text-muted-foreground sm:text-sm lg:whitespace-normal">
+              {personas[0][1]}
+            </p>
           </div>
-          <div className="mt-6">
-            <p className="text-sm font-semibold">Define your custom persona or role:</p>
-            <div className="mt-3 rounded-md border bg-background px-4 py-3 text-sm text-muted-foreground">
-              e.g. Senior Security Auditor, Fintech Regulatory Lead, Creative Director...
-            </div>
-          </div>
-          <span className="mt-6 flex h-12 w-full items-center justify-center gap-2 rounded-md bg-primary text-sm font-medium text-primary-foreground shadow-sm">
+          {/* Mobile CTA — closes the input card */}
+          <span className="mt-7 flex h-12 w-full items-center justify-center gap-2 rounded-md bg-primary text-sm font-medium text-primary-foreground shadow-sm lg:hidden">
             <Sparkles className="size-4" aria-hidden /> Patkan it
           </span>
         </div>
 
-        <div className="flex flex-col bg-muted/40 p-5 sm:p-7">
+        {/* Mobile connector — the // mark as the transformation glyph */}
+        <div className="flex flex-col items-center py-1 lg:hidden" aria-hidden>
+          <span className="h-4 w-px bg-border" />
+          <img src={patkanMark} alt="" width={816} height={816} className="my-1 size-8 rounded-[0.55rem] shadow-sm" />
+          <span className="h-4 w-px bg-border" />
+        </div>
+
+        {/* Output card */}
+        <div className="flex flex-col rounded-lg border bg-muted/40 p-5 shadow-sm sm:p-7 lg:rounded-none lg:border-0 lg:shadow-none">
           <div className="flex items-center justify-between gap-3 text-xs">
             <span className="font-semibold tracking-wider">COMPILED PROMPT</span>
             <span className="inline-flex shrink-0 items-center gap-2 text-muted-foreground">
               <Copy className="size-4" aria-hidden /> Copy
             </span>
           </div>
-          <div className="mt-6 space-y-3">
-            <p className="text-sm font-medium text-foreground">Ready</p>
-            <div className="h-px w-full bg-border" />
-            <div className="h-px w-4/5 bg-border" />
-            <div className="h-px w-11/12 bg-border" />
-            <div className="h-px w-3/4 bg-border" />
-          </div>
-          <div className="mt-10 border-t pt-4 lg:mt-auto">
-            <p className="text-xs leading-relaxed text-muted-foreground">
-              <strong className="text-foreground">Assumed:</strong> B2C e-commerce context · Standard multi-step
-              checkout with cart, payment, and confirmation
-            </p>
-            <div className="mt-4 flex flex-wrap gap-2">
-              {["+ Mobile-first focus", "+ B2B Wholesale focus", "+ Payment aggregator migration"].map((item) => (
-                <span key={item} className="rounded-full border border-dashed px-3 py-1.5 text-xs text-muted-foreground">
-                  {item}
-                </span>
-              ))}
+          <p className="mt-3 truncate font-mono text-[11px] tracking-wide text-muted-foreground">
+            compiled for {targetAis[0][0]} · {personas[0][0]}
+          </p>
+          <div className="relative mt-4 overflow-hidden rounded-md border bg-background">
+            <div className="max-h-56 space-y-2.5 p-4 font-mono text-[11px] leading-relaxed sm:max-h-64 sm:p-5 sm:text-xs">
+              <p className="text-primary">&lt;role&gt;</p>
+              <p className="pl-4 text-foreground/90">an expert in the domain the task implies</p>
+              <p className="text-primary">&lt;/role&gt;</p>
+              <p className="text-primary">&lt;context&gt;</p>
+              <p className="pl-4 text-foreground/90">
+                B2C e-commerce context · Standard multi-step checkout with cart, payment, and confirmation
+              </p>
+              <p className="text-primary">&lt;/context&gt;</p>
+              <p className="text-primary">&lt;task&gt;</p>
+              <p className="pl-4 text-foreground/90">…</p>
             </div>
+            <div
+              className="pointer-events-none absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-background to-transparent"
+              aria-hidden
+            />
+          </div>
+          <div className="mt-5 border-l-2 border-primary/60 pl-4">
+            <p className="text-xs leading-relaxed text-muted-foreground">
+              <strong className="font-mono text-[11px] tracking-wide text-foreground">Assumed:</strong> B2C e-commerce
+              context · Standard multi-step checkout with cart, payment, and confirmation
+            </p>
+          </div>
+          <div className="mt-4 flex flex-wrap gap-2 lg:mt-auto lg:pt-5">
+            {["+ Mobile-first focus", "+ B2B Wholesale focus", "+ Payment aggregator migration"].map((item) => (
+              <span key={item} className="rounded-full border border-dashed px-3 py-1.5 text-xs text-muted-foreground">
+                {item}
+              </span>
+            ))}
           </div>
         </div>
+
+        {/* Desktop bridge CTA straddling the panel seam */}
+        <span className="absolute top-1/2 left-[45.45%] hidden h-12 -translate-x-1/2 -translate-y-1/2 items-center gap-2 rounded-full bg-primary px-6 text-sm font-medium whitespace-nowrap text-primary-foreground shadow-lg ring-4 ring-background lg:inline-flex">
+          <Sparkles className="size-4" aria-hidden /> Patkan it
+        </span>
       </div>
     </div>
   );
