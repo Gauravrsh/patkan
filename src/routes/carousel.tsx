@@ -204,7 +204,10 @@ function CarouselPage() {
                     className="cover-headline"
                     style={
                       slide.headlineSize
-                        ? { fontSize: slide.headlineSize, marginBottom: 24 }
+                        ? {
+                            fontSize: `${slide.headlineSize / 10.8}cqw`,
+                            marginBottom: "2.2cqw",
+                          }
                         : undefined
                     }
                   >
@@ -222,7 +225,7 @@ function CarouselPage() {
                   )}
                   <div
                     className="cover-hint"
-                    style={slide.dictionary ? { marginTop: 36 } : undefined}
+                    style={slide.dictionary ? { marginTop: "3.3cqw" } : undefined}
                   >
                     <span className="dot" />
                     <span>{slide.hint ?? "swipe →"}</span>
