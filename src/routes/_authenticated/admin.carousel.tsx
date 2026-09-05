@@ -94,7 +94,7 @@ const SLIDES: Slide[] = [
     body: "- If you are more Maya than Monisha \n\n\n#IFKYK",
   },
   {
-    label: "the question",
+    label: "\n",
     headline: "Is that you, more often than not?",
     body: "I surely am.",
   },
