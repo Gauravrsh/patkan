@@ -79,8 +79,10 @@ type Slide = {
   label: string;
   headline: string;
   body?: string;
+  definition?: string;
   bullets?: string[];
   accent?: boolean;
+  size?: "xl" | "lg" | "md" | "sm";
   logoLayout?: "a" | "b" | "c" | "d" | "e";
 };
 
@@ -88,51 +90,61 @@ const SLIDES: Slide[] = [
   {
     label: "\n",
     headline: "Kya ch***ya hai ye AI!!",
+    size: "xl",
     body: "...with an exhausted sigh!!",
   },
-  { label: "\n", headline: "OR", accent: true },
+  { label: "\n", headline: "OR", accent: true, size: "xl" },
   {
     label: "\n",
     headline: "This AI sucks!!",
+    size: "xl",
     body: "if you are more Maya than Monisha\n#IFKYK",
   },
   {
     label: "\n",
     headline: "is that you, more often than not?",
+    size: "lg",
     body: "i surely am.",
   },
   {
     label: "\n",
+    size: "md",
     headline: "writing a good [[opening prompt]] is a game changer for any work with AI",
   },
   {
     label: "\n",
+    size: "md",
     headline: "it gives right context, persona, task, guardrails, do's & don'ts, output format to AI.",
   },
   {
     label: "\n",
+    size: "md",
     headline: "it can ask you all the right questions before even getting started.",
   },
     {
       label: "\n",
+    size: "md",
     headline: "the outputs suddenly starts to get so much...",
     bullets: ["how you always wanted it...", "how an AI should be..."],
   },
-  { label: "\n", headline: "intelligent!!" },
-  { label: "\n", headline: "so, what's the problem?" },
-  { label: "\n", headline: "bas ek." },
-  { label: "\n", headline: "Itna type kaun karega!!" },
+  { label: "\n", headline: "intelligent!!", size: "xl" },
+  { label: "\n", headline: "so, what's the problem?", size: "xl" },
+  { label: "\n", headline: "bas ek.", size: "xl" },
+  { label: "\n", headline: "Itna type kaun karega!!", size: "xl" },
   {
     label: "\n",
+    size: "md",
     headline:
       "what if your rough first idea converts into a surgical prompt,\neven before it goes into your AI chat?",
   },
   {
     label: "\n",
+    size: "md",
     headline: "and sets your session with AI on a totally different track.",
   },
   {
     label: "\n",
+    size: "md",
     headline: "the track that gets you 100X from your AI.",
     bullets: [
       "things that you had not thought of.",
@@ -143,17 +155,21 @@ const SLIDES: Slide[] = [
   {
     label: "\n",
     headline: "patkan",
+    size: "xl",
     body: "/pʌtˈkʌn/ · verb",
-    bullets: ["to perform, execute or complete an action [[instantly, promptly, and without delay]], in a single swift motion "],
+    definition:
+      "to perform, execute or complete an action [[instantly, promptly]], and [[without delay]], in a single swift motion",
   },
   {
     label: "\n",
-    headline: "just type your rough thought in your AI chat, and end the sentence with  //",
+    size: "md",
+    headline: "just type your rough thought in your AI chat, and end the sentence with  //",
     body: "see the magic for yourself.",
   },
   /* --- final slide: poster layout with mast-sized tile --- */
   { label: "\n", headline: "patkan.in", logoLayout: "e" },
 ];
+
 
 const pad = (n: number) => String(n).padStart(2, "0");
 
