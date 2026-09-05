@@ -5,6 +5,7 @@ Refine the existing `/v2` page only. Zero copy changes: every visible word, punc
 ## 1. Brand mark
 
 Create a proper Patkan mark: `//` set in the mono face inside a rounded square, with a few small sparkle glints around it, in the warm orange-on-ink palette. Use it in:
+
 - the top header, next to the wordmark
 - the Patkan card inside the browser mockup in the install guide
 - (Grammarly card keeps a neutral placeholder mark, not the Patkan one)
@@ -14,6 +15,7 @@ Replace the generic sparkle icon everywhere it currently stands in for Patkan.
 ## 2. Mobile and desktop coherence
 
 The page currently reads as a desktop layout squeezed down. Rework the responsive scale so mobile feels designed, not shrunk:
+
 - One shared type scale that steps down cleanly on small screens; headings stop wrapping awkwardly, body copy gets a comfortable measure.
 - Consistent section rhythm: same horizontal gutters and vertical spacing rules on every section instead of the current per-section values.
 - Header: mark + wordmark + phonetic badge shrink gracefully; the button becomes compact on narrow widths without clipping.
@@ -27,6 +29,7 @@ On mobile they are currently full-height blocks with a huge empty gap between th
 ## 4. Install guide
 
 Bring in the nuances from the reference:
+
 - Real toggle switches (track + knob) instead of the word "ON"; Developer mode uses the same real toggle.
 - Browser mockup: proper chrome with traffic lights, address pill, and a page surface with real card structure; Patkan card visibly selected with a ring; Details / Remove rendered as actual small buttons.
 - Buttons row (Load unpacked / Pack extension / Update) styled as real buttons, with "Load unpacked" as the emphasised one.
