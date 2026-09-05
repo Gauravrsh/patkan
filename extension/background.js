@@ -7,7 +7,7 @@ const chrome = globalThis.browser ?? globalThis.chrome;
 const hasSidePanel = Boolean(chrome.sidePanel?.open);
 
 chrome.runtime.onInstalled.addListener(() => {
-  chrome.sidePanel?.setPanelBehavior?.({ openPanelOnActionClick: true }).catch(() => {});
+  Promise.resolve(chrome.sidePanel?.setPanelBehavior?.({ openPanelOnActionClick: true })).catch(() => {});
 });
 
 // Firefox: the toolbar click has no side panel behaviour, so open the sidebar.
