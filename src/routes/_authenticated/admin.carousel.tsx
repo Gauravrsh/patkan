@@ -141,7 +141,7 @@ const SLIDES: Slide[] = [
     label: "\n",
     headline: "patkan",
     body: "/pʌtˈkʌn/ · verb",
-    bullets: ["to perform, execute or complete an action instantly, promptly, and without delay, in a single swift motion "],
+    bullets: ["to perform, execute or complete an action **instantly, promptly, and without delay**, in a single swift motion "],
   },
   {
     label: "\n",
