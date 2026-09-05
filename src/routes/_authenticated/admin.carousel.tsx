@@ -87,7 +87,7 @@ type Slide = {
 const SLIDES: Slide[] = [
   {
     label: "\n",
-    headline: "Kya ch***ya hai ye AI!",
+    headline: "Kya ch***ya hai ye AI!!",
     body: "...with an exhausted sigh!!",
   },
   { label: "\n", headline: "OR", accent: true },
