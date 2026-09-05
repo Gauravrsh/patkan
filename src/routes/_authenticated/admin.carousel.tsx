@@ -138,10 +138,10 @@ const SLIDES: Slide[] = [
     ],
   },
   {
-    label: "presenting",
+    label: "\n",
     headline: "patkan",
     body: "/pʌtˈkʌn/ · verb",
-    bullets: ["turn a rough thought into a surgical prompt."],
+    bullets: ["to perform, execute or complete an action instantly, promptly, and without delay, in a single swift motion "],
   },
   {
     label: "how to use",
