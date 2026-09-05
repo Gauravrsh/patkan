@@ -4,7 +4,6 @@ import {
   ArrowDownToLine,
   ArrowRight,
   Check,
-  Copy,
   EyeOff,
   Globe2,
   Headphones,
@@ -16,6 +15,7 @@ import {
   Volume2,
   Zap,
 } from "lucide-react";
+
 import { toast } from "sonner";
 
 import {
