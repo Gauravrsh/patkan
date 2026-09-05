@@ -18,6 +18,7 @@ import { Route as ConnectRouteImport } from './routes/connect'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedLibraryRouteImport } from './routes/_authenticated/library'
+import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
 import { Route as ApiPublicFeedbackRouteImport } from './routes/api/public/feedback'
 import { Route as ApiPublicTemplatesRouteImport } from './routes/api/public/templates'
 import { Route as ApiPublicTransformRouteImport } from './routes/api/public/transform'
@@ -68,6 +69,11 @@ const AuthenticatedLibraryRoute = AuthenticatedLibraryRouteImport.update({
   path: '/library',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AuthenticatedAdminRoute,
+} as any)
 const ApiPublicFeedbackRoute = ApiPublicFeedbackRouteImport.update({
   id: '/api/public/feedback',
   path: '/api/public/feedback',
@@ -101,12 +107,13 @@ export interface FileRoutesByFullPath {
   '/claude-prompt-generator': typeof ClaudePromptGeneratorRoute
   '/connect': typeof ConnectRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
-  '/admin': typeof AuthenticatedAdminRoute
+  '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/library': typeof AuthenticatedLibraryRoute
   '/api/public/feedback': typeof ApiPublicFeedbackRoute
   '/api/public/templates': typeof ApiPublicTemplatesRoute
   '/api/public/transform': typeof ApiPublicTransformRoute
   '/api/public/usage': typeof ApiPublicUsageRoute
+  '/admin/': typeof AuthenticatedAdminIndexRoute
   '/api/public/cron/health': typeof ApiPublicCronHealthRoute
 }
 export interface FileRoutesByTo {
@@ -116,12 +123,12 @@ export interface FileRoutesByTo {
   '/claude-prompt-generator': typeof ClaudePromptGeneratorRoute
   '/connect': typeof ConnectRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
-  '/admin': typeof AuthenticatedAdminRoute
   '/library': typeof AuthenticatedLibraryRoute
   '/api/public/feedback': typeof ApiPublicFeedbackRoute
   '/api/public/templates': typeof ApiPublicTemplatesRoute
   '/api/public/transform': typeof ApiPublicTransformRoute
   '/api/public/usage': typeof ApiPublicUsageRoute
+  '/admin': typeof AuthenticatedAdminIndexRoute
   '/api/public/cron/health': typeof ApiPublicCronHealthRoute
 }
 export interface FileRoutesById {
@@ -133,12 +140,13 @@ export interface FileRoutesById {
   '/claude-prompt-generator': typeof ClaudePromptGeneratorRoute
   '/connect': typeof ConnectRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
-  '/_authenticated/admin': typeof AuthenticatedAdminRoute
+  '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
   '/_authenticated/library': typeof AuthenticatedLibraryRoute
   '/api/public/feedback': typeof ApiPublicFeedbackRoute
   '/api/public/templates': typeof ApiPublicTemplatesRoute
   '/api/public/transform': typeof ApiPublicTransformRoute
   '/api/public/usage': typeof ApiPublicUsageRoute
+  '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/api/public/cron/health': typeof ApiPublicCronHealthRoute
 }
 export interface FileRouteTypes {
@@ -156,6 +164,7 @@ export interface FileRouteTypes {
     | '/api/public/templates'
     | '/api/public/transform'
     | '/api/public/usage'
+    | '/admin/'
     | '/api/public/cron/health'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -165,12 +174,12 @@ export interface FileRouteTypes {
     | '/claude-prompt-generator'
     | '/connect'
     | '/sitemap.xml'
-    | '/admin'
     | '/library'
     | '/api/public/feedback'
     | '/api/public/templates'
     | '/api/public/transform'
     | '/api/public/usage'
+    | '/admin'
     | '/api/public/cron/health'
   id:
     | '__root__'
@@ -187,6 +196,7 @@ export interface FileRouteTypes {
     | '/api/public/templates'
     | '/api/public/transform'
     | '/api/public/usage'
+    | '/_authenticated/admin/'
     | '/api/public/cron/health'
   fileRoutesById: FileRoutesById
 }
@@ -270,6 +280,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedLibraryRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/admin/': {
+      id: '/_authenticated/admin/'
+      path: '/'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AuthenticatedAdminIndexRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/api/public/feedback': {
       id: '/api/public/feedback'
       path: '/api/public/feedback'
@@ -308,13 +325,24 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface AuthenticatedAdminRouteChildren {
+  AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
+}
+
+const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
+  AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
+}
+
+const AuthenticatedAdminRouteWithChildren =
+  AuthenticatedAdminRoute._addFileChildren(AuthenticatedAdminRouteChildren)
+
 interface AuthenticatedRouteRouteChildren {
-  AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
+  AuthenticatedAdminRoute: typeof AuthenticatedAdminRouteWithChildren
   AuthenticatedLibraryRoute: typeof AuthenticatedLibraryRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
-  AuthenticatedAdminRoute: AuthenticatedAdminRoute,
+  AuthenticatedAdminRoute: AuthenticatedAdminRouteWithChildren,
   AuthenticatedLibraryRoute: AuthenticatedLibraryRoute,
 }
 

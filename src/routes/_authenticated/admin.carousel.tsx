@@ -1,7 +1,13 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { Loader2 } from "lucide-react";
 
-export const Route = createFileRoute("/carousel")({
+import { Button } from "@/components/ui/button";
+import { getMyAdminAccess } from "@/lib/admin.functions";
+
+export const Route = createFileRoute("/_authenticated/admin/carousel")({
   head: () => ({
     meta: [
       { title: "Patkan — LinkedIn Carousel Preview" },
@@ -25,8 +31,44 @@ export const Route = createFileRoute("/carousel")({
       },
     ],
   }),
-  component: CarouselPage,
+  component: CarouselGate,
 });
+
+function CarouselGate() {
+  const checkAccess = useServerFn(getMyAdminAccess);
+  const { data, isLoading, error } = useQuery({
+    queryKey: ["my-admin-access"],
+    queryFn: () => checkAccess(),
+    retry: false,
+    staleTime: 5 * 60 * 1000,
+  });
+
+  if (isLoading) {
+    return (
+      <main className="flex min-h-screen items-center justify-center">
+        <Loader2 className="size-6 animate-spin text-muted-foreground" />
+      </main>
+    );
+  }
+
+  if (error || !data?.isAdmin) {
+    return (
+      <main className="flex min-h-screen items-center justify-center px-6 text-center">
+        <div className="max-w-sm">
+          <h1 className="text-xl font-semibold tracking-tight">Not your page</h1>
+          <p className="mt-2 text-sm text-muted-foreground">
+            This page is limited to Patkan admins.
+          </p>
+          <Button asChild variant="outline" className="mt-5">
+            <Link to="/">Back to Patkan</Link>
+          </Button>
+        </div>
+      </main>
+    );
+  }
+
+  return <CarouselPage />;
+}
 
 /* ------------------------------------------------------------------ */
 /*  SLIDE COPY — one entry per `----` fragment. Edit text here only.    */
