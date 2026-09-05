@@ -115,17 +115,17 @@ const SLIDES: Slide[] = [
   },
     {
       label: "\n",
-    headline: "the outputs suddenly starts to get so much..",
-    bullets: ["how you always wanted it..", "how an AI should be.."],
+    headline: "the outputs suddenly starts to get so much...",
+    bullets: ["how you always wanted it...", "how an AI should be..."],
   },
-  { label: "\n", headline: "Intelligent!" },
+  { label: "\n", headline: "intelligent!!" },
   { label: "\n", headline: "so, what's the problem?" },
   { label: "\n", headline: "bas ek." },
   { label: "\n", headline: "Itna type kaun karega!!" },
   {
     label: "\n",
     headline:
-      "what if your rough first idea converts into a surgical prompt,\n\n\neven before it goes into your AI chat?",
+      "what if your rough first idea converts into a surgical prompt,\neven before it goes into your AI chat?",
   },
   {
     label: "\n",
