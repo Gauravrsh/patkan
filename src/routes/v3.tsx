@@ -552,7 +552,7 @@ function BrowserMockup() {
         </div>
         <div className="mt-5 grid gap-3 sm:grid-cols-2">
           <ExtensionCard
-            title="Patkan"
+            title="ptkn"
             version="1.0.0"
             description="End any prompt with // in ChatGPT, Claude, or Gemini to trigger Patkan."
             accent
