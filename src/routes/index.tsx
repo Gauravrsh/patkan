@@ -560,7 +560,7 @@ function Landing() {
                           onClick={download}
                           className="mt-3 inline-flex h-9 items-center gap-2 rounded-md bg-primary px-4 text-xs font-medium text-primary-foreground shadow-sm transition-colors hover:bg-primary/90"
                         >
-                          <ArrowDownToLine className="size-4" aria-hidden /> Download Patkan v1.0
+                          <ArrowDownToLine className="size-4" aria-hidden /> Download Patkan
                         </button>
                       )}
                     </div>
@@ -569,7 +569,11 @@ function Landing() {
               </ol>
               <BrowserMockup />
             </div>
+            <p className="mt-8 text-xs leading-relaxed text-muted-foreground">
+              *Live on Google Chrome today. Support for the other major browsers is underway.
+            </p>
           </div>
+
         </section>
 
         {/* Privacy */}
