@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -51,22 +51,16 @@ function AuthPage() {
 
   function safeNext() {
     const value = new URLSearchParams(window.location.search).get("next");
-    if (!value) return "/library";
+    if (!value) return "/";
     try {
       const url = new URL(value, window.location.origin);
-      if (url.origin !== window.location.origin || !url.pathname.startsWith("/")) return "/library";
+      if (url.origin !== window.location.origin || !url.pathname.startsWith("/")) return "/";
       return `${url.pathname}${url.search}${url.hash}`;
     } catch {
-      return "/library";
+      return "/";
     }
   }
 
-
-  useEffect(() => {
-    if (!loading && session) {
-      window.location.assign(safeNext());
-    }
-  }, [loading, session]);
 
   async function withGoogle() {
     setMessage(null);
@@ -96,6 +90,21 @@ function AuthPage() {
     } else if (mode === "signup") {
       setMessage("Check your inbox to confirm your address, then sign in.");
     }
+  }
+
+  if (!loading && session) {
+    return (
+      <main className="flex min-h-screen items-center justify-center bg-background px-6 py-16">
+        <div className="w-full max-w-sm rounded-lg border bg-card p-8 text-center shadow-sm">
+          <p className="text-base leading-relaxed">
+            Thanks for signing-in. There is nothing more to do here. Get your best work done :)
+          </p>
+          <Button asChild className="mt-6 w-full">
+            <Link to="/">Close</Link>
+          </Button>
+        </div>
+      </main>
+    );
   }
 
   return (

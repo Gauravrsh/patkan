@@ -44,10 +44,11 @@ export const Route = createFileRoute("/")({
         content: "Turn a rough thought into a surgically crafted prompt without leaving your AI chat.",
       },
       { property: "og:type", content: "website" },
-      { property: "og:url", content: "https://patkan.lovable.app/" },
+      { property: "og:url", content: "https://patkan.in/" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
-    links: [{ rel: "canonical", href: "https://patkan.lovable.app/" }],
+    links: [{ rel: "canonical", href: "https://patkan.in/" }],
+
   }),
   component: Landing,
 });
@@ -87,8 +88,10 @@ const personas = [
   ["B2B Marketer", "marketer", "Role: a B2B marketer who writes platform-native, high-conversion copy"],
   ["Engineer", "engineer", "Role: a pragmatic staff engineer who gives implementation-grade answers"],
   ["Analyst", "analyst", "Role: a data analyst who reasons quantitatively and shows the working"],
-  ["Other", "auto", "Custom persona active"],
 ] as const;
+
+type PersonaOption = readonly [string, string, string];
+
 
 const pillars = [
   {
@@ -118,27 +121,46 @@ const installSteps = [
   ["Load Unpacked", 'Click "Load unpacked" (top left) and select your extracted folder.'],
   [
     "Trigger Patkan",
-    "Type your prompt in ChatGPT, Claude, or Gemini in natural language. End it with // and Patkan takes over.",
+    "Type your prompt in ChatGPT, Claude, Gemini, Microsoft Copilot, Perplexity, and more in natural language. End it with // and Patkan takes over.",
   ],
 ] as const;
 
-const approvedUrls = ["https://chatgpt.com/*", "https://claude.ai/*", "https://gemini.google.com/*"] as const;
+const approvedUrls = [
+  "https://chatgpt.com/*",
+  "https://chat.openai.com/*",
+  "https://claude.ai/*",
+  "https://gemini.google.com/*",
+  "https://aistudio.google.com/*",
+  "https://www.perplexity.ai/*",
+  "https://perplexity.ai/*",
+  "https://copilot.microsoft.com/*",
+  "https://grok.com/*",
+  "https://chat.deepseek.com/*",
+  "https://www.meta.ai/*",
+  "https://meta.ai/*",
+  "https://chat.mistral.ai/*",
+  "https://poe.com/*",
+  "https://www.notion.so/*",
+  "https://kimi.com/*",
+  "https://www.kimi.com/*",
+  "https://chat.qwen.ai/*",
+] as const;
 
 const privacy = [
   {
     icon: Headphones,
     heading: "Deaf until //",
-    body: "No keyloggers. No background daemons listening to keystrokes. Patkan stays completely inert in memory until you type `//` at the end of a sentence.",
+    body: "No keyloggers. No background daemons listening to keystrokes. Patkan takes no action until you type `//` at the end of a sentence.",
   },
   {
     icon: EyeOff,
     heading: "Blind to the rest of the web",
-    body: "Patkan cannot see your other tabs, bank logins, emails, or browsing history. The browser sandbox strictly confines it to `chatgpt.com`, `claude.ai`, and `gemini.google.com`.",
+    body: "Patkan cannot see your other tabs, bank logins, emails, or browsing history. The browser sandbox strictly confines it to the AI sites in its approved list — `ChatGPT`, `Claude`, `Gemini`, `Microsoft Copilot`, `Perplexity`, and more.",
   },
   {
     icon: Zap,
     heading: "Zero memory. Zero retention.",
-    body: "Your rough input compiles in RAM for 200ms and immediately replaces your text. No prompt logs, no chat databases, and zero model training on what you write.",
+    body: "Your rough input compiles in RAM and immediately replaces your text. No prompt logs, no chat databases, and zero model training on what you write.",
   },
   {
     icon: Globe2,
@@ -146,6 +168,7 @@ const privacy = [
     body: "No obfuscated binary blobs. Because you install Patkan unpacked, you can open the folder, inspect every line of plain JavaScript, and verify every network call in DevTools before you click load.",
   },
 ] as const;
+
 
 function Landing() {
   const { session } = useAuth();
@@ -160,15 +183,34 @@ function Landing() {
   const [busy, setBusy] = useState(false);
   const [copied, setCopied] = useState(false);
   const [usage, setUsage] = useState<{ used: number; limit: number } | null>(null);
+  const [customPersonas, setCustomPersonas] = useState<string[]>([]);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const outRef = useRef<HTMLPreElement>(null);
 
+  const personaList: PersonaOption[] = [
+    ...personas,
+    ...customPersonas.map((name) => [name, "auto", `Role: ${name}`] as PersonaOption),
+  ];
+
   const target = targetAis[targetIndex]!;
-  const persona = personas[personaIndex]!;
+  const persona = personaList[personaIndex] ?? personaList[0]!;
   const dialect = target[1] as Dialect;
   const personaId = persona[1];
+  const customInstruction = personaIndex >= personas.length ? `Write as ${persona[0]}.` : null;
   const intensity: Intensity = "standard";
-  const settled = phase === "ready" || phase === "idle";
+
+  function addCustomPersona(name: string) {
+    const clean = name.trim().slice(0, 40);
+    if (!clean) return;
+    const existing = customPersonas.indexOf(clean);
+    if (existing >= 0) {
+      setPersonaIndex(personas.length + existing);
+      return;
+    }
+    setCustomPersonas([...customPersonas, clean]);
+    setPersonaIndex(personas.length + customPersonas.length);
+  }
+
 
   useEffect(() => {
     if (textareaRef.current) {
@@ -177,6 +219,24 @@ function Landing() {
       el.style.height = `${Math.max(el.scrollHeight, 96)}px`;
     }
   }, [input]);
+
+  // The allowance shown on load must be the real one, not an optimistic 10.
+  useEffect(() => {
+    let cancelled = false;
+    const token = session?.access_token;
+    fetch(`/api/public/usage?deviceId=${encodeURIComponent(deviceId())}`, {
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+    })
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data: { used?: number; limit?: number } | null) => {
+        if (cancelled || !data || typeof data.used !== "number" || typeof data.limit !== "number") return;
+        setUsage({ used: data.used, limit: data.limit });
+      })
+      .catch(() => undefined);
+    return () => {
+      cancelled = true;
+    };
+  }, [session?.access_token]);
 
   async function transform(refinement?: string) {
     if (!input.trim() || busy) return;
@@ -195,8 +255,10 @@ function Landing() {
           deviceId: deviceId(),
           accessToken: session?.access_token,
           refinement: refinement ?? null,
+          customInstruction,
           surface: "web",
         },
+
         (visible) => {
           setPhase("sharpening");
           setOutput(visible);
@@ -287,15 +349,12 @@ function Landing() {
               <a href="#install" className="transition-colors hover:text-foreground">
                 Install Guide
               </a>
-              {session ? (
-                <Link to="/library" className="transition-colors hover:text-foreground">
-                  Library
-                </Link>
-              ) : (
+              {session ? null : (
                 <Link to="/auth" className="transition-colors hover:text-foreground">
                   Sign in
                 </Link>
               )}
+
             </div>
             <button
               onClick={download}
@@ -348,7 +407,12 @@ function Landing() {
                 Try it here first <ArrowRight className="size-4" aria-hidden />
               </button>
             </div>
-            <p className="mt-4 text-xs text-muted-foreground">No sign-up to start. 10 transforms per day, free.</p>
+            {session ? null : (
+              <p className="mt-4 text-xs text-muted-foreground">
+                No sign-up to start. 10 transforms a day in ghost mode, after that, sign-up and continue.
+              </p>
+            )}
+
           </div>
 
           <article className="order-1 overflow-hidden rounded-lg border bg-card shadow-sm lg:order-2">
@@ -408,6 +472,8 @@ function Landing() {
               copied={copied}
               copy={copy}
               transform={transform}
+              personaList={personaList}
+              addCustomPersona={addCustomPersona}
               remaining={remaining}
               exhausted={exhausted}
               session={!!session}
@@ -455,13 +521,14 @@ function Landing() {
                 </h2>
               </div>
               <p className="max-w-md text-sm leading-relaxed text-muted-foreground">
-                Works across all major desktop browsers. Not in stores yet, so it installs directly unpacked.
+                Works across all major desktop browsers*. Not in stores yet, so it installs directly unpacked.
               </p>
+
             </div>
 
             <div className="relative mt-10">
               <div className="flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden md:border-b md:gap-1 md:pb-0">
-                {["Google Chrome", "Microsoft Edge", "Mozilla Firefox", "Apple Safari", "Opera"].map((browser, index) => (
+                {["Google Chrome"].map((browser, index) => (
                   <span
                     key={browser}
                     className={`shrink-0 rounded-full border px-4 py-2 text-sm md:rounded-none md:border-0 md:border-b-2 md:px-4 md:py-3 ${
@@ -495,7 +562,7 @@ function Landing() {
                           onClick={download}
                           className="mt-3 inline-flex h-9 items-center gap-2 rounded-md bg-primary px-4 text-xs font-medium text-primary-foreground shadow-sm transition-colors hover:bg-primary/90"
                         >
-                          <ArrowDownToLine className="size-4" aria-hidden /> Download Patkan v1.0
+                          <ArrowDownToLine className="size-4" aria-hidden /> Download Patkan
                         </button>
                       )}
                     </div>
@@ -504,7 +571,11 @@ function Landing() {
               </ol>
               <BrowserMockup />
             </div>
+            <p className="mt-8 text-xs leading-relaxed text-muted-foreground">
+              *Live on Google Chrome today. Support for the other major browsers is underway.
+            </p>
           </div>
+
         </section>
 
         {/* Privacy */}
@@ -519,7 +590,7 @@ function Landing() {
             </div>
             <p className="text-base leading-relaxed text-muted-foreground sm:text-lg">
               No background tracking. No keystroke logging. No reading your chat history. Patkan is hardcoded strictly
-              to <ApprovedUrlsTrigger /> and stays completely inert until you type{" "}
+              to <ApprovedUrlsTrigger /> and takes no action until you type{" "}
               <code className="font-mono text-foreground">//</code>. What you type compiles in RAM and vanishes.
             </p>
           </div>
@@ -546,7 +617,7 @@ function Landing() {
       <footer className="border-t">
         <div className={`${shell} flex flex-wrap items-center justify-between gap-3 py-8 text-xs text-muted-foreground`}>
           <span>✦ Patkan — quickly.</span>
-          <span>10 free transforms a day.</span>
+          <span>10 transforms a day in ghost mode.</span>
         </div>
       </footer>
     </div>
@@ -606,6 +677,8 @@ interface PlaygroundProps {
   setTargetIndex: (i: number) => void;
   personaIndex: number;
   setPersonaIndex: (i: number) => void;
+  personaList: PersonaOption[];
+  addCustomPersona: (name: string) => void;
   output: string;
   phase: Phase;
   engine: EngineId;
@@ -630,6 +703,8 @@ function Playground(props: PlaygroundProps) {
     setTargetIndex,
     personaIndex,
     setPersonaIndex,
+    personaList,
+    addCustomPersona,
     output,
     phase,
     engine,
@@ -646,8 +721,10 @@ function Playground(props: PlaygroundProps) {
     outRef,
   } = props;
 
+  const [customOpen, setCustomOpen] = useState(false);
+  const [customDraft, setCustomDraft] = useState("");
   const target = targetAis[targetIndex]!;
-  const persona = personas[personaIndex]!;
+  const persona = personaList[personaIndex] ?? personaList[0]!;
   const settled = phase === "ready" || phase === "idle";
 
   return (
@@ -661,7 +738,13 @@ function Playground(props: PlaygroundProps) {
           <div className="flex items-center justify-between gap-3 text-xs">
             <span className="font-semibold tracking-wider">YOUR THOUGHTS</span>
             <span className="shrink-0 text-muted-foreground">
-              {exhausted ? "0 left today" : `${remaining} left today`}
+              {session
+                ? exhausted
+                  ? "0 left today"
+                  : `${remaining} left today`
+                : exhausted
+                  ? "0 transforms left — sign in to keep going"
+                  : `${remaining} more transforms, before you need to sign-in`}
             </span>
           </div>
 
@@ -707,10 +790,36 @@ function Playground(props: PlaygroundProps) {
               <span className="text-xs text-muted-foreground">{persona[2]}</span>
             </div>
             <div className={chipRow}>
-              {personas.map(([name], index) => (
+              {personaList.map(([name], index) => (
                 <Chip key={name} name={name} active={personaIndex === index} onClick={() => setPersonaIndex(index)} />
               ))}
+              <Chip name="Other" active={customOpen} onClick={() => setCustomOpen(!customOpen)} />
             </div>
+            {customOpen && (
+              <form
+                className="mt-3 flex gap-2"
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  addCustomPersona(customDraft);
+                  setCustomDraft("");
+                  setCustomOpen(false);
+                }}
+              >
+                <input
+                  value={customDraft}
+                  onChange={(e) => setCustomDraft(e.target.value)}
+                  placeholder="Name your persona"
+                  maxLength={40}
+                  className="h-9 min-w-0 flex-1 rounded-md border bg-background px-3 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+                />
+                <button
+                  type="submit"
+                  className="h-9 shrink-0 rounded-md bg-primary px-3 text-xs font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+                >
+                  Add
+                </button>
+              </form>
+            )}
             <p className="mt-3 truncate text-xs leading-relaxed text-muted-foreground sm:text-sm lg:whitespace-normal">
               {persona[2]}
             </p>
@@ -903,14 +1012,13 @@ function BrowserMockup() {
         <div className="mt-5 grid gap-3 sm:grid-cols-2">
           <ExtensionCard
             title="Patkan"
-            version="1.0.0"
-            description="End any prompt with // in ChatGPT, Claude, or Gemini to trigger Patkan."
+            description="End any prompt with // in ChatGPT, Claude, Gemini, Microsoft Copilot, Perplexity, and more to trigger Patkan."
             accent
           />
           <ExtensionCard
-            title="Grammarly"
-            version="14.1.2"
-            description="Improve your writing with real-time grammar and spell checking."
+            title="uBlock Origin"
+            initial="U"
+            description="An efficient blocker. Easy on CPU and memory."
           />
         </div>
       </div>
@@ -920,12 +1028,12 @@ function BrowserMockup() {
 
 function ExtensionCard({
   title,
-  version,
+  initial = "U",
   description,
   accent = false,
 }: {
   title: string;
-  version: string;
+  initial?: string;
   description: string;
   accent?: boolean;
 }) {
@@ -940,14 +1048,12 @@ function ExtensionCard({
           <img src={patkanMark} alt="Patkan" width={816} height={816} loading="lazy" className="size-9 rounded-md" />
         ) : (
           <span className="flex size-9 items-center justify-center rounded-md bg-muted text-sm font-semibold text-muted-foreground">
-            G
+            {initial}
           </span>
         )}
         <Toggle />
       </div>
-      <h4 className="mt-4 text-sm font-semibold tracking-tight">
-        {title} <span className="font-normal text-muted-foreground">{version}</span>
-      </h4>
+      <h4 className="mt-4 text-sm font-semibold tracking-tight">{title}</h4>
       <p className="mt-2 min-h-12 text-[11px] leading-relaxed text-muted-foreground">{description}</p>
       <div className="mt-4 flex gap-2 border-t pt-3 text-[10px] text-muted-foreground">
         <span className="rounded border px-2 py-1">Details</span>
