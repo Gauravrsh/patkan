@@ -120,9 +120,9 @@ const SLIDES: Slide[] = [
   { label: "just one", headline: "bas ek." },
   { label: "\n", headline: "Itna type kaun karega!!" },
   {
-    label: "the promise",
+    label: "\n",
     headline:
-      "what if your rough first idea converts into a surgical prompt, even before it goes into your AI chat?",
+      "what if your rough first idea converts into a surgical prompt,\n\n\neven before it goes into your AI chat?",
   },
   {
     label: "the shift",
