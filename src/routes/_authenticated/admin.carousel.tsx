@@ -83,15 +83,15 @@ type Slide = {
 
 const SLIDES: Slide[] = [
   {
-    label: "the sigh",
-    headline: '"Kya ch***ya hai ye AI"',
-    body: "(with an exhausted sigh!!)",
+    label: "\n",
+    headline: "Kya ch***ya hai ye AI!",
+    body: "..with an exhausted sigh!!",
   },
   { label: "or", headline: "OR" },
   {
-    label: "the other sigh",
-    headline: '"This AI sucks!!"',
-    body: "— if you are more Maya than Monisha (#IFKYK)",
+    label: "\n",
+    headline: "This AI sucks!",
+    body: "- If you are more Maya than Monisha \n\n\n#IFKYK",
   },
   {
     label: "the question",
@@ -226,7 +226,7 @@ function CarouselPage() {
                 </div>
 
                 <div className="slide-footer">
-                  <div className="footer-left">patkan</div>
+                   <div className="footer-left">{"\n"}</div>
                   <div className="footer-right">
                     {pad(i + 1)} / {pad(total)}
                   </div>
