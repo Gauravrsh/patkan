@@ -222,7 +222,9 @@ function CarouselPage() {
         <div className="pk-slides">
           {SLIDES.map((slide, i) => {
             const len = slide.headline.length;
-            const size = len <= 18 ? "xl" : len <= 45 ? "lg" : len <= 80 ? "md" : "sm";
+            const size =
+              slide.size ??
+              (len <= 18 ? "xl" : len <= 45 ? "lg" : len <= 80 ? "md" : "sm");
             return (
               <div
                 key={i}
@@ -235,7 +237,7 @@ function CarouselPage() {
                 </div>
 
                 <div
-                  className={`slide-body${slide.accent || slide.logoLayout ? " centered" : ""}`}
+                  className={`slide-body${slide.logoLayout ? " centered" : ""}`}
                 >
                   {slide.logoLayout ? (
                     <div className={`logo-slide layout-${slide.logoLayout}`}>
@@ -256,6 +258,11 @@ function CarouselPage() {
                       {slide.body && (
                         <div className="content-body">{renderEmphasis(slide.body)}</div>
                       )}
+                      {slide.definition && (
+                        <div className="content-definition">
+                          {renderEmphasis(slide.definition)}
+                        </div>
+                      )}
                       {slide.bullets && (
                         <ul className="content-bullets">
                           {slide.bullets.map((b, bi) => (
@@ -269,6 +276,7 @@ function CarouselPage() {
                     </>
                   )}
                 </div>
+
 
                 {i !== total - 1 && (
                   <div className="slide-swipe">
