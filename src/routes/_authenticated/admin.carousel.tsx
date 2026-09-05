@@ -356,6 +356,15 @@ const CAROUSEL_CSS = `
 .pk-slide .content-bullets li { display: flex; align-items: baseline; gap: 2cqw; font-size: 3cqw; line-height: 1.4; color: var(--ink); }
 .pk-slide .content-bullets .marker { flex: none; width: 0; height: 0; border-left: 1.5cqw solid var(--orange); border-top: 0.9cqw solid transparent; border-bottom: 0.9cqw solid transparent; }
 
+.pk-slide .content-headline strong { font-weight: 600; }
+.pk-slide .content-body strong,
+.pk-slide .content-bullets strong { font-weight: 600; }
+
+.pk-slide .slide-swipe { display: flex; align-items: center; justify-content: flex-end; gap: 1.1cqw; margin-top: 3cqw; font-size: 2.6cqw; color: var(--muted); letter-spacing: 0.02em; }
+.pk-slide .slide-swipe .dot { flex: none; width: 1.5cqw; height: 1.5cqw; border-radius: 50%; background: var(--orange); }
+.pk-slide .slide-swipe .word { text-transform: lowercase; }
+.pk-slide .slide-swipe .arrow { color: var(--ink); }
+
 
 .pk-nav { margin-top: 20px; display: flex; align-items: center; gap: 16px; color: rgba(255,255,255,0.8); }
 .pk-nav button { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: rgba(255,255,255,0.9); width: 40px; height: 40px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 200ms ease; }
