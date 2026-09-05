@@ -428,8 +428,8 @@ const CAROUSEL_CSS = `
 .pk-slide .logo-slide.layout-d .logo-word { font-size: 12.5cqw; order: -1; }
 .pk-slide .logo-slide.layout-d .logo-tile { width: 30cqw; height: 30cqw; }
 
-/* E — poster: full-bleed-ish large tile centered with wordmark beneath, orange underline accent */
+/* E — poster: tile centered with wordmark beneath, orange underline accent (tile size from layout C) */
 .pk-slide .logo-slide.layout-e { flex-direction: column; align-items: center; justify-content: center; gap: 5cqw; text-align: center; }
-.pk-slide .logo-slide.layout-e .logo-tile { width: 56cqw; height: 56cqw; }
+.pk-slide .logo-slide.layout-e .logo-tile { width: 26cqw; height: 26cqw; }
 .pk-slide .logo-slide.layout-e .logo-word { font-size: 8.5cqw; border-bottom: 1.2cqw solid var(--orange); padding-bottom: 1.4cqw; }
 `;
