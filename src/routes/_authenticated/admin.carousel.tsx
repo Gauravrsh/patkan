@@ -244,17 +244,19 @@ function CarouselPage() {
                         {renderEmphasis(slide.headline)}
                       </div>
                       {slide.body && (
-                    <div className="content-body">{renderEmphasis(slide.body)}</div>
-                  )}
-                  {slide.bullets && (
-                    <ul className="content-bullets">
-                      {slide.bullets.map((b, bi) => (
-                        <li key={bi}>
-                          <span className="marker" />
-                          <span>{renderEmphasis(b)}</span>
-                        </li>
-                      ))}
-                    </ul>
+                        <div className="content-body">{renderEmphasis(slide.body)}</div>
+                      )}
+                      {slide.bullets && (
+                        <ul className="content-bullets">
+                          {slide.bullets.map((b, bi) => (
+                            <li key={bi}>
+                              <span className="marker" />
+                              <span>{renderEmphasis(b)}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+                    </>
                   )}
                 </div>
 
