@@ -289,12 +289,40 @@
 
   /* ---------- core action ---------- */
 
+  // Set once a rewrite lands; resolved to accepted/discarded so quality is measurable.
+  let pendingFeedback = false;
+
+  function reportFeedback(accepted) {
+    if (!pendingFeedback) return;
+    pendingFeedback = false;
+    chrome.runtime.sendMessage({ type: "PATKAN_FEEDBACK", payload: { accepted } }).catch(() => {});
+  }
+
   function undo() {
     if (target && lastOriginal != null) {
       writeText(target, lastOriginal);
       lastOriginal = null;
       showChip(false);
+      reportFeedback(false);
     }
+  }
+
+  /** The wall is a doorway, not a dead end: one tap opens sign-in. */
+  function showLimitCta(message) {
+    ensureUI();
+    const existing = shadow.querySelector(".limitCta");
+    if (existing) existing.remove();
+    const el = document.createElement("div");
+    el.className = "pill show limitCta";
+    el.style.cssText += "left:50%;transform:translateX(-50%);top:24px;max-width:min(520px,90vw);text-align:center;";
+    el.textContent = message;
+    el.addEventListener("mousedown", (ev) => {
+      ev.preventDefault();
+      chrome.runtime.sendMessage({ type: "PATKAN_OPEN_SIGNIN" });
+      el.remove();
+    });
+    shadow.appendChild(el);
+    setTimeout(() => el.remove(), 12000);
   }
 
   async function run() {
@@ -325,19 +353,34 @@
         persona: settings?.persona,
         dialect: host.dialect,
         intensity: settings?.intensity,
+        host: host.id,
+        surface: "extension-inline",
       },
     });
 
     if (!res || !res.ok) {
       setPhase("ready", "local");
+      // Nothing is lost: the user's own words go straight back.
       if (lastOriginal != null) writeText(target, lastOriginal);
-      const msg = res?.error || "Patkan failed.";
-      toast(res?.requiresSignIn ? msg + " Open the Patkan panel to sign in." : msg);
+      if (res?.limitReached) {
+        restingLabel = "Daily limit reached — sign in";
+        showLimitCta(
+          res.requiresSignIn
+            ? "Daily limit reached — tap to sign in and keep going"
+            : "Daily limit reached — resets at midnight UTC",
+        );
+        setPhase("idle");
+        return;
+      }
+      toast(res?.error || "Patkan failed.");
       return;
     }
 
     const wrote = writeText(target, res.prompt);
     setPhase("ready", res.engine || "primary");
+    if (typeof res.used === "number" && typeof res.limit === "number") {
+      restingLabel = `Type // to Patkan · ${Math.max(0, res.limit - res.used)} left today`;
+    }
     if (!wrote) {
       try {
         await navigator.clipboard.writeText(res.prompt);
@@ -348,6 +391,7 @@
       return;
     }
 
+    pendingFeedback = true;
     const prev = target.style.backgroundColor;
     target.style.transition = "background-color .4s ease";
     target.style.backgroundColor = "rgba(255,180,80,.16)";
@@ -358,6 +402,7 @@
     showChip(true);
     setTimeout(() => showChip(false), 8000);
   }
+
 
   /* ---------- wiring ---------- */
 
@@ -427,6 +472,12 @@
           return;
         }
       }
+      if (!busy && e.key === "Enter" && !e.shiftKey && pendingFeedback) {
+        const el = findComposer(e.target);
+        // Sent with the rewrite in place = the rewrite was accepted.
+        if (el === target) reportFeedback(true);
+      }
+
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "z" && lastOriginal != null) {
         const el = findComposer(document.activeElement);
         if (el === target) {
@@ -440,6 +491,17 @@
 
   window.addEventListener("scroll", () => place(target), true);
   window.addEventListener("resize", () => place(target));
+
+  // Show the remaining allowance before the user hits the wall, not after.
+  chrome.runtime
+    .sendMessage({ type: "PATKAN_FETCH_USAGE" })
+    .then((usage) => {
+      if (usage && typeof usage.remaining === "number") {
+        restingLabel = `Type // to Patkan · ${usage.remaining} left today`;
+      }
+    })
+    .catch(() => {});
+
 
   chrome.runtime.onMessage.addListener((msg) => {
     if (msg?.type === "PATKAN_TRIGGER") run();

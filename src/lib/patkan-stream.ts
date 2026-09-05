@@ -9,7 +9,10 @@ export interface TransformRequest {
   accessToken?: string | undefined;
   refinement?: string | null | undefined;
   customInstruction?: string | null | undefined;
+  host?: string | null | undefined;
+  surface?: string | undefined;
 }
+
 
 export type EngineId = "primary" | "fallback" | "local";
 
@@ -45,8 +48,11 @@ export async function streamTransform(
       deviceId: req.deviceId,
       refinement: req.refinement ?? null,
       customInstruction: req.customInstruction ?? null,
+      host: req.host ?? null,
+      surface: req.surface ?? "web",
     }),
   });
+
 
   if (!res.ok || !res.body) {
     const data = (await res.json().catch(() => ({}))) as { error?: string };

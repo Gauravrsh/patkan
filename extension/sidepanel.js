@@ -43,8 +43,10 @@ function renderControls() {
 }
 
 function setUsage(used, limit) {
-  if (typeof used === "number") $("usage").textContent = `${used}/${limit} today`;
+  if (typeof used !== "number" || typeof limit !== "number") return;
+  $("usage").textContent = `${Math.max(0, limit - used)} left today`;
 }
+
 
 async function loadTemplates(settings) {
   if (!settings.session?.access_token) {
@@ -74,19 +76,44 @@ async function loadTemplates(settings) {
   }
 }
 
+let activeHost = null;
+
 async function init() {
   const settings = await chrome.runtime.sendMessage({ type: "PATKAN_GET_SETTINGS" });
   persona = settings?.persona || persona;
   intensity = settings?.intensity || intensity;
   try {
     const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-    if (tab?.url) dialect = dialectForHost(new URL(tab.url).hostname);
+    if (tab?.url) {
+      activeHost = new URL(tab.url).hostname;
+      dialect = dialectForHost(activeHost);
+    }
   } catch {
     /* keep the default dialect */
   }
   renderControls();
   if (settings?.usage) setUsage(settings.usage.used, settings.usage.limit);
+  chrome.runtime.sendMessage({ type: "PATKAN_FETCH_USAGE" }).then((usage) => {
+    if (usage) setUsage(usage.used, usage.limit);
+  });
   loadTemplates(settings || {});
+}
+
+function showLimitNote(res) {
+  $("note").innerHTML = "";
+  const span = document.createElement("span");
+  span.textContent = (res?.error || "Daily limit reached.") + " ";
+  $("note").appendChild(span);
+  if (res?.requiresSignIn) {
+    const a = document.createElement("a");
+    a.href = "#";
+    a.textContent = "Sign in to keep going";
+    a.addEventListener("click", (e) => {
+      e.preventDefault();
+      chrome.runtime.sendMessage({ type: "PATKAN_OPEN_SIGNIN" });
+    });
+    $("note").appendChild(a);
+  }
 }
 
 $("go").addEventListener("click", async () => {
@@ -104,17 +131,32 @@ $("go").addEventListener("click", async () => {
   $("note").textContent = "Drafting… sharpening this, hold on.";
   const res = await chrome.runtime.sendMessage({
     type: "PATKAN_TRANSFORM",
-    payload: { text, persona, dialect, intensity, customInstruction: $("template").value || null },
+    payload: {
+      text,
+      persona,
+      dialect,
+      intensity,
+      customInstruction: $("template").value || null,
+      host: activeHost,
+      surface: "extension-panel",
+    },
   });
   $("go").disabled = false;
   $("go").textContent = "Patkan it";
   $("out").style.opacity = "1";
   if (!res?.ok) {
+    if (res?.limitReached) {
+      showLimitNote(res);
+      setUsage(res.used, res.limit);
+      $("out").textContent = "";
+      return;
+    }
     $("note").textContent = res?.error || "Transform failed.";
     $("copy").disabled = false;
     $("insert").disabled = false;
     return;
   }
+
   output = res.prompt;
   $("out").textContent = output;
   $("note").textContent =
@@ -133,13 +175,23 @@ $("go").addEventListener("click", async () => {
       b.disabled = true;
       const again = await chrome.runtime.sendMessage({
         type: "PATKAN_TRANSFORM",
-        payload: { text, persona, dialect, intensity, refinement: c.refinement },
+        payload: {
+          text,
+          persona,
+          dialect,
+          intensity,
+          refinement: c.refinement,
+          host: activeHost,
+          surface: "extension-panel",
+        },
       });
       b.disabled = false;
       if (again?.ok) {
         output = again.prompt;
         $("out").textContent = output;
         setUsage(again.used, again.limit);
+      } else if (again?.limitReached) {
+        showLimitNote(again);
       }
     });
     $("clarifiers").appendChild(b);
@@ -150,6 +202,7 @@ $("go").addEventListener("click", async () => {
 $("copy").addEventListener("click", async () => {
   await navigator.clipboard.writeText(output);
   $("copy").textContent = "Copied";
+  chrome.runtime.sendMessage({ type: "PATKAN_FEEDBACK", payload: { accepted: true } });
   setTimeout(() => ($("copy").textContent = "Copy"), 1400);
 });
 
@@ -158,8 +211,10 @@ $("insert").addEventListener("click", async () => {
   if (!tab?.id) return;
   chrome.tabs.sendMessage(tab.id, { type: "PATKAN_INSERT", payload: { text: output } }, () => {
     if (chrome.runtime.lastError) $("note").textContent = "Patkan doesn't run on this page.";
+    else chrome.runtime.sendMessage({ type: "PATKAN_FEEDBACK", payload: { accepted: true } });
   });
 });
+
 
 $("options").addEventListener("click", () => chrome.runtime.openOptionsPage());
 
