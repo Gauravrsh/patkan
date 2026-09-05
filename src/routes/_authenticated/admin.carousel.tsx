@@ -155,12 +155,8 @@ const SLIDES: Slide[] = [
     headline: "patkan.in",
     body: "\n",
   },
-  /* --- last-slide logo layout options (pick one) --- */
-  { label: "option 19", headline: "patkan.in", logoLayout: "a" },
-  { label: "option 20", headline: "patkan.in", logoLayout: "b" },
-  { label: "option 21", headline: "patkan.in", logoLayout: "c" },
-  { label: "option 22", headline: "patkan.in", logoLayout: "d" },
-  { label: "option 23", headline: "patkan.in", logoLayout: "e" },
+  /* --- final slide: poster layout with mast-sized tile --- */
+  { label: "\n", headline: "patkan.in", logoLayout: "e" },
 ];
 
 const pad = (n: number) => String(n).padStart(2, "0");
