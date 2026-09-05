@@ -179,10 +179,11 @@ function CarouselPage() {
       <div
         className="pk-stage"
         onTouchStart={(e) => {
-          touchStartX.current = e.changedTouches[0].screenX;
+          touchStartX.current = e.changedTouches[0]?.screenX ?? 0;
         }}
         onTouchEnd={(e) => {
-          const diff = touchStartX.current - e.changedTouches[0].screenX;
+          const endX = e.changedTouches[0]?.screenX ?? 0;
+          const diff = touchStartX.current - endX;
           if (Math.abs(diff) > 50) goTo(diff > 0 ? current + 1 : current - 1);
         }}
       >
