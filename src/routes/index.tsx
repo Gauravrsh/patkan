@@ -253,6 +253,7 @@ function Landing() {
   const [copied, setCopied] = useState(false);
   const [usage, setUsage] = useState<{ used: number; limit: number } | null>(null);
   const [customPersonas, setCustomPersonas] = useState<string[]>([]);
+  const [browserIndex, setBrowserIndex] = useState(0);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const outRef = useRef<HTMLPreElement>(null);
 
@@ -261,6 +262,7 @@ function Landing() {
     ...customPersonas.map((name) => [name, "auto", `Role: ${name}`] as PersonaOption),
   ];
 
+  const activeGuide = browserGuides[browserIndex] ?? browserGuides[0]!;
   const target = targetAis[targetIndex]!;
   const persona = personaList[personaIndex] ?? personaList[0]!;
   const dialect = target[1] as Dialect;
@@ -280,6 +282,24 @@ function Landing() {
     setPersonaIndex(personas.length + customPersonas.length);
   }
 
+
+  // Open the install guide on the browser the visitor is actually using.
+  useEffect(() => {
+    const ua = navigator.userAgent;
+    const guess = /OPR\//.test(ua)
+      ? "Opera"
+      : /Edg\//.test(ua)
+        ? "Microsoft Edge"
+        : /Firefox\//.test(ua)
+          ? "Mozilla Firefox"
+          : /Chrome\//.test(ua)
+            ? "Google Chrome"
+            : /Safari\//.test(ua)
+              ? "Apple Safari"
+              : null;
+    const index = browserGuides.findIndex((g) => g.name === guess);
+    if (index > 0) setBrowserIndex(index);
+  }, []);
 
   useEffect(() => {
     if (textareaRef.current) {
@@ -357,8 +377,8 @@ function Landing() {
     setTimeout(() => setCopied(false), 1500);
   }
 
-  function download() {
-    fetch("/patkan-extension.zip")
+  function download(file: string) {
+    fetch(`/${file}`)
       .then((res) => {
         if (!res.ok) throw new Error("Download failed. Try again.");
         return res.blob();
@@ -366,7 +386,7 @@ function Landing() {
       .then((blob) => {
         const a = document.createElement("a");
         a.href = URL.createObjectURL(blob);
-        a.download = "patkan-extension.zip";
+        a.download = file;
         a.click();
         URL.revokeObjectURL(a.href);
       })
@@ -1053,7 +1073,7 @@ function Toggle({ on = true }: { on?: boolean }) {
   );
 }
 
-function BrowserMockup() {
+function BrowserMockup({ address }: { address: string }) {
   return (
     <div className="mx-auto w-full max-w-md overflow-hidden rounded-xl border bg-background shadow-md lg:max-w-none">
       <div className="flex items-center gap-2 border-b bg-muted px-3 py-2.5 sm:px-4 sm:py-3">
@@ -1061,7 +1081,7 @@ function BrowserMockup() {
         <span className="size-2.5 rounded-full bg-primary/50" />
         <span className="size-2.5 rounded-full bg-chart-2/60" />
         <div className="ml-2 flex-1 truncate rounded-full bg-background px-3 py-1.5 font-mono text-[10px] text-muted-foreground">
-          chrome://extensions
+          {address}
         </div>
       </div>
       <div className="p-4 sm:p-6 md:p-7">
