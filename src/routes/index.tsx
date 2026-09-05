@@ -539,6 +539,16 @@ function Landing() {
                   <button
                     onClick={() => {
                       setMenuOpen(false);
+                      sharePatkan();
+                    }}
+                    className="flex items-center gap-2 rounded-md px-2 py-2.5 text-left transition-colors hover:bg-muted"
+                  >
+                    <Share2 className="size-4" aria-hidden />
+                    Share
+                  </button>
+                  <button
+                    onClick={() => {
+                      setMenuOpen(false);
                       getExtension();
                     }}
                     className="mt-2 inline-flex h-10 items-center justify-center gap-2 rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground"
