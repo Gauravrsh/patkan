@@ -406,7 +406,9 @@ const CAROUSEL_CSS = `
 .pk-slide .content-headline.size-lg { font-size: 8.5cqw; }
 .pk-slide .content-headline.size-md { font-size: 7.2cqw; }
 .pk-slide .content-headline.size-sm { font-size: 6.2cqw; }
-.pk-slide .content-headline.accent { color: var(--orange); text-align: center; width: 100%; }
+.pk-slide .content-headline.accent { color: var(--orange); }
+.pk-slide .content-definition { font-family: 'Fraunces', serif; font-style: italic; font-weight: 400; font-size: 4.6cqw; line-height: 1.35; color: var(--ink); margin-top: 4.5cqw; max-width: 100%; }
+
 .pk-slide .content-body { font-size: 3.1cqw; line-height: 1.5; color: var(--ink); white-space: pre-line; max-width: 100%; margin-top: 3.4cqw; }
 .pk-slide .content-bullets { list-style: none; margin: 4cqw 0 0; padding: 0; display: flex; flex-direction: column; gap: 2.4cqw; }
 .pk-slide .content-bullets li { display: flex; align-items: baseline; gap: 2cqw; font-size: 3cqw; line-height: 1.4; color: var(--ink); }
