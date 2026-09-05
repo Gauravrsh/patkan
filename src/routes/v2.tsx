@@ -232,7 +232,7 @@ function PatkanV2() {
                   <span className="font-mono text-xs tracking-widest text-muted-foreground">{number}</span>
                   <Icon className="size-5 text-primary" aria-hidden />
                 </div>
-                <h2 className="mt-8 text-2xl font-semibold tracking-tight md:mt-auto md:pt-16">{heading}</h2>
+                <h2 className="mt-8 text-2xl font-semibold tracking-tight md:mt-24">{heading}</h2>
                 <p className="mt-4 text-sm leading-7 text-muted-foreground">{body}</p>
               </article>
             ))}
