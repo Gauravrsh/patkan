@@ -27,7 +27,7 @@ export const Route = createFileRoute("/_authenticated/admin/carousel")({
       },
       {
         rel: "stylesheet",
-        href: "https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400;1,9..144,500;1,9..144,600&family=Inter:wght@300;400;500;600&display=swap",
+        href: "https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,900;1,9..144,400;1,9..144,500;1,9..144,600&family=Inter:wght@300;400;500;600;700&display=swap",
       },
     ],
   }),
@@ -359,9 +359,9 @@ const CAROUSEL_CSS = `
 .pk-slide .content-bullets li { display: flex; align-items: baseline; gap: 2cqw; font-size: 3cqw; line-height: 1.4; color: var(--ink); }
 .pk-slide .content-bullets .marker { flex: none; width: 0; height: 0; border-left: 1.5cqw solid var(--orange); border-top: 0.9cqw solid transparent; border-bottom: 0.9cqw solid transparent; }
 
-.pk-slide .content-headline strong { font-weight: 600; }
+.pk-slide .content-headline strong { font-weight: 900; }
 .pk-slide .content-body strong,
-.pk-slide .content-bullets strong { font-weight: 600; }
+.pk-slide .content-bullets strong { font-weight: 700; }
 
 .pk-slide .slide-swipe { display: flex; align-items: center; justify-content: flex-end; gap: 1.1cqw; margin-top: 3cqw; font-size: 2.6cqw; color: var(--muted); letter-spacing: 0.02em; }
 .pk-slide .slide-swipe .dot { flex: none; width: 1.5cqw; height: 1.5cqw; border-radius: 50%; background: var(--orange); }
