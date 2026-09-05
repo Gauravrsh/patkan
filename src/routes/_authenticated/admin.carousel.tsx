@@ -100,7 +100,7 @@ const SLIDES: Slide[] = [
   },
   {
     label: "\n",
-    headline: "writing a good **opening prompt** is a game changer for any work with AI",
+    headline: "writing a good [[opening prompt]] is a game changer for any work with AI",
   },
   {
     label: "\n",
@@ -141,7 +141,7 @@ const SLIDES: Slide[] = [
     label: "\n",
     headline: "patkan",
     body: "/pʌtˈkʌn/ · verb",
-    bullets: ["to perform, execute or complete an action **instantly, promptly, and without delay**, in a single swift motion "],
+    bullets: ["to perform, execute or complete an action [[instantly, promptly, and without delay]], in a single swift motion "],
   },
   {
     label: "\n",
@@ -157,9 +157,12 @@ const SLIDES: Slide[] = [
 
 const pad = (n: number) => String(n).padStart(2, "0");
 
-/** Splits on ** markers and renders the marked runs as <strong>. */
+/**
+ * Renders [[...]] runs as <strong>. Uses [[ ]] rather than ** because slide
+ * copy legitimately contains asterisks (e.g. "Kya ch***ya hai ye AI!").
+ */
 function renderEmphasis(text: string) {
-  return text.split("**").map((part, i) =>
+  return text.split(/\[\[(.+?)\]\]/g).map((part, i) =>
     i % 2 === 1 ? <strong key={i}>{part}</strong> : <span key={i}>{part}</span>,
   );
 }
