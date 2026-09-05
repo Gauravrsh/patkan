@@ -104,7 +104,7 @@ const SLIDES: Slide[] = [
   },
   {
     label: "\n",
-    headline: "it gives right context,\nguardrails, \ndo's and don'ts, \noutput format to AI.",
+    headline: "it gives right context, persona, task, guardrails, do's & don'ts,  output format to AI.",
   },
   {
     label: "\n",
