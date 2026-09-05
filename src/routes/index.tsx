@@ -613,7 +613,7 @@ function Landing() {
           <div className={shell}>
             <div className="flex flex-col justify-between gap-5 md:flex-row md:items-end">
               <div>
-                <p className="font-mono text-xs uppercase tracking-[0.18em] text-primary">Install Guide</p>
+                <p className="font-mono text-xs uppercase tracking-[0.18em] text-primary">INSTALLATION GUIDE</p>
                 <h2 className="mt-3 text-3xl font-semibold tracking-tight sm:text-4xl md:text-5xl">
                   Browser Installation Guide
                 </h2>
