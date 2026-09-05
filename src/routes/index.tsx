@@ -393,6 +393,15 @@ function Landing() {
       .catch((err: Error) => toast.error(err.message));
   }
 
+  // Header/hero buttons follow whichever browser the visitor is on.
+  function getExtension() {
+    if (!activeGuide.live) {
+      document.getElementById("install")?.scrollIntoView({ behavior: "smooth", block: "start" });
+      return;
+    }
+    download(activeGuide.file);
+  }
+
   function scrollToPlayground() {
     const el = document.getElementById("playground");
     if (el) {
@@ -446,7 +455,7 @@ function Landing() {
 
             </div>
             <button
-              onClick={download}
+              onClick={getExtension}
               className="inline-flex h-9 shrink-0 items-center gap-2 rounded-md bg-primary px-3 text-sm font-medium text-primary-foreground shadow-sm transition-colors hover:bg-primary/90 sm:px-4"
             >
               <span className="hidden sm:inline">Get Extension</span>
@@ -484,7 +493,7 @@ function Landing() {
             </p>
             <div className="mt-7 flex flex-col gap-3 sm:mt-8 sm:flex-row sm:flex-wrap">
               <button
-                onClick={download}
+                onClick={getExtension}
                 className="inline-flex h-11 items-center justify-center gap-2 rounded-md bg-primary px-5 text-sm font-medium text-primary-foreground shadow-sm transition-colors hover:bg-primary/90 sm:h-10"
               >
                 <ArrowDownToLine className="size-4" aria-hidden /> Download the extension
@@ -741,7 +750,7 @@ function ApprovedUrlsTrigger() {
           ))}
         </div>
         <p className="border-t px-4 py-3 text-xs leading-relaxed text-muted-foreground">
-          Chrome strictly prevents content scripts from running on any domain not explicitly listed in this match array.
+          Your browser strictly prevents content scripts from running on any domain not explicitly listed in this match array.
         </p>
       </PopoverContent>
     </Popover>
