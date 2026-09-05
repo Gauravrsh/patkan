@@ -116,16 +116,83 @@ const pillars = [
   },
 ] as const;
 
-const installSteps = [
+const triggerStep: [string, string] = [
+  "Trigger Patkan",
+  "Type your prompt in ChatGPT, Claude, Gemini, Microsoft Copilot, Perplexity, and more in natural language. End it with // and Patkan takes over.",
+];
+
+type BrowserGuide = {
+  name: string;
+  file: string;
+  address: string;
+  live: boolean;
+  steps: [string, string][];
+};
+
+const chromiumSteps = (address: string, devToggle: string): [string, string][] => [
   ["Download & Extract", "Download Patkan and extract the .zip file."],
-  ["Open Extensions", "Type chrome://extensions in your address bar and hit enter."],
-  ["Enable Developer Mode", "Toggle the switch in the top right corner to ON."],
-  ["Load Unpacked", 'Click "Load unpacked" (top left) and select your extracted folder.'],
-  [
-    "Trigger Patkan",
-    "Type your prompt in ChatGPT, Claude, Gemini, Microsoft Copilot, Perplexity, and more in natural language. End it with // and Patkan takes over.",
-  ],
-] as const;
+  ["Open Extensions", `Type ${address} in your address bar and hit enter.`],
+  ["Enable Developer Mode", devToggle],
+  ["Load Unpacked", 'Click "Load unpacked" and select your extracted folder.'],
+  triggerStep,
+];
+
+const browserGuides: BrowserGuide[] = [
+  {
+    name: "Google Chrome",
+    file: "patkan-extension.zip",
+    address: "chrome://extensions",
+    live: true,
+    steps: chromiumSteps("chrome://extensions", "Toggle the switch in the top right corner to ON."),
+  },
+  {
+    name: "Microsoft Edge",
+    file: "patkan-extension.zip",
+    address: "edge://extensions",
+    live: true,
+    steps: chromiumSteps("edge://extensions", "Turn on Developer mode in the left sidebar."),
+  },
+  {
+    name: "Opera",
+    file: "patkan-extension.zip",
+    address: "opera://extensions",
+    live: true,
+    steps: chromiumSteps("opera://extensions", "Toggle Developer mode in the top right corner to ON."),
+  },
+  {
+    name: "Mozilla Firefox",
+    file: "patkan-extension-firefox.zip",
+    address: "about:debugging#/runtime/this-firefox",
+    live: true,
+    steps: [
+      ["Download the Firefox build", "Download Patkan for Firefox — it is a separate .zip, no need to extract."],
+      ["Open Debugging", "Type about:debugging#/runtime/this-firefox in your address bar and hit enter."],
+      ["Load Temporary Add-on", 'Click "Load Temporary Add-on" and pick the downloaded .zip file.'],
+      [
+        "Allow the AI sites",
+        "Open the Extensions menu, choose Patkan, and allow it to run on the AI sites when Firefox asks.",
+      ],
+      triggerStep,
+    ],
+  },
+  {
+    name: "Apple Safari",
+    file: "patkan-extension.zip",
+    address: "Safari > Settings > Extensions",
+    live: false,
+    steps: [
+      [
+        "Not yet available",
+        "Safari only accepts extensions signed through Apple's developer programme, so Patkan cannot be side-loaded the way it can elsewhere. The Safari build is in progress.",
+      ],
+      [
+        "Meanwhile",
+        "Use Patkan on Chrome, Edge, Opera or Firefox — the same account and the same daily allowance follow you across them.",
+      ],
+    ],
+  },
+];
+
 
 const approvedUrls = [
   "https://chatgpt.com/*",
