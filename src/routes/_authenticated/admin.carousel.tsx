@@ -406,4 +406,34 @@ const CAROUSEL_CSS = `
   .pk-app { padding: 12px; }
   .pk-stage { max-width: 100%; width: 100%; }
 }
+
+/* --- last-slide logo layout options --- */
+.pk-slide .logo-slide { flex: 1; min-height: 0; display: flex; width: 100%; }
+.pk-slide .logo-slide .logo-tile { border-radius: 3.4cqw; display: block; }
+.pk-slide .logo-slide .logo-word { font-family: 'Fraunces', serif; font-weight: 500; color: var(--ink); line-height: 1.1; }
+
+/* A — centered: big tile stacked over the wordmark */
+.pk-slide .logo-slide.layout-a { flex-direction: column; align-items: center; justify-content: center; gap: 6cqw; text-align: center; }
+.pk-slide .logo-slide.layout-a .logo-tile { width: 42cqw; height: 42cqw; }
+.pk-slide .logo-slide.layout-a .logo-word { font-size: 9.5cqw; }
+
+/* B — split row: tile left, wordmark right, vertically centered */
+.pk-slide .logo-slide.layout-b { flex-direction: row; align-items: center; justify-content: center; gap: 6.5cqw; }
+.pk-slide .logo-slide.layout-b .logo-tile { width: 34cqw; height: 34cqw; }
+.pk-slide .logo-slide.layout-b .logo-word { font-size: 9cqw; }
+
+/* C — mast style: small tile top-left (with section label), huge wordmark anchored bottom */
+.pk-slide .logo-slide.layout-c { flex-direction: column; justify-content: space-between; align-items: flex-start; }
+.pk-slide .logo-slide.layout-c .logo-tile { width: 26cqw; height: 26cqw; }
+.pk-slide .logo-slide.layout-c .logo-word { font-size: 13cqw; }
+
+/* D — wordmark first, tile inline below as a sign-off block */
+.pk-slide .logo-slide.layout-d { flex-direction: column; align-items: flex-start; justify-content: center; gap: 7cqw; }
+.pk-slide .logo-slide.layout-d .logo-word { font-size: 12.5cqw; order: -1; }
+.pk-slide .logo-slide.layout-d .logo-tile { width: 30cqw; height: 30cqw; }
+
+/* E — poster: full-bleed-ish large tile centered with wordmark beneath, orange underline accent */
+.pk-slide .logo-slide.layout-e { flex-direction: column; align-items: center; justify-content: center; gap: 5cqw; text-align: center; }
+.pk-slide .logo-slide.layout-e .logo-tile { width: 56cqw; height: 56cqw; }
+.pk-slide .logo-slide.layout-e .logo-word { font-size: 8.5cqw; border-bottom: 1.2cqw solid var(--orange); padding-bottom: 1.4cqw; }
 `;
