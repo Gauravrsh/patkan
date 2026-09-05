@@ -116,7 +116,7 @@ const SLIDES: Slide[] = [
     bullets: ["how you always wanted it..", "how an AI should be.."],
   },
   { label: "in one word", headline: "Intelligent!" },
-  { label: "the turn", headline: "so, what's the problem?" },
+  { label: "\n", headline: "so, what's the problem?" },
   { label: "just one", headline: "bas ek." },
   { label: "the catch", headline: "Itna type kaun karega!!" },
   {
