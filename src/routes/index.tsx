@@ -412,6 +412,25 @@ function Landing() {
     download(activeGuide.file);
   }
 
+  async function sharePatkan() {
+    const url = "https://www.patkan.in";
+    const text = "Patkan — turn a rough thought into a surgically crafted prompt, instantly.";
+    if (typeof navigator !== "undefined" && navigator.share) {
+      try {
+        await navigator.share({ title: "Patkan", text, url });
+      } catch {
+        // User cancelled the share sheet — do nothing.
+      }
+      return;
+    }
+    try {
+      await navigator.clipboard.writeText(url);
+      toast.success("Link copied");
+    } catch {
+      toast.error("Couldn't copy the link");
+    }
+  }
+
   function scrollToPlayground() {
     const el = document.getElementById("playground");
     if (el) {
