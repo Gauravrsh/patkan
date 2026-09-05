@@ -259,6 +259,7 @@ function Landing() {
   const [clarifiers, setClarifiers] = useState<{ label: string; refinement: string }[]>([]);
   const [busy, setBusy] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
   const [usage, setUsage] = useState<{ used: number; limit: number } | null>(null);
   const [customPersonas, setCustomPersonas] = useState<string[]>([]);
   const [browserIndex, setBrowserIndex] = useState(0);
