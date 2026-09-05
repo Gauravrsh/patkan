@@ -121,27 +121,46 @@ const installSteps = [
   ["Load Unpacked", 'Click "Load unpacked" (top left) and select your extracted folder.'],
   [
     "Trigger Patkan",
-    "Type your prompt in ChatGPT, Claude, or Gemini in natural language. End it with // and Patkan takes over.",
+    "Type your prompt in ChatGPT, Claude, Gemini, Microsoft Copilot, Perplexity, and more in natural language. End it with // and Patkan takes over.",
   ],
 ] as const;
 
-const approvedUrls = ["https://chatgpt.com/*", "https://claude.ai/*", "https://gemini.google.com/*"] as const;
+const approvedUrls = [
+  "https://chatgpt.com/*",
+  "https://chat.openai.com/*",
+  "https://claude.ai/*",
+  "https://gemini.google.com/*",
+  "https://aistudio.google.com/*",
+  "https://www.perplexity.ai/*",
+  "https://perplexity.ai/*",
+  "https://copilot.microsoft.com/*",
+  "https://grok.com/*",
+  "https://chat.deepseek.com/*",
+  "https://www.meta.ai/*",
+  "https://meta.ai/*",
+  "https://chat.mistral.ai/*",
+  "https://poe.com/*",
+  "https://www.notion.so/*",
+  "https://kimi.com/*",
+  "https://www.kimi.com/*",
+  "https://chat.qwen.ai/*",
+] as const;
 
 const privacy = [
   {
     icon: Headphones,
     heading: "Deaf until //",
-    body: "No keyloggers. No background daemons listening to keystrokes. Patkan stays completely inert in memory until you type `//` at the end of a sentence.",
+    body: "No keyloggers. No background daemons listening to keystrokes. Patkan takes no action until you type `//` at the end of a sentence.",
   },
   {
     icon: EyeOff,
     heading: "Blind to the rest of the web",
-    body: "Patkan cannot see your other tabs, bank logins, emails, or browsing history. The browser sandbox strictly confines it to `chatgpt.com`, `claude.ai`, and `gemini.google.com`.",
+    body: "Patkan cannot see your other tabs, bank logins, emails, or browsing history. The browser sandbox strictly confines it to the AI sites in its approved list — `ChatGPT`, `Claude`, `Gemini`, `Microsoft Copilot`, `Perplexity`, and more.",
   },
   {
     icon: Zap,
     heading: "Zero memory. Zero retention.",
-    body: "Your rough input compiles in RAM for 200ms and immediately replaces your text. No prompt logs, no chat databases, and zero model training on what you write.",
+    body: "Your rough input compiles in RAM and immediately replaces your text. No prompt logs, no chat databases, and zero model training on what you write.",
   },
   {
     icon: Globe2,
@@ -149,6 +168,7 @@ const privacy = [
     body: "No obfuscated binary blobs. Because you install Patkan unpacked, you can open the folder, inspect every line of plain JavaScript, and verify every network call in DevTools before you click load.",
   },
 ] as const;
+
 
 function Landing() {
   const { session } = useAuth();
