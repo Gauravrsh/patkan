@@ -719,15 +719,7 @@ function Landing() {
       </main>
 
       <footer className="border-t">
-        <div className={`${shell} flex flex-wrap items-center justify-between gap-3 py-8 text-xs text-muted-foreground`}>
-          <span>✦ Patkan — quickly.</span>
-          <div className="flex items-center gap-4">
-            <Link to="/claude-prompt-generator" className="transition-colors hover:text-foreground">
-              Claude prompt generator
-            </Link>
-            <span>10 transforms a day in ghost mode.</span>
-          </div>
-        </div>
+        <div className={`${shell} py-8`} />
       </footer>
     </div>
   );
