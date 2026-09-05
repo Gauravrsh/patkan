@@ -183,15 +183,34 @@ function Landing() {
   const [busy, setBusy] = useState(false);
   const [copied, setCopied] = useState(false);
   const [usage, setUsage] = useState<{ used: number; limit: number } | null>(null);
+  const [customPersonas, setCustomPersonas] = useState<string[]>([]);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const outRef = useRef<HTMLPreElement>(null);
 
+  const personaList: PersonaOption[] = [
+    ...personas,
+    ...customPersonas.map((name) => [name, "auto", `Role: ${name}`] as PersonaOption),
+  ];
+
   const target = targetAis[targetIndex]!;
-  const persona = personas[personaIndex]!;
+  const persona = personaList[personaIndex] ?? personaList[0]!;
   const dialect = target[1] as Dialect;
   const personaId = persona[1];
+  const customInstruction = personaIndex >= personas.length ? `Write as ${persona[0]}.` : null;
   const intensity: Intensity = "standard";
-  const settled = phase === "ready" || phase === "idle";
+
+  function addCustomPersona(name: string) {
+    const clean = name.trim().slice(0, 40);
+    if (!clean) return;
+    const existing = customPersonas.indexOf(clean);
+    if (existing >= 0) {
+      setPersonaIndex(personas.length + existing);
+      return;
+    }
+    setCustomPersonas([...customPersonas, clean]);
+    setPersonaIndex(personas.length + customPersonas.length);
+  }
+
 
   useEffect(() => {
     if (textareaRef.current) {
