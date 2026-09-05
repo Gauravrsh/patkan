@@ -394,7 +394,7 @@ function Playground() {
       </div>
       <div className="relative flex flex-col lg:grid lg:grid-cols-[5fr_6fr] lg:gap-px lg:overflow-hidden lg:rounded-lg lg:border lg:bg-border lg:shadow-sm">
         {/* Input card */}
-        <div className="rounded-lg border bg-background p-5 shadow-sm sm:p-7 lg:rounded-none lg:border-0 lg:shadow-none">
+        <div className="rounded-lg border bg-background p-5 shadow-sm sm:p-7 lg:rounded-none lg:border-0 lg:pr-16 lg:shadow-none">
           <div className="flex items-center justify-between gap-3 text-xs">
             <span className="font-semibold tracking-wider">YOUR THOUGHTS</span>
             <span className="shrink-0 text-muted-foreground">10/day free</span>
@@ -444,7 +444,7 @@ function Playground() {
         </div>
 
         {/* Output card */}
-        <div className="flex flex-col rounded-lg border bg-muted/40 p-5 shadow-sm sm:p-7 lg:rounded-none lg:border-0 lg:shadow-none">
+        <div className="flex flex-col rounded-lg border bg-muted/40 p-5 shadow-sm sm:p-7 lg:rounded-none lg:border-0 lg:pl-16 lg:shadow-none">
           <div className="flex items-center justify-between gap-3 text-xs">
             <span className="font-semibold tracking-wider">COMPILED PROMPT</span>
             <span className="inline-flex shrink-0 items-center gap-2 text-muted-foreground">
