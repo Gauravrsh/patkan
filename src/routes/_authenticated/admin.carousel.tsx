@@ -227,10 +227,23 @@ function CarouselPage() {
                 </div>
 
                 <div className="slide-body">
-                  <div className={`content-headline size-${size}`}>
-                    {renderEmphasis(slide.headline)}
-                  </div>
-                  {slide.body && (
+                  {slide.logoLayout ? (
+                    <div className={`logo-slide layout-${slide.logoLayout}`}>
+                      <img
+                        src={patkanMark}
+                        alt="Patkan logo"
+                        className="logo-tile"
+                        width={816}
+                        height={816}
+                      />
+                      <div className="logo-word">patkan.in</div>
+                    </div>
+                  ) : (
+                    <>
+                      <div className={`content-headline size-${size}`}>
+                        {renderEmphasis(slide.headline)}
+                      </div>
+                      {slide.body && (
                     <div className="content-body">{renderEmphasis(slide.body)}</div>
                   )}
                   {slide.bullets && (
