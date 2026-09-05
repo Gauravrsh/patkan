@@ -488,7 +488,7 @@ function Playground() {
         </div>
 
         {/* Desktop bridge CTA straddling the panel seam */}
-        <span className="absolute top-1/2 left-[45.45%] hidden h-12 -translate-x-1/2 -translate-y-1/2 items-center gap-2 rounded-full bg-primary px-6 text-sm font-medium whitespace-nowrap text-primary-foreground shadow-lg ring-4 ring-background lg:inline-flex">
+        <span className="absolute top-1/2 left-[45.45%] hidden h-11 -translate-x-1/2 -translate-y-1/2 items-center gap-2 rounded-full bg-primary px-5 text-sm font-medium whitespace-nowrap text-primary-foreground shadow-lg ring-[6px] ring-background lg:inline-flex">
           <Sparkles className="size-4" aria-hidden /> Patkan it
         </span>
       </div>
