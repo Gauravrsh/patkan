@@ -492,6 +492,17 @@
   window.addEventListener("scroll", () => place(target), true);
   window.addEventListener("resize", () => place(target));
 
+  // Show the remaining allowance before the user hits the wall, not after.
+  chrome.runtime
+    .sendMessage({ type: "PATKAN_FETCH_USAGE" })
+    .then((usage) => {
+      if (usage && typeof usage.remaining === "number") {
+        restingLabel = `Type // to Patkan · ${usage.remaining} left today`;
+      }
+    })
+    .catch(() => {});
+
+
   chrome.runtime.onMessage.addListener((msg) => {
     if (msg?.type === "PATKAN_TRIGGER") run();
     if (msg?.type === "PATKAN_INSERT" && target) {
