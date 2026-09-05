@@ -117,7 +117,7 @@ const SLIDES: Slide[] = [
   },
   { label: "in one word", headline: "Intelligent!" },
   { label: "\n", headline: "so, what's the problem?" },
-  { label: "just one", headline: "bas ek." },
+  { label: "\n", headline: "bas ek." },
   { label: "\n", headline: "Itna type kaun karega!!" },
   {
     label: "\n",
