@@ -74,122 +74,86 @@ function CarouselGate() {
 /*  SLIDE COPY — one entry per `----` fragment. Edit text here only.    */
 /* ------------------------------------------------------------------ */
 
-type Slide =
-  | {
-      layout: "cover";
-      headline: string;
-      subline?: string;
-      dictionary?: { word: string; meta: string; def: string };
-      hint?: string;
-      headlineSize?: number;
-    }
-  | { layout: "content"; label: string; headline: string; body?: string }
-  | { layout: "cta"; headline: string; body?: string }
-  | { layout: "closing"; headline: string; body?: string };
+type Slide = {
+  label: string;
+  headline: string;
+  body?: string;
+  bullets?: string[];
+};
 
 const SLIDES: Slide[] = [
-  // 01
   {
-    layout: "cover",
+    label: "the sigh",
     headline: '"Kya ch***ya hai ye AI"',
-    subline: "(with an exhausted sigh!!)",
+    body: "(with an exhausted sigh!!)",
   },
-  // 02
-  { layout: "cover", headline: "OR" },
-  // 03
+  { label: "or", headline: "OR" },
   {
-    layout: "cover",
+    label: "the other sigh",
     headline: '"This AI sucks!!"',
-    subline: "— if you are more Maya than Monisha (#IFKYK)",
+    body: "— if you are more Maya than Monisha (#IFKYK)",
   },
-  // 04
   {
-    layout: "content",
     label: "the question",
     headline: "is that you, more often than not?",
     body: "I surely am.",
   },
-  // 05
   {
-    layout: "content",
     label: "the premise",
     headline: "writing a good opening prompt is a game changer for any work with AI",
   },
-  // 06
   {
-    layout: "content",
     label: "what it gives",
     headline: "it gives right context, guardrails, do's and don'ts, output format to AI.",
   },
-  // 07
   {
-    layout: "content",
     label: "the leverage",
     headline: "it can ask you all the right questions before even getting started.",
   },
-  // 08
   {
-    layout: "content",
     label: "the result",
     headline: "the outputs suddenly starts to get so much..",
-    body: "how you always wanted it..\nhow an AI should be",
+    bullets: ["how you always wanted it..", "how an AI should be"],
   },
-  // 09
-  { layout: "cover", headline: "Intelligent!" },
-  // 10
+  { label: "in one word", headline: "Intelligent!" },
+  { label: "the turn", headline: "so, what's the problem?" },
+  { label: "just one", headline: "bas ek." },
+  { label: "the catch", headline: "Itna type kaun karega!!" },
   {
-    layout: "content",
-    label: "the turn",
-    headline: "so, what's the problem?",
-  },
-  // 11
-  { layout: "cover", headline: "bas ek." },
-  // 12
-  { layout: "cover", headline: "Itna type kaun karega!!" },
-  // 13
-  {
-    layout: "content",
     label: "the promise",
     headline:
       "what if your rough first idea converts into a surgical prompt, even before it goes into your AI chat?",
   },
-  // 14
   {
-    layout: "content",
     label: "the shift",
     headline: "and sets your conversation on a totally different track.",
   },
-  // 15
   {
-    layout: "content",
     label: "the payoff",
     headline: "the track that gets you 100X from your AI.",
-    body: "things that you had not thought of.\nareas which you had overlooked.\nscenarios you had not imagined.",
+    bullets: [
+      "things that you had not thought of.",
+      "areas which you had overlooked.",
+      "scenarios you had not imagined.",
+    ],
   },
-  // 16
   {
-    layout: "cover",
-    headline: "presenting patkan",
-    headlineSize: 48,
-    dictionary: {
-      word: "patkan",
-      meta: "/pʌtˈkʌn/ · verb",
-      def: "turn a rough thought into a surgical prompt.",
-    },
-    hint: "dictionary screen",
+    label: "presenting",
+    headline: "patkan",
+    body: "/pʌtˈkʌn/ · verb",
+    bullets: ["turn a rough thought into a surgical prompt."],
   },
-  // 17
   {
-    layout: "cta",
+    label: "how to use",
     headline: "just type in your rough thought and end the sentence with a [//]",
     body: "see the magic for yourself.",
   },
-  // 18
-  { layout: "closing", headline: "website link", body: "www.patkan.in" },
+  {
+    label: "find it here",
+    headline: "www.patkan.in",
+    body: "speak. polish. post.",
+  },
 ];
-
-const FOOTER_LEFT = "made with patkan · speak. polish. post.";
-const TAGLINE = "speak. polish. post.";
 
 const pad = (n: number) => String(n).padStart(2, "0");
 
