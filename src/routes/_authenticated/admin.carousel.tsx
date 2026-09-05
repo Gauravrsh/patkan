@@ -87,7 +87,7 @@ const SLIDES: Slide[] = [
     headline: "Kya ch***ya hai ye AI!",
     body: "..with an exhausted sigh!!",
   },
-  { label: "or", headline: "OR" },
+  { label: "\n", headline: "OR" },
   {
     label: "\n",
     headline: "This AI sucks!",
