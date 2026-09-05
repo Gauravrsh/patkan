@@ -100,7 +100,7 @@ const SLIDES: Slide[] = [
   },
   {
     label: "\n",
-    headline: "writing a good opening prompt is a game changer for any work with AI",
+    headline: "writing a good **opening prompt** is a game changer for any work with AI",
   },
   {
     label: "\n",
