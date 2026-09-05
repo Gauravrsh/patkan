@@ -525,7 +525,7 @@ function Landing() {
 
             <div className="relative mt-10">
               <div className="flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden md:border-b md:gap-1 md:pb-0">
-                {["Google Chrome", "Microsoft Edge", "Mozilla Firefox", "Apple Safari", "Opera"].map((browser, index) => (
+                {["Google Chrome"].map((browser, index) => (
                   <span
                     key={browser}
                     className={`shrink-0 rounded-full border px-4 py-2 text-sm md:rounded-none md:border-0 md:border-b-2 md:px-4 md:py-3 ${
