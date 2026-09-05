@@ -251,11 +251,13 @@ function CarouselPage() {
                   )}
                 </div>
 
-                <div className="slide-swipe">
-                  <span className="dot" />
-                  <span className="word">swipe</span>
-                  <span className="arrow">→</span>
-                </div>
+                {i !== total - 1 && (
+                  <div className="slide-swipe">
+                    <span className="dot" />
+                    <span className="word">swipe</span>
+                    <span className="arrow">→</span>
+                  </div>
+                )}
 
                 <div className="slide-footer">
                    <div className="footer-left">{"\n"}</div>
