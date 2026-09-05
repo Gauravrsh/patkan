@@ -44,10 +44,11 @@ export const Route = createFileRoute("/")({
         content: "Turn a rough thought into a surgically crafted prompt without leaving your AI chat.",
       },
       { property: "og:type", content: "website" },
-      { property: "og:url", content: "https://patkan.lovable.app/" },
+      { property: "og:url", content: "https://patkan.in/" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
-    links: [{ rel: "canonical", href: "https://patkan.lovable.app/" }],
+    links: [{ rel: "canonical", href: "https://patkan.in/" }],
+
   }),
   component: Landing,
 });
