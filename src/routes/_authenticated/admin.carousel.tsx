@@ -144,8 +144,8 @@ const SLIDES: Slide[] = [
     bullets: ["to perform, execute or complete an action instantly, promptly, and without delay, in a single swift motion "],
   },
   {
-    label: "how to use",
-    headline: "just type in your rough thought and end the sentence with  //",
+    label: "\n",
+    headline: "just type your rough thought in your AI chat, and end the sentence with  //",
     body: "see the magic for yourself.",
   },
   {
