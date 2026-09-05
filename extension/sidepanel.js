@@ -7,6 +7,9 @@ import {
   localScaffold,
 } from "./patkan-core.js";
 
+
+const chrome = globalThis.browser ?? globalThis.chrome;
+
 const $ = (id) => document.getElementById(id);
 let persona = "auto";
 let dialect = "markdown";

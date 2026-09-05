@@ -1,5 +1,8 @@
 import { PERSONAS, INTENSITIES, DEFAULT_API_BASE } from "./patkan-core.js";
 
+
+const chrome = globalThis.browser ?? globalThis.chrome;
+
 const $ = (id) => document.getElementById(id);
 
 for (const p of PERSONAS) {

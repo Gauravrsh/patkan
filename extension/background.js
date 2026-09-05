@@ -1,5 +1,8 @@
 import { DEFAULT_API_BASE, getPersona, localScaffold } from "./patkan-core.js";
 
+
+const chrome = globalThis.browser ?? globalThis.chrome;
+
 chrome.runtime.onInstalled.addListener(() => {
   chrome.sidePanel.setPanelBehavior({ openPanelOnActionClick: true }).catch(() => {});
 });
