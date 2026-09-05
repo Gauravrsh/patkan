@@ -422,7 +422,7 @@ const CAROUSEL_CSS = `
 .pk-slide .slide-progress { position: absolute; left: 0; right: 0; bottom: 0; height: 0.28cqw; min-height: 2px; background: rgba(28, 25, 23, 0.12); }
 .pk-slide .slide-progress-fill { display: block; height: 100%; background: var(--orange); }
 
-.pk-slide .slide-swipe .dot { flex: none; width: 1.5cqw; height: 1.5cqw; border-radius: 50%; background: var(--orange); }
+.pk-slide .slide-swipe .dot { flex: none; width: 1.8cqw; height: 1.8cqw; border-radius: 50%; background: var(--orange); }
 .pk-slide .slide-swipe .word { text-transform: lowercase; }
 .pk-slide .slide-swipe .arrow { color: var(--ink); }
 
