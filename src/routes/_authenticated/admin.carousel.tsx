@@ -194,90 +194,46 @@ function CarouselPage() {
         }}
       >
         <div className="pk-slides">
-          {SLIDES.map((slide, i) => (
-            <div
-              key={i}
-              className={`pk-slide layout-${slide.layout}${i === current ? " active" : ""}`}
-            >
-              <div className="slide-header">
-                <div className="wordmark">patkan</div>
-                <div className="slide-number">№ {pad(i + 1)}</div>
-              </div>
+          {SLIDES.map((slide, i) => {
+            const len = slide.headline.length;
+            const size = len <= 18 ? "xl" : len <= 45 ? "lg" : len <= 80 ? "md" : "sm";
+            return (
+              <div
+                key={i}
+                className={`pk-slide${i === current ? " active" : ""}`}
+              >
+                <div className="section-label">
+                  <span className="number">{pad(i + 1)}</span>
+                  <span className="rule" />
+                  <span className="label">{slide.label}</span>
+                </div>
 
-              {slide.layout === "cover" && (
-                <>
-                  <div
-                    className="cover-headline"
-                    style={
-                      slide.headlineSize
-                        ? {
-                            fontSize: `${slide.headlineSize / 10.8}cqw`,
-                            marginBottom: "2.2cqw",
-                          }
-                        : undefined
-                    }
-                  >
+                <div className="slide-body">
+                  <div className={`content-headline size-${size}`}>
                     {slide.headline}
                   </div>
-                  {slide.subline && (
-                    <div className="cover-subline">{slide.subline}</div>
-                  )}
-                  {slide.dictionary && (
-                    <div className="dictionary-card">
-                      <div className="dictionary-word">{slide.dictionary.word}</div>
-                      <div className="dictionary-meta">{slide.dictionary.meta}</div>
-                      <div className="dictionary-def">{slide.dictionary.def}</div>
-                    </div>
-                  )}
-                  <div
-                    className="cover-hint"
-                    style={slide.dictionary ? { marginTop: "3.3cqw" } : undefined}
-                  >
-                    <span className="dot" />
-                    <span>{slide.hint ?? "swipe →"}</span>
-                  </div>
-                </>
-              )}
-
-              {slide.layout === "content" && (
-                <>
-                  <div className="section-label">
-                    <span className="number">{pad(i + 1)}</span>
-                    <span className="rule" />
-                    <span className="label">{slide.label}</span>
-                  </div>
-                  <div className="content-headline">{slide.headline}</div>
                   {slide.body && <div className="content-body">{slide.body}</div>}
-                </>
-              )}
+                  {slide.bullets && (
+                    <ul className="content-bullets">
+                      {slide.bullets.map((b, bi) => (
+                        <li key={bi}>
+                          <span className="marker" />
+                          <span>{b}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
 
-              {slide.layout === "cta" && (
-                <>
-                  <div className="content-headline">{slide.headline}</div>
-                  {slide.body && <div className="content-body">{slide.body}</div>}
-                  <div className="cta-wordmark">patkan</div>
-                  <div className="cta-tagline">{TAGLINE}</div>
-                </>
-              )}
-
-              {slide.layout === "closing" && (
-                <>
-                  <div className="closing-headline">{slide.headline}</div>
-                  <div className="closing-rule" />
-                  {slide.body && <div className="closing-body">{slide.body}</div>}
-                  <div className="closing-wordmark">patkan</div>
-                  <div className="closing-tagline">{TAGLINE}</div>
-                </>
-              )}
-
-              <div className="slide-footer">
-                <div className="footer-left">{FOOTER_LEFT}</div>
-                <div className="footer-right">
-                  {pad(i + 1)} / {pad(total)}
+                <div className="slide-footer">
+                  <div className="footer-left">patkan</div>
+                  <div className="footer-right">
+                    {pad(i + 1)} / {pad(total)}
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
 
