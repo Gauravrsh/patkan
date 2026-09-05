@@ -145,7 +145,7 @@ const SLIDES: Slide[] = [
   },
   {
     label: "how to use",
-    headline: "just type in your rough thought and end the sentence with a [//]",
+    headline: "just type in your rough thought and end the sentence with  //",
     body: "see the magic for yourself.",
   },
   {
