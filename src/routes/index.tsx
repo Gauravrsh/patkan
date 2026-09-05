@@ -671,7 +671,7 @@ function Landing() {
                   </li>
                 ))}
               </ol>
-              <BrowserMockup address={activeGuide.address} />
+              <BrowserMockup address={activeGuide.address} firefox={activeGuide.name === "Mozilla Firefox"} />
             </div>
             <p className="mt-8 text-xs leading-relaxed text-muted-foreground">
               *Live on Google Chrome, Microsoft Edge, Opera and Mozilla Firefox today. Apple Safari requires an
@@ -1082,7 +1082,7 @@ function Toggle({ on = true }: { on?: boolean }) {
   );
 }
 
-function BrowserMockup({ address }: { address: string }) {
+function BrowserMockup({ address, firefox = false }: { address: string; firefox?: boolean }) {
   return (
     <div className="mx-auto w-full max-w-md overflow-hidden rounded-xl border bg-background shadow-md lg:max-w-none">
       <div className="flex items-center gap-2 border-b bg-muted px-3 py-2.5 sm:px-4 sm:py-3">
@@ -1095,14 +1095,19 @@ function BrowserMockup({ address }: { address: string }) {
       </div>
       <div className="p-4 sm:p-6 md:p-7">
         <div className="flex items-center justify-between gap-3">
-          <h3 className="text-base font-semibold tracking-tight sm:text-lg">Extensions</h3>
+          <h3 className="text-base font-semibold tracking-tight sm:text-lg">
+            {firefox ? "This Firefox" : "Extensions"}
+          </h3>
           <span className="flex shrink-0 items-center gap-2 text-[11px] text-muted-foreground sm:text-xs">
-            <span className="hidden sm:inline">Developer mode</span>
+            <span className="hidden sm:inline">{firefox ? "Temporary Extensions" : "Developer mode"}</span>
             <Toggle />
           </span>
         </div>
         <div className="mt-4 flex flex-wrap gap-2 text-[10px] sm:text-[11px]">
-          {["Load unpacked", "Pack extension", "Update"].map((item, index) => (
+          {(firefox
+            ? ["Load Temporary Add-on", "Inspect", "Reload"]
+            : ["Load unpacked", "Pack extension", "Update"]
+          ).map((item, index) => (
             <span
               key={item}
               className={`rounded-md px-3 py-1.5 font-medium shadow-sm ${
