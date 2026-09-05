@@ -6,6 +6,7 @@ import { Loader2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { getMyAdminAccess } from "@/lib/admin.functions";
+import patkanMark from "@/assets/patkan-mark.png";
 
 export const Route = createFileRoute("/_authenticated/admin/carousel")({
   head: () => ({
@@ -73,8 +74,6 @@ function CarouselGate() {
 /* ------------------------------------------------------------------ */
 /*  SLIDE COPY — one entry per `----` fragment. Edit text here only.    */
 /* ------------------------------------------------------------------ */
-
-import patkanMark from "@/assets/patkan-mark.png";
 
 type Slide = {
   label: string;
