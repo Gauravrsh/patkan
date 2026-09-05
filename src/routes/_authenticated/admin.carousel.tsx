@@ -150,11 +150,6 @@ const SLIDES: Slide[] = [
     headline: "just type your rough thought in your AI chat, and end the sentence with  //",
     body: "see the magic for yourself.",
   },
-  {
-    label: "\n",
-    headline: "patkan.in",
-    body: "\n",
-  },
   /* --- final slide: poster layout with mast-sized tile --- */
   { label: "\n", headline: "patkan.in", logoLayout: "e" },
 ];
