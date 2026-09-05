@@ -120,14 +120,7 @@ function PatkanV3() {
       <header className="sticky top-0 z-30 border-b bg-background/85 backdrop-blur-md">
         <div className={`${shell} grid h-14 grid-cols-[minmax(0,1fr)_auto] items-center gap-3 sm:h-16`}>
           <div className="flex min-w-0 items-center gap-2.5">
-            <img
-              src={patkanMark}
-              alt="Patkan"
-              width={816}
-              height={816}
-              className="size-8 shrink-0 rounded-[0.55rem] sm:size-9"
-            />
-            <span className="truncate text-lg font-semibold tracking-tight sm:text-xl">Patkan</span>
+            <PtknMark className="h-7 w-auto text-foreground transition-colors hover:text-primary sm:h-8" />
             <span className="hidden shrink-0 rounded-full border bg-muted px-2.5 py-1 font-mono text-[11px] text-muted-foreground sm:inline">
               /पट्कन/
             </span>
@@ -449,7 +442,7 @@ function Playground() {
         {/* Mobile connector — the // mark as the transformation glyph */}
         <div className="flex flex-col items-center py-1 lg:hidden" aria-hidden>
           <span className="h-4 w-px bg-border" />
-          <img src={patkanMark} alt="" width={816} height={816} className="my-1 size-8 rounded-[0.55rem] shadow-sm" />
+          <PtknMark className="my-1 h-6 w-auto text-foreground" />
           <span className="h-4 w-px bg-border" />
         </div>
 
@@ -594,7 +587,7 @@ function ExtensionCard({
     >
       <div className="flex items-start justify-between gap-2">
         {accent ? (
-          <img src={patkanMark} alt="Patkan" width={816} height={816} loading="lazy" className="size-9 rounded-md" />
+          <PtknMark className="h-8 w-auto text-foreground" />
         ) : (
           <span className="flex size-9 items-center justify-center rounded-md bg-muted text-sm font-semibold text-muted-foreground">
             G
