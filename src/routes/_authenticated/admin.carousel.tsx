@@ -6,6 +6,7 @@ import { Loader2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { getMyAdminAccess } from "@/lib/admin.functions";
+import patkanMark from "@/assets/patkan-mark.png";
 
 export const Route = createFileRoute("/_authenticated/admin/carousel")({
   head: () => ({
@@ -79,6 +80,7 @@ type Slide = {
   headline: string;
   body?: string;
   bullets?: string[];
+  logoLayout?: "a" | "b" | "c" | "d" | "e";
 };
 
 const SLIDES: Slide[] = [
@@ -153,6 +155,12 @@ const SLIDES: Slide[] = [
     headline: "patkan.in",
     body: "\n",
   },
+  /* --- last-slide logo layout options (pick one) --- */
+  { label: "option 19", headline: "patkan.in", logoLayout: "a" },
+  { label: "option 20", headline: "patkan.in", logoLayout: "b" },
+  { label: "option 21", headline: "patkan.in", logoLayout: "c" },
+  { label: "option 22", headline: "patkan.in", logoLayout: "d" },
+  { label: "option 23", headline: "patkan.in", logoLayout: "e" },
 ];
 
 const pad = (n: number) => String(n).padStart(2, "0");
@@ -219,21 +227,36 @@ function CarouselPage() {
                 </div>
 
                 <div className="slide-body">
-                  <div className={`content-headline size-${size}`}>
-                    {renderEmphasis(slide.headline)}
-                  </div>
-                  {slide.body && (
-                    <div className="content-body">{renderEmphasis(slide.body)}</div>
-                  )}
-                  {slide.bullets && (
-                    <ul className="content-bullets">
-                      {slide.bullets.map((b, bi) => (
-                        <li key={bi}>
-                          <span className="marker" />
-                          <span>{renderEmphasis(b)}</span>
-                        </li>
-                      ))}
-                    </ul>
+                  {slide.logoLayout ? (
+                    <div className={`logo-slide layout-${slide.logoLayout}`}>
+                      <img
+                        src={patkanMark}
+                        alt="Patkan logo"
+                        className="logo-tile"
+                        width={816}
+                        height={816}
+                      />
+                      <div className="logo-word">patkan.in</div>
+                    </div>
+                  ) : (
+                    <>
+                      <div className={`content-headline size-${size}`}>
+                        {renderEmphasis(slide.headline)}
+                      </div>
+                      {slide.body && (
+                        <div className="content-body">{renderEmphasis(slide.body)}</div>
+                      )}
+                      {slide.bullets && (
+                        <ul className="content-bullets">
+                          {slide.bullets.map((b, bi) => (
+                            <li key={bi}>
+                              <span className="marker" />
+                              <span>{renderEmphasis(b)}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+                    </>
                   )}
                 </div>
 
@@ -383,4 +406,34 @@ const CAROUSEL_CSS = `
   .pk-app { padding: 12px; }
   .pk-stage { max-width: 100%; width: 100%; }
 }
+
+/* --- last-slide logo layout options --- */
+.pk-slide .logo-slide { flex: 1; min-height: 0; display: flex; width: 100%; }
+.pk-slide .logo-slide .logo-tile { border-radius: 3.4cqw; display: block; }
+.pk-slide .logo-slide .logo-word { font-family: 'Fraunces', serif; font-weight: 500; color: var(--ink); line-height: 1.1; }
+
+/* A — centered: big tile stacked over the wordmark */
+.pk-slide .logo-slide.layout-a { flex-direction: column; align-items: center; justify-content: center; gap: 6cqw; text-align: center; }
+.pk-slide .logo-slide.layout-a .logo-tile { width: 42cqw; height: 42cqw; }
+.pk-slide .logo-slide.layout-a .logo-word { font-size: 9.5cqw; }
+
+/* B — split row: tile left, wordmark right, vertically centered */
+.pk-slide .logo-slide.layout-b { flex-direction: row; align-items: center; justify-content: center; gap: 6.5cqw; }
+.pk-slide .logo-slide.layout-b .logo-tile { width: 34cqw; height: 34cqw; }
+.pk-slide .logo-slide.layout-b .logo-word { font-size: 9cqw; }
+
+/* C — mast style: small tile top-left (with section label), huge wordmark anchored bottom */
+.pk-slide .logo-slide.layout-c { flex-direction: column; justify-content: space-between; align-items: flex-start; }
+.pk-slide .logo-slide.layout-c .logo-tile { width: 26cqw; height: 26cqw; }
+.pk-slide .logo-slide.layout-c .logo-word { font-size: 13cqw; }
+
+/* D — wordmark first, tile inline below as a sign-off block */
+.pk-slide .logo-slide.layout-d { flex-direction: column; align-items: flex-start; justify-content: center; gap: 7cqw; }
+.pk-slide .logo-slide.layout-d .logo-word { font-size: 12.5cqw; order: -1; }
+.pk-slide .logo-slide.layout-d .logo-tile { width: 30cqw; height: 30cqw; }
+
+/* E — poster: full-bleed-ish large tile centered with wordmark beneath, orange underline accent */
+.pk-slide .logo-slide.layout-e { flex-direction: column; align-items: center; justify-content: center; gap: 5cqw; text-align: center; }
+.pk-slide .logo-slide.layout-e .logo-tile { width: 56cqw; height: 56cqw; }
+.pk-slide .logo-slide.layout-e .logo-word { font-size: 8.5cqw; border-bottom: 1.2cqw solid var(--orange); padding-bottom: 1.4cqw; }
 `;
