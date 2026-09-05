@@ -27,7 +27,7 @@ export const Route = createFileRoute("/_authenticated/admin/carousel")({
       },
       {
         rel: "stylesheet",
-        href: "https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400;1,9..144,500;1,9..144,600&family=Inter:wght@300;400;500;600&display=swap",
+        href: "https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,900;1,9..144,400;1,9..144,500;1,9..144,600&family=Inter:wght@300;400;500;600;700&display=swap",
       },
     ],
   }),
@@ -100,7 +100,7 @@ const SLIDES: Slide[] = [
   },
   {
     label: "\n",
-    headline: "writing a good opening prompt is a game changer for any work with AI",
+    headline: "writing a good [[opening prompt]] is a game changer for any work with AI",
   },
   {
     label: "\n",
@@ -141,7 +141,7 @@ const SLIDES: Slide[] = [
     label: "\n",
     headline: "patkan",
     body: "/pʌtˈkʌn/ · verb",
-    bullets: ["to perform, execute or complete an action instantly, promptly, and without delay, in a single swift motion "],
+    bullets: ["to perform, execute or complete an action [[instantly, promptly, and without delay]], in a single swift motion "],
   },
   {
     label: "\n",
@@ -156,6 +156,16 @@ const SLIDES: Slide[] = [
 ];
 
 const pad = (n: number) => String(n).padStart(2, "0");
+
+/**
+ * Renders [[...]] runs as <strong>. Uses [[ ]] rather than ** because slide
+ * copy legitimately contains asterisks (e.g. "Kya ch***ya hai ye AI!").
+ */
+function renderEmphasis(text: string) {
+  return text.split(/\[\[(.+?)\]\]/g).map((part, i) =>
+    i % 2 === 1 ? <strong key={i}>{part}</strong> : <span key={i}>{part}</span>,
+  );
+}
 
 function CarouselPage() {
   const total = SLIDES.length;
@@ -210,19 +220,27 @@ function CarouselPage() {
 
                 <div className="slide-body">
                   <div className={`content-headline size-${size}`}>
-                    {slide.headline}
+                    {renderEmphasis(slide.headline)}
                   </div>
-                  {slide.body && <div className="content-body">{slide.body}</div>}
+                  {slide.body && (
+                    <div className="content-body">{renderEmphasis(slide.body)}</div>
+                  )}
                   {slide.bullets && (
                     <ul className="content-bullets">
                       {slide.bullets.map((b, bi) => (
                         <li key={bi}>
                           <span className="marker" />
-                          <span>{b}</span>
+                          <span>{renderEmphasis(b)}</span>
                         </li>
                       ))}
                     </ul>
                   )}
+                </div>
+
+                <div className="slide-swipe">
+                  <span className="dot" />
+                  <span className="word">swipe</span>
+                  <span className="arrow">→</span>
                 </div>
 
                 <div className="slide-footer">
@@ -340,6 +358,15 @@ const CAROUSEL_CSS = `
 .pk-slide .content-bullets { list-style: none; margin: 4cqw 0 0; padding: 0; display: flex; flex-direction: column; gap: 2.4cqw; }
 .pk-slide .content-bullets li { display: flex; align-items: baseline; gap: 2cqw; font-size: 3cqw; line-height: 1.4; color: var(--ink); }
 .pk-slide .content-bullets .marker { flex: none; width: 0; height: 0; border-left: 1.5cqw solid var(--orange); border-top: 0.9cqw solid transparent; border-bottom: 0.9cqw solid transparent; }
+
+.pk-slide .content-headline strong { font-weight: 900; }
+.pk-slide .content-body strong,
+.pk-slide .content-bullets strong { font-weight: 700; }
+
+.pk-slide .slide-swipe { display: flex; align-items: center; justify-content: flex-end; gap: 1.1cqw; margin-top: 3cqw; font-size: 2.6cqw; color: var(--muted); letter-spacing: 0.02em; }
+.pk-slide .slide-swipe .dot { flex: none; width: 1.5cqw; height: 1.5cqw; border-radius: 50%; background: var(--orange); }
+.pk-slide .slide-swipe .word { text-transform: lowercase; }
+.pk-slide .slide-swipe .arrow { color: var(--ink); }
 
 
 .pk-nav { margin-top: 20px; display: flex; align-items: center; gap: 16px; color: rgba(255,255,255,0.8); }
