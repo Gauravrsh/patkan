@@ -93,13 +93,13 @@ const SLIDES: Slide[] = [
   { label: "\n", headline: "OR", accent: true },
   {
     label: "\n",
-    headline: "This AI sucks!",
+    headline: "This AI sucks!!",
     body: "- If you are more Maya than Monisha \n\n\n#IFKYK",
   },
   {
     label: "\n",
-    headline: "Is that you, more often than not?",
-    body: "I surely am.",
+    headline: "is that you, more often than not?",
+    body: "i surely am.",
   },
   {
     label: "\n",
