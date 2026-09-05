@@ -43,8 +43,10 @@ function renderControls() {
 }
 
 function setUsage(used, limit) {
-  if (typeof used === "number") $("usage").textContent = `${used}/${limit} today`;
+  if (typeof used !== "number" || typeof limit !== "number") return;
+  $("usage").textContent = `${Math.max(0, limit - used)} left today`;
 }
+
 
 async function loadTemplates(settings) {
   if (!settings.session?.access_token) {
