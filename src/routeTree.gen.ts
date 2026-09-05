@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as CarouselRouteImport } from './routes/carousel'
 import { Route as ClaudePromptGeneratorRouteImport } from './routes/claude-prompt-generator'
 import { Route as ConnectRouteImport } from './routes/connect'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
@@ -35,6 +36,11 @@ const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CarouselRoute = CarouselRouteImport.update({
+  id: '/carousel',
+  path: '/carousel',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ClaudePromptGeneratorRoute = ClaudePromptGeneratorRouteImport.update({
@@ -91,6 +97,7 @@ const ApiPublicCronHealthRoute = ApiPublicCronHealthRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/carousel': typeof CarouselRoute
   '/claude-prompt-generator': typeof ClaudePromptGeneratorRoute
   '/connect': typeof ConnectRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -105,6 +112,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/carousel': typeof CarouselRoute
   '/claude-prompt-generator': typeof ClaudePromptGeneratorRoute
   '/connect': typeof ConnectRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -121,6 +129,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
+  '/carousel': typeof CarouselRoute
   '/claude-prompt-generator': typeof ClaudePromptGeneratorRoute
   '/connect': typeof ConnectRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -137,6 +146,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/auth'
+    | '/carousel'
     | '/claude-prompt-generator'
     | '/connect'
     | '/sitemap.xml'
@@ -151,6 +161,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/auth'
+    | '/carousel'
     | '/claude-prompt-generator'
     | '/connect'
     | '/sitemap.xml'
@@ -166,6 +177,7 @@ export interface FileRouteTypes {
     | '/'
     | '/_authenticated'
     | '/auth'
+    | '/carousel'
     | '/claude-prompt-generator'
     | '/connect'
     | '/sitemap.xml'
@@ -182,6 +194,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
+  CarouselRoute: typeof CarouselRoute
   ClaudePromptGeneratorRoute: typeof ClaudePromptGeneratorRoute
   ConnectRoute: typeof ConnectRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
@@ -213,6 +226,13 @@ declare module '@tanstack/react-router' {
       path: '/auth'
       fullPath: '/auth'
       preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/carousel': {
+      id: '/carousel'
+      path: '/carousel'
+      fullPath: '/carousel'
+      preLoaderRoute: typeof CarouselRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/claude-prompt-generator': {
@@ -305,6 +325,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
+  CarouselRoute: CarouselRoute,
   ClaudePromptGeneratorRoute: ClaudePromptGeneratorRoute,
   ConnectRoute: ConnectRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
