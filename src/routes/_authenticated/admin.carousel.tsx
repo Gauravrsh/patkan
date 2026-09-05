@@ -135,7 +135,8 @@ const SLIDES: Slide[] = [
     label: "\n",
     size: "md",
     headline:
-      "what if your rough first idea converts into a surgical prompt,\neven before it goes into your AI chat?",
+      "what if your [[rough first idea]] converts into a [[surgical prompt]],\neven before it goes into your AI chat?",
+
   },
   {
     label: "\n",
