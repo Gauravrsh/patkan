@@ -110,10 +110,10 @@ const SLIDES: Slide[] = [
     label: "\n",
     headline: "it can ask you all the right questions before even getting started.",
   },
-  {
-    label: "the result",
+    {
+      label: "\n",
     headline: "the outputs suddenly starts to get so much..",
-    bullets: ["how you always wanted it..", "how an AI should be"],
+    bullets: ["how you always wanted it..", "how an AI should be.."],
   },
   { label: "in one word", headline: "Intelligent!" },
   { label: "the turn", headline: "so, what's the problem?" },
