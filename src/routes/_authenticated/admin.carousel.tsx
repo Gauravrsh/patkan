@@ -74,11 +74,14 @@ function CarouselGate() {
 /*  SLIDE COPY — one entry per `----` fragment. Edit text here only.    */
 /* ------------------------------------------------------------------ */
 
+import patkanMark from "@/assets/patkan-mark.png";
+
 type Slide = {
   label: string;
   headline: string;
   body?: string;
   bullets?: string[];
+  logoLayout?: "a" | "b" | "c" | "d" | "e";
 };
 
 const SLIDES: Slide[] = [
