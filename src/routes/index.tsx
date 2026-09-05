@@ -45,7 +45,9 @@ export const Route = createFileRoute("/")({
       },
       { property: "og:type", content: "website" },
       { property: "og:url", content: "https://patkan.in/" },
+      { property: "og:image", content: "https://patkan.in/og-image.jpg" },
       { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:image", content: "https://patkan.in/og-image.jpg" },
     ],
     links: [{ rel: "canonical", href: "https://patkan.in/" }],
 
