@@ -11,6 +11,7 @@ import {
   LockKeyhole,
   Menu,
   MousePointer2,
+  Share2,
   ShieldCheck,
   Sparkles,
   Volume2,
