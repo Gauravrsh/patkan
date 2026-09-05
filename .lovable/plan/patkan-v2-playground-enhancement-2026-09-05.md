@@ -7,13 +7,15 @@ Rework only the Playground section of `/v2` per the approved wireframes. `/`, th
 - Keep one bordered card with a 1px split; change panel ratio from 1:1 to 5:6 so the compiled-prompt panel is the hero.
 - Input panel:
   - Replace the faint "I want to.." line with the approved rough-thought sample ("I want to.. write a PRD for redesigning the checkout flow" — reuse existing approved playground sample copy verbatim), styled with a dotted underline and caret to read as rough/human input.
+  - Delete the section "define your custom persona or role". Its already taken care of in the persona chips.
   - TARGET AI and PERSONA chip groups keep their approved labels and explainer lines.
   - Custom persona field and full-width "Patkan it" button stay; button aligns with the bottom of the output panel's assumptions block.
+  - I'd like the "patkan it" connector and CTA between the two input and output panels, like a bridge or tunnel.
 - Output panel:
   - Replace skeleton bars with a static compiled-prompt preview in mono font: tag lines tinted in the accent color, body in ink, truncated with a soft bottom fade (no scrollbar).
   - Preview text is drawn only from the original supplied markdown's playground output structure — verbatim, no invented copy. If a needed line has no approved source, it is left out.
   - Add a "compiled for" strip at the top of the panel mirroring the selected chip state (e.g. "compiled for Claude · Engineering · Standard"), assembled from existing approved chip labels only.
-  - Assumptions block gets a 2px accent left rail; clarifier chips keep dashed borders + "+" prefix.
+  - Assumptions block gets a 2px accent left rail; clarifier chips keep dashed borders + "+" prefix.----is that even needed? what value it is adding? The assumptions etc must get called out in the output prompt itself.
 
 ## Mobile layout (393px)
 
