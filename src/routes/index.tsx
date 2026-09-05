@@ -88,8 +88,10 @@ const personas = [
   ["B2B Marketer", "marketer", "Role: a B2B marketer who writes platform-native, high-conversion copy"],
   ["Engineer", "engineer", "Role: a pragmatic staff engineer who gives implementation-grade answers"],
   ["Analyst", "analyst", "Role: a data analyst who reasons quantitatively and shows the working"],
-  ["Other", "auto", "Custom persona active"],
 ] as const;
+
+type PersonaOption = readonly [string, string, string];
+
 
 const pillars = [
   {
