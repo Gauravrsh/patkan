@@ -500,7 +500,7 @@ function BrowserMockup() {
         <div className="flex items-center justify-between gap-3">
           <h3 className="text-base font-semibold tracking-tight sm:text-lg">Extensions</h3>
           <span className="flex shrink-0 items-center gap-2 text-[11px] text-muted-foreground sm:text-xs">
-            <span className="hidden xs:inline sm:inline">Developer mode</span>
+            <span className="hidden sm:inline">Developer mode</span>
             <Toggle />
           </span>
         </div>
