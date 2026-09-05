@@ -151,7 +151,7 @@ const SLIDES: Slide[] = [
   {
     label: "find it here",
     headline: "www.patkan.in",
-    body: "speak. polish. post.",
+    body: "\n",
   },
 ];
 
