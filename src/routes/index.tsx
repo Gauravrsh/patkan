@@ -472,6 +472,8 @@ function Landing() {
               copied={copied}
               copy={copy}
               transform={transform}
+              personaList={personaList}
+              addCustomPersona={addCustomPersona}
               remaining={remaining}
               exhausted={exhausted}
               session={!!session}
@@ -675,6 +677,8 @@ interface PlaygroundProps {
   setTargetIndex: (i: number) => void;
   personaIndex: number;
   setPersonaIndex: (i: number) => void;
+  personaList: PersonaOption[];
+  addCustomPersona: (name: string) => void;
   output: string;
   phase: Phase;
   engine: EngineId;
@@ -699,6 +703,8 @@ function Playground(props: PlaygroundProps) {
     setTargetIndex,
     personaIndex,
     setPersonaIndex,
+    personaList,
+    addCustomPersona,
     output,
     phase,
     engine,
@@ -715,8 +721,10 @@ function Playground(props: PlaygroundProps) {
     outRef,
   } = props;
 
+  const [customOpen, setCustomOpen] = useState(false);
+  const [customDraft, setCustomDraft] = useState("");
   const target = targetAis[targetIndex]!;
-  const persona = personas[personaIndex]!;
+  const persona = personaList[personaIndex] ?? personaList[0]!;
   const settled = phase === "ready" || phase === "idle";
 
   return (
@@ -730,7 +738,13 @@ function Playground(props: PlaygroundProps) {
           <div className="flex items-center justify-between gap-3 text-xs">
             <span className="font-semibold tracking-wider">YOUR THOUGHTS</span>
             <span className="shrink-0 text-muted-foreground">
-              {exhausted ? "0 left today" : `${remaining} left today`}
+              {session
+                ? exhausted
+                  ? "0 left today"
+                  : `${remaining} left today`
+                : exhausted
+                  ? "0 transforms left — sign in to keep going"
+                  : `${remaining} more transforms, before you need to sign-in`}
             </span>
           </div>
 
@@ -776,10 +790,36 @@ function Playground(props: PlaygroundProps) {
               <span className="text-xs text-muted-foreground">{persona[2]}</span>
             </div>
             <div className={chipRow}>
-              {personas.map(([name], index) => (
+              {personaList.map(([name], index) => (
                 <Chip key={name} name={name} active={personaIndex === index} onClick={() => setPersonaIndex(index)} />
               ))}
+              <Chip name="Other" active={customOpen} onClick={() => setCustomOpen(!customOpen)} />
             </div>
+            {customOpen && (
+              <form
+                className="mt-3 flex gap-2"
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  addCustomPersona(customDraft);
+                  setCustomDraft("");
+                  setCustomOpen(false);
+                }}
+              >
+                <input
+                  value={customDraft}
+                  onChange={(e) => setCustomDraft(e.target.value)}
+                  placeholder="Name your persona"
+                  maxLength={40}
+                  className="h-9 min-w-0 flex-1 rounded-md border bg-background px-3 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+                />
+                <button
+                  type="submit"
+                  className="h-9 shrink-0 rounded-md bg-primary px-3 text-xs font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+                >
+                  Add
+                </button>
+              </form>
+            )}
             <p className="mt-3 truncate text-xs leading-relaxed text-muted-foreground sm:text-sm lg:whitespace-normal">
               {persona[2]}
             </p>
