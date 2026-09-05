@@ -1,6 +1,11 @@
 # Make V2 the live homepage — migration checklist
 
+**Decision:** Shift everything to V2 and make it `/`, then delete the old homepage. Do not patch the current homepage piece by piece.
+
+**Why:** V2 is the approved design, copy, and layout. Migrating the whole page into `index.tsx` keeps one source of truth, avoids a half-old/half-new hybrid, and makes verification simple. The old homepage's only reusable assets are the transform logic and download helper, which move over intact.
+
 V2 becomes `/`. Every V2 word and layout stays exactly as it is today; the only change is that the fake controls become real, wired to the engine already powering the current homepage.
+
 
 ## A. Route swap
 
