@@ -1,6 +1,7 @@
 # LinkedIn Carousel HTML Preview — Patkan Manuscript Set
 
 ## Goal
+
 Build a standalone HTML slideshow preview of the LinkedIn carousel using the user's exact copy and the approved "Manuscript" template set (Set 1). Each `----` separator in the supplied copy becomes one slide. Output is a single, self-contained HTML file saved to `/mnt/documents/` so it can be opened locally or shared without touching the live app.
 
 ## Resolved requirements
@@ -13,7 +14,7 @@ Build a standalone HTML slideshow preview of the LinkedIn carousel using the use
 
 ## Slide inventory
 
-1. "Kya ch***ya hai ye AI" (with an exhausted sigh!!)
+1. "Kya ch***ya hai ye AI!!" (with an exhausted sigh!!)
 2. OR
 3. "This AI sucks!!" — if you are more Maya than Monisha (#IFKYK)
 4. Is that you, more often than not? / I surely am.
@@ -63,7 +64,7 @@ Use the three Manuscript templates in rotation, choosing the best fit per slide:
 ## Copy fidelity rules
 
 - Paste each fragment exactly as supplied, including punctuation, line breaks, asterisks, and `[//]`.
-- Do not edit, sanitize, shorten, or reword any fragment.
+- Do not edit, sanitize, shorten, or reword any fragment. COPY SHALL NOT BE EDITED
 - Preserve the user's line breaks within multi-line fragments.
 
 ## Verification
