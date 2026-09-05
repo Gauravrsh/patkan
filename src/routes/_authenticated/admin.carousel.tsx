@@ -80,6 +80,7 @@ type Slide = {
   headline: string;
   body?: string;
   bullets?: string[];
+  accent?: boolean;
   logoLayout?: "a" | "b" | "c" | "d" | "e";
 };
 
