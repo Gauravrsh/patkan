@@ -149,7 +149,7 @@ const SLIDES: Slide[] = [
     body: "see the magic for yourself.",
   },
   {
-    label: "find it here",
+    label: "\n",
     headline: "www.patkan.in",
     body: "\n",
   },
