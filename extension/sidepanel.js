@@ -175,13 +175,23 @@ $("go").addEventListener("click", async () => {
       b.disabled = true;
       const again = await chrome.runtime.sendMessage({
         type: "PATKAN_TRANSFORM",
-        payload: { text, persona, dialect, intensity, refinement: c.refinement },
+        payload: {
+          text,
+          persona,
+          dialect,
+          intensity,
+          refinement: c.refinement,
+          host: activeHost,
+          surface: "extension-panel",
+        },
       });
       b.disabled = false;
       if (again?.ok) {
         output = again.prompt;
         $("out").textContent = output;
         setUsage(again.used, again.limit);
+      } else if (again?.limitReached) {
+        showLimitNote(again);
       }
     });
     $("clarifiers").appendChild(b);
@@ -192,6 +202,7 @@ $("go").addEventListener("click", async () => {
 $("copy").addEventListener("click", async () => {
   await navigator.clipboard.writeText(output);
   $("copy").textContent = "Copied";
+  chrome.runtime.sendMessage({ type: "PATKAN_FEEDBACK", payload: { accepted: true } });
   setTimeout(() => ($("copy").textContent = "Copy"), 1400);
 });
 
@@ -200,8 +211,10 @@ $("insert").addEventListener("click", async () => {
   if (!tab?.id) return;
   chrome.tabs.sendMessage(tab.id, { type: "PATKAN_INSERT", payload: { text: output } }, () => {
     if (chrome.runtime.lastError) $("note").textContent = "Patkan doesn't run on this page.";
+    else chrome.runtime.sendMessage({ type: "PATKAN_FEEDBACK", payload: { accepted: true } });
   });
 });
+
 
 $("options").addEventListener("click", () => chrome.runtime.openOptionsPage());
 
