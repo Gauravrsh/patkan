@@ -292,7 +292,15 @@ function CarouselPage() {
                     {pad(i + 1)} / {pad(total)}
                   </div>
                 </div>
+
+                <div className="slide-progress">
+                  <span
+                    className="slide-progress-fill"
+                    style={{ width: `${((i + 1) / total) * 100}%` }}
+                  />
+                </div>
               </div>
+
             );
           })}
         </div>
