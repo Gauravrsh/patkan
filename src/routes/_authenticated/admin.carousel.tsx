@@ -146,7 +146,7 @@ const SLIDES: Slide[] = [
   {
     label: "\n",
     size: "md",
-    headline: "the track that gets you 100X from your AI.",
+    headline: "the track that gets you [[100X]] from your AI.",
     bullets: [
       "things that you had not thought of.",
       "areas which you had overlooked.",
@@ -159,7 +159,7 @@ const SLIDES: Slide[] = [
     size: "xl",
     body: "/pʌtˈkʌn/ · verb",
     definition:
-      "to perform, execute or complete an action [[instantly, promptly]], and [[without delay]], in a single swift motion",
+      "to perform, execute or complete an action [[instantly]], [[promptly]], and [[without delay]], in a single swift motion",
   },
   {
     label: "\n",
@@ -408,7 +408,7 @@ const CAROUSEL_CSS = `
 .pk-slide .content-headline.size-md { font-size: 7.2cqw; }
 .pk-slide .content-headline.size-sm { font-size: 6.2cqw; }
 .pk-slide .content-headline.accent { color: var(--orange); }
-.pk-slide .content-definition { font-family: 'Fraunces', serif; font-weight: 400; font-size: 4.2cqw; line-height: 1.35; color: var(--ink); margin-top: 4.5cqw; max-width: 100%; }
+.pk-slide .content-definition { font-family: 'Inter', sans-serif; font-weight: 400; font-size: 4.0cqw; line-height: 1.35; color: var(--ink); margin-top: 4.5cqw; max-width: 100%; }
 
 .pk-slide .content-body { font-size: 3.1cqw; line-height: 1.5; color: var(--ink); white-space: pre-line; max-width: 100%; margin-top: 3.4cqw; }
 .pk-slide .content-bullets { list-style: none; margin: 4cqw 0 0; padding: 0; display: flex; flex-direction: column; gap: 2.4cqw; }
@@ -422,7 +422,7 @@ const CAROUSEL_CSS = `
 
 
 .pk-slide .slide-swipe { display: flex; align-items: center; justify-content: flex-end; gap: 1.2cqw; margin: 4cqw 0 3cqw; font-size: 3.1cqw; color: var(--muted); letter-spacing: 0.02em; }
-.pk-slide .slide-progress { position: absolute; left: 0; right: 0; bottom: 0; height: 1.2cqw; min-height: 8px; background: rgba(28, 25, 23, 0.12); }
+.pk-slide .slide-progress { position: absolute; left: 0; right: 0; bottom: 0; height: 0.84cqw; min-height: 6px; background: rgba(28, 25, 23, 0.12); }
 .pk-slide .slide-progress-fill { display: block; height: 100%; background: var(--orange); }
 
 .pk-slide .slide-swipe .dot { flex: none; width: 1.8cqw; height: 1.8cqw; border-radius: 50%; background: var(--orange); }
