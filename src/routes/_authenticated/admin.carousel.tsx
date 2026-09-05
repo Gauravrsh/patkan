@@ -94,7 +94,7 @@ const SLIDES: Slide[] = [
   {
     label: "\n",
     headline: "This AI sucks!!",
-    body: "- If you are more Maya than Monisha \n\n\n#IFKYK",
+    body: "if you are more Maya than Monisha\n#IFKYK",
   },
   {
     label: "\n",
@@ -107,7 +107,7 @@ const SLIDES: Slide[] = [
   },
   {
     label: "\n",
-    headline: "it gives right context, persona, task, guardrails, do's & don'ts,  output format to AI.",
+    headline: "it gives right context, persona, task, guardrails, do's & don'ts, output format to AI.",
   },
   {
     label: "\n",
