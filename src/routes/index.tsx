@@ -349,15 +349,12 @@ function Landing() {
               <a href="#install" className="transition-colors hover:text-foreground">
                 Install Guide
               </a>
-              {session ? (
-                <Link to="/library" className="transition-colors hover:text-foreground">
-                  Library
-                </Link>
-              ) : (
+              {session ? null : (
                 <Link to="/auth" className="transition-colors hover:text-foreground">
                   Sign in
                 </Link>
               )}
+
             </div>
             <button
               onClick={download}
