@@ -15,6 +15,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as ConnectRouteImport } from './routes/connect'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedLibraryRouteImport } from './routes/_authenticated/library'
+import { Route as SitemapXmlRouteImport } from './routes/sitemap.xml'
 import { Route as ApiPublicFeedbackRouteImport } from './routes/api/public/feedback'
 import { Route as ApiPublicTemplatesRouteImport } from './routes/api/public/templates'
 import { Route as ApiPublicTransformRouteImport } from './routes/api/public/transform'
@@ -50,6 +51,11 @@ const AuthenticatedLibraryRoute = AuthenticatedLibraryRouteImport.update({
   path: '/library',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const SitemapXmlRoute = SitemapXmlRouteImport.update({
+  id: '/sitemap/xml',
+  path: '/sitemap/xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicFeedbackRoute = ApiPublicFeedbackRouteImport.update({
   id: '/api/public/feedback',
   path: '/api/public/feedback',
@@ -82,6 +88,7 @@ export interface FileRoutesByFullPath {
   '/connect': typeof ConnectRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/library': typeof AuthenticatedLibraryRoute
+  '/sitemap/xml': typeof SitemapXmlRoute
   '/api/public/feedback': typeof ApiPublicFeedbackRoute
   '/api/public/templates': typeof ApiPublicTemplatesRoute
   '/api/public/transform': typeof ApiPublicTransformRoute
@@ -94,6 +101,7 @@ export interface FileRoutesByTo {
   '/connect': typeof ConnectRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/library': typeof AuthenticatedLibraryRoute
+  '/sitemap/xml': typeof SitemapXmlRoute
   '/api/public/feedback': typeof ApiPublicFeedbackRoute
   '/api/public/templates': typeof ApiPublicTemplatesRoute
   '/api/public/transform': typeof ApiPublicTransformRoute
@@ -108,6 +116,7 @@ export interface FileRoutesById {
   '/connect': typeof ConnectRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
   '/_authenticated/library': typeof AuthenticatedLibraryRoute
+  '/sitemap/xml': typeof SitemapXmlRoute
   '/api/public/feedback': typeof ApiPublicFeedbackRoute
   '/api/public/templates': typeof ApiPublicTemplatesRoute
   '/api/public/transform': typeof ApiPublicTransformRoute
@@ -122,6 +131,7 @@ export interface FileRouteTypes {
     | '/connect'
     | '/admin'
     | '/library'
+    | '/sitemap/xml'
     | '/api/public/feedback'
     | '/api/public/templates'
     | '/api/public/transform'
@@ -134,6 +144,7 @@ export interface FileRouteTypes {
     | '/connect'
     | '/admin'
     | '/library'
+    | '/sitemap/xml'
     | '/api/public/feedback'
     | '/api/public/templates'
     | '/api/public/transform'
@@ -147,6 +158,7 @@ export interface FileRouteTypes {
     | '/connect'
     | '/_authenticated/admin'
     | '/_authenticated/library'
+    | '/sitemap/xml'
     | '/api/public/feedback'
     | '/api/public/templates'
     | '/api/public/transform'
@@ -159,6 +171,7 @@ export interface RootRouteChildren {
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
   ConnectRoute: typeof ConnectRoute
+  SitemapXmlRoute: typeof SitemapXmlRoute
   ApiPublicFeedbackRoute: typeof ApiPublicFeedbackRoute
   ApiPublicTemplatesRoute: typeof ApiPublicTemplatesRoute
   ApiPublicTransformRoute: typeof ApiPublicTransformRoute
@@ -209,6 +222,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/library'
       preLoaderRoute: typeof AuthenticatedLibraryRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/sitemap/xml': {
+      id: '/sitemap/xml'
+      path: '/sitemap/xml'
+      fullPath: '/sitemap/xml'
+      preLoaderRoute: typeof SitemapXmlRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/api/public/feedback': {
       id: '/api/public/feedback'
@@ -266,6 +286,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
   ConnectRoute: ConnectRoute,
+  SitemapXmlRoute: SitemapXmlRoute,
   ApiPublicFeedbackRoute: ApiPublicFeedbackRoute,
   ApiPublicTemplatesRoute: ApiPublicTemplatesRoute,
   ApiPublicTransformRoute: ApiPublicTransformRoute,
