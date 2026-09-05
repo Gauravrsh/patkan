@@ -13,6 +13,7 @@ Both symptoms are deliberate hiding rules in the header, not a rendering fault:
 2. Keep the desktop row exactly as it is today; only screens under 1024px get the menu button.
 3. Show `/पट्कन/` at every width. On phones it renders slightly smaller so the row stays on one line, with the name truncating before the badge does.
 4. Verify at 393px, 834px, and 1440px: all links reachable, badge visible, no overflow, no console errors.
+5. ----------cant it be made adaptive in some way, across devices and browsers?
 
 ## Bug log
 
