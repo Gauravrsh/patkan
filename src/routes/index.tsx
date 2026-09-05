@@ -407,7 +407,12 @@ function Landing() {
                 Try it here first <ArrowRight className="size-4" aria-hidden />
               </button>
             </div>
-            <p className="mt-4 text-xs text-muted-foreground">No sign-up to start. 10 transforms per day, free.</p>
+            {session ? null : (
+              <p className="mt-4 text-xs text-muted-foreground">
+                No sign-up to start. 10 transforms a day in ghost mode, after that, sign-up and continue.
+              </p>
+            )}
+
           </div>
 
           <article className="order-1 overflow-hidden rounded-lg border bg-card shadow-sm lg:order-2">
