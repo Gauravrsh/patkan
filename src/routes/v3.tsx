@@ -14,9 +14,9 @@ import {
   Zap,
 } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import patkanMark from "@/assets/patkan-mark.png";
+import { PtknMark } from "@/components/ptkn-mark";
 
-export const Route = createFileRoute("/v2")({
+export const Route = createFileRoute("/v3")({
   head: () => ({
     meta: [
       { title: "Patkan — Expert prompts, instantly" },
@@ -114,7 +114,7 @@ const privacy = [
 
 const shell = "mx-auto w-full max-w-6xl px-5 sm:px-6 lg:px-8";
 
-function PatkanV2() {
+function PatkanV3() {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <header className="sticky top-0 z-30 border-b bg-background/85 backdrop-blur-md">
