@@ -472,6 +472,12 @@
           return;
         }
       }
+      if (!busy && e.key === "Enter" && !e.shiftKey && pendingFeedback) {
+        const el = findComposer(e.target);
+        // Sent with the rewrite in place = the rewrite was accepted.
+        if (el === target) reportFeedback(true);
+      }
+
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "z" && lastOriginal != null) {
         const el = findComposer(document.activeElement);
         if (el === target) {
