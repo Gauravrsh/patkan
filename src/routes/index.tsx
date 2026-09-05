@@ -615,7 +615,7 @@ function Landing() {
       <footer className="border-t">
         <div className={`${shell} flex flex-wrap items-center justify-between gap-3 py-8 text-xs text-muted-foreground`}>
           <span>✦ Patkan — quickly.</span>
-          <span>10 free transforms a day.</span>
+          <span>10 transforms a day in ghost mode.</span>
         </div>
       </footer>
     </div>
@@ -972,14 +972,13 @@ function BrowserMockup() {
         <div className="mt-5 grid gap-3 sm:grid-cols-2">
           <ExtensionCard
             title="Patkan"
-            version="1.0.0"
-            description="End any prompt with // in ChatGPT, Claude, or Gemini to trigger Patkan."
+            description="End any prompt with // in ChatGPT, Claude, Gemini, Microsoft Copilot, Perplexity, and more to trigger Patkan."
             accent
           />
           <ExtensionCard
-            title="Grammarly"
-            version="14.1.2"
-            description="Improve your writing with real-time grammar and spell checking."
+            title="uBlock Origin"
+            initial="U"
+            description="An efficient blocker. Easy on CPU and memory."
           />
         </div>
       </div>
@@ -989,12 +988,12 @@ function BrowserMockup() {
 
 function ExtensionCard({
   title,
-  version,
+  initial = "U",
   description,
   accent = false,
 }: {
   title: string;
-  version: string;
+  initial?: string;
   description: string;
   accent?: boolean;
 }) {
@@ -1009,14 +1008,12 @@ function ExtensionCard({
           <img src={patkanMark} alt="Patkan" width={816} height={816} loading="lazy" className="size-9 rounded-md" />
         ) : (
           <span className="flex size-9 items-center justify-center rounded-md bg-muted text-sm font-semibold text-muted-foreground">
-            G
+            {initial}
           </span>
         )}
         <Toggle />
       </div>
-      <h4 className="mt-4 text-sm font-semibold tracking-tight">
-        {title} <span className="font-normal text-muted-foreground">{version}</span>
-      </h4>
+      <h4 className="mt-4 text-sm font-semibold tracking-tight">{title}</h4>
       <p className="mt-2 min-h-12 text-[11px] leading-relaxed text-muted-foreground">{description}</p>
       <div className="mt-4 flex gap-2 border-t pt-3 text-[10px] text-muted-foreground">
         <span className="rounded border px-2 py-1">Details</span>
