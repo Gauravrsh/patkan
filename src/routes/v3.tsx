@@ -19,23 +19,23 @@ import { PtknMark } from "@/components/ptkn-mark";
 export const Route = createFileRoute("/v3")({
   head: () => ({
     meta: [
-      { title: "Patkan — Expert prompts, instantly" },
+      { title: "ptkn — Expert prompts, instantly" },
       {
         name: "description",
         content: "Turn a rough thought into a surgically crafted prompt without leaving your AI chat.",
       },
-      { property: "og:title", content: "Patkan — Expert prompts, instantly" },
+      { property: "og:title", content: "ptkn — Expert prompts, instantly" },
       {
         property: "og:description",
         content: "Turn a rough thought into a surgically crafted prompt without leaving your AI chat.",
       },
       { property: "og:type", content: "website" },
-      { property: "og:url", content: "https://patkan.lovable.app/v2" },
+      { property: "og:url", content: "https://patkan.lovable.app/v3" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
-    links: [{ rel: "canonical", href: "https://patkan.lovable.app/v2" }],
+    links: [{ rel: "canonical", href: "https://patkan.lovable.app/v3" }],
   }),
-  component: PatkanV2,
+  component: PatkanV3,
 });
 
 const targetAis = [
