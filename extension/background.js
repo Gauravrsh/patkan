@@ -1,8 +1,38 @@
 import { DEFAULT_API_BASE, getPersona, localScaffold } from "./patkan-core.js";
 
+
+const chrome = globalThis.browser ?? globalThis.chrome;
+
+// Chromium (Chrome/Edge/Opera) has sidePanel; Firefox has sidebarAction instead.
+const hasSidePanel = Boolean(chrome.sidePanel?.open);
+
 chrome.runtime.onInstalled.addListener(() => {
-  chrome.sidePanel.setPanelBehavior({ openPanelOnActionClick: true }).catch(() => {});
+  Promise.resolve(chrome.sidePanel?.setPanelBehavior?.({ openPanelOnActionClick: true })).catch(() => {});
 });
+
+// Firefox: the toolbar click has no side panel behaviour, so open the sidebar.
+if (!hasSidePanel && chrome.action?.onClicked) {
+  chrome.action.onClicked.addListener(() => {
+    chrome.sidebarAction?.open?.();
+  });
+}
+
+async function openPanel() {
+  if (hasSidePanel) {
+    const w = await chrome.windows.getCurrent();
+    try {
+      await chrome.sidePanel.open({ windowId: w.id });
+    } catch {
+      /* user gesture may have expired */
+    }
+    return;
+  }
+  try {
+    await chrome.sidebarAction?.open?.();
+  } catch {
+    /* Firefox requires a user gesture; the toolbar button still works */
+  }
+}
 
 async function getSettings() {
   const stored = await chrome.storage.local.get([
@@ -182,10 +212,7 @@ chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
     return true;
   }
   if (msg?.type === "PATKAN_OPEN_PANEL") {
-    chrome.windows.getCurrent().then((w) => {
-      chrome.sidePanel.open({ windowId: w.id }).catch(() => {});
-      sendResponse({ ok: true });
-    });
+    openPanel().then(() => sendResponse({ ok: true }));
     return true;
   }
   return false;

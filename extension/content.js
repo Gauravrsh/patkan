@@ -2,6 +2,9 @@
 (() => {
   "use strict";
 
+  // Firefox exposes promise-based APIs on `browser`; Chromium on `chrome`.
+  const chrome = globalThis.browser ?? globalThis.chrome;
+
   const GENERIC = ["textarea", "div[contenteditable='true']", "[role='textbox'][contenteditable='true']"];
 
   const HOSTS = [
