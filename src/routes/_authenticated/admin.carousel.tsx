@@ -126,7 +126,7 @@ const SLIDES: Slide[] = [
   },
   {
     label: "\n",
-    headline: "and sets your conversation on a totally different track.",
+    headline: "and sets your session with AI on a totally different track.",
   },
   {
     label: "\n",
