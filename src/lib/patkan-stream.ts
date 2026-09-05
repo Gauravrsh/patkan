@@ -9,7 +9,10 @@ export interface TransformRequest {
   accessToken?: string | undefined;
   refinement?: string | null | undefined;
   customInstruction?: string | null | undefined;
+  host?: string | null | undefined;
+  surface?: string | undefined;
 }
+
 
 export type EngineId = "primary" | "fallback" | "local";
 
