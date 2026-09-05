@@ -125,7 +125,7 @@ const SLIDES: Slide[] = [
       "what if your rough first idea converts into a surgical prompt,\n\n\neven before it goes into your AI chat?",
   },
   {
-    label: "the shift",
+    label: "\n",
     headline: "and sets your conversation on a totally different track.",
   },
   {
