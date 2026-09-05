@@ -72,7 +72,7 @@ const pillars = [
     number: "03",
     icon: HeartMark,
     heading: "A tool, not a toll.",
-    body: "No pricing tiers. No credit limits. No monthly subscriptions. Foundational utilities should be a public good. Patkan is open-source, absolutely free, and built with zero interest in your data. A quiet gift back to the FOSS community.",
+    body: "No pricing tiers. No credit limits. No monthly subscriptions. Foundational utilities should be a public good. Patkan is open-source, absolutely free, and built with zero interest in your data. Our contribution to the FOSS community.",
   },
 ] as const;
 
