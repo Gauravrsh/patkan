@@ -10,7 +10,7 @@ Add a Share button to the homepage header (`src/routes/index.tsx`) in two places
 ## Share behavior
 
 - Tapping Share calls the browser's native share sheet (`navigator.share`) with:
-  - URL: `https://patkan.in`
+  - URL: `https://www.patkan.in`
   - Text: "Patkan — turn a rough thought into a surgically crafted prompt, instantly."
 - **Fallback** (desktop browsers without native share): copy the URL to the clipboard and show a "Link copied" toast (existing `sonner` toast).
 - If the user cancels the native sheet, nothing happens (no error toast).
