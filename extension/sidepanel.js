@@ -76,19 +76,44 @@ async function loadTemplates(settings) {
   }
 }
 
+let activeHost = null;
+
 async function init() {
   const settings = await chrome.runtime.sendMessage({ type: "PATKAN_GET_SETTINGS" });
   persona = settings?.persona || persona;
   intensity = settings?.intensity || intensity;
   try {
     const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-    if (tab?.url) dialect = dialectForHost(new URL(tab.url).hostname);
+    if (tab?.url) {
+      activeHost = new URL(tab.url).hostname;
+      dialect = dialectForHost(activeHost);
+    }
   } catch {
     /* keep the default dialect */
   }
   renderControls();
   if (settings?.usage) setUsage(settings.usage.used, settings.usage.limit);
+  chrome.runtime.sendMessage({ type: "PATKAN_FETCH_USAGE" }).then((usage) => {
+    if (usage) setUsage(usage.used, usage.limit);
+  });
   loadTemplates(settings || {});
+}
+
+function showLimitNote(res) {
+  $("note").innerHTML = "";
+  const span = document.createElement("span");
+  span.textContent = (res?.error || "Daily limit reached.") + " ";
+  $("note").appendChild(span);
+  if (res?.requiresSignIn) {
+    const a = document.createElement("a");
+    a.href = "#";
+    a.textContent = "Sign in to keep going";
+    a.addEventListener("click", (e) => {
+      e.preventDefault();
+      chrome.runtime.sendMessage({ type: "PATKAN_OPEN_SIGNIN" });
+    });
+    $("note").appendChild(a);
+  }
 }
 
 $("go").addEventListener("click", async () => {
@@ -106,17 +131,32 @@ $("go").addEventListener("click", async () => {
   $("note").textContent = "Drafting… sharpening this, hold on.";
   const res = await chrome.runtime.sendMessage({
     type: "PATKAN_TRANSFORM",
-    payload: { text, persona, dialect, intensity, customInstruction: $("template").value || null },
+    payload: {
+      text,
+      persona,
+      dialect,
+      intensity,
+      customInstruction: $("template").value || null,
+      host: activeHost,
+      surface: "extension-panel",
+    },
   });
   $("go").disabled = false;
   $("go").textContent = "Patkan it";
   $("out").style.opacity = "1";
   if (!res?.ok) {
+    if (res?.limitReached) {
+      showLimitNote(res);
+      setUsage(res.used, res.limit);
+      $("out").textContent = "";
+      return;
+    }
     $("note").textContent = res?.error || "Transform failed.";
     $("copy").disabled = false;
     $("insert").disabled = false;
     return;
   }
+
   output = res.prompt;
   $("out").textContent = output;
   $("note").textContent =
