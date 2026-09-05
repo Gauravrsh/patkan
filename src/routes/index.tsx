@@ -717,10 +717,6 @@ function Landing() {
           </div>
         </section>
       </main>
-
-      <footer className="border-t">
-        <div className={`${shell} py-8`} />
-      </footer>
     </div>
   );
 }
