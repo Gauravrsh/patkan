@@ -615,11 +615,12 @@ function Landing() {
               <div>
                 <p className="font-mono text-xs uppercase tracking-[0.18em] text-primary">Install Guide</p>
                 <h2 className="mt-3 text-3xl font-semibold tracking-tight sm:text-4xl md:text-5xl">
-                  60 sec Installation Guide
+                  Browser Installation Guide
                 </h2>
               </div>
               <p className="max-w-md text-sm leading-relaxed text-muted-foreground">
-                Works on Chrome, Edge, Opera and Firefox*. Not in stores yet, so it installs directly unpacked.
+                {"\n"}
+
               </p>
 
             </div>
