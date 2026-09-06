@@ -245,7 +245,22 @@ export const Route = createFileRoute("/api/public/transform")({
           }
         }
 
+        // Shared ceiling per IP: new device ids can't multiply the free allowance.
+        if (!(await consumeIpQuota(supabaseAdmin, request, day))) {
+          telemetry({ outcome: "limited" });
+          return json(
+            {
+              error: `This network has used its ${IP_DAILY_CEILING} Patkan transforms for today. The counter resets at midnight UTC.`,
+              limitReached: true,
+              used: usedBefore,
+              limit,
+            },
+            429,
+          );
+        }
+
         // Atomic claim: two simultaneous requests can never both pass the wall.
+
         const { data: quota, error: quotaError } = await supabaseAdmin.rpc("consume_quota", {
           _subject_key: subjectKey,
           _day: day,
