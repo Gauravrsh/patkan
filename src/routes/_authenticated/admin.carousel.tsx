@@ -1,12 +1,8 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
-import { useServerFn } from "@tanstack/react-start";
+import { createFileRoute } from "@tanstack/react-router";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Loader2 } from "lucide-react";
 
-import { Button } from "@/components/ui/button";
-import { getMyAdminAccess } from "@/lib/admin.functions";
 import patkanMark from "@/assets/patkan-mark.png";
+
 
 export const Route = createFileRoute("/_authenticated/admin/carousel")({
   head: () => ({
