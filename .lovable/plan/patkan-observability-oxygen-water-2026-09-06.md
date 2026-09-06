@@ -17,53 +17,61 @@
 
 **Oxygen (fails → product is dead in under a minute)**
 
-| Metric | Source |
-|---|---|
-| Transform success rate (`ok` share) | have |
-| Transform error rate | have |
-| Empty output rate | have |
-| Engine availability — primary vs fallback share | have |
-| End-to-end latency p50/p95 and time-to-first-token | have |
-| API reachability / 5xx on `/api/public/transform` | build |
-| `//` trigger interception rate (detected vs typed) | build |
-| Host DOM injection failure rate (per host) | build |
-| Extension init success after install | build |
+
+| Metric                                             | Source |
+| -------------------------------------------------- | ------ |
+| Transform success rate (`ok` share)                | have   |
+| Transform error rate                               | have   |
+| Empty output rate                                  | have   |
+| Engine availability — primary vs fallback share    | have   |
+| End-to-end latency p50/p95 and time-to-first-token | have   |
+| API reachability / 5xx on `/api/public/transform`  | build  |
+| `//` trigger interception rate (detected vs typed) | build  |
+| Host DOM injection failure rate (per host)         | build  |
+| Extension init success after install               | build  |
+
 
 **Water (no immediate death, signals decay)**
 
-| Metric | Source |
-|---|---|
-| Acceptance rate (kept vs discarded) | have |
-| Cache hit rate | have |
-| Host / persona / dialect / intent / surface mix | have |
-| Average raw input length | derivable from `input_chars` |
-| Rejection-by-undo rate, separate from silent discard | build |
-| Latency drift week over week | build (rollup) |
+
+| Metric                                               | Source                       |
+| ---------------------------------------------------- | ---------------------------- |
+| Acceptance rate (kept vs discarded)                  | have                         |
+| Cache hit rate                                       | have                         |
+| Host / persona / dialect / intent / surface mix      | have                         |
+| Average raw input length                             | derivable from `input_chars` |
+| Rejection-by-undo rate, separate from silent discard | build                        |
+| Latency drift week over week                         | build (rollup)               |
+
 
 ### B. Business performance
 
 **Oxygen**
 
-| Metric | Source |
-|---|---|
-| Landing page uptime + `/patkan-extension.zip` HTTP 200 | build |
-| Daily active triggers — unique subjects transforming today | have |
-| New installs per day | build |
-| Free quota exhaustion rate (share of DAU hitting 10) | partly — needs DAU denominator |
-| Zero-transform day alarm | build (cron) |
+
+| Metric                                                     | Source                         |
+| ---------------------------------------------------------- | ------------------------------ |
+| Landing page uptime + `/patkan-extension.zip` HTTP 200     | build                          |
+| Daily active triggers — unique subjects transforming today | have                           |
+| New installs per day                                       | build                          |
+| Free quota exhaustion rate (share of DAU hitting 10)       | partly — needs DAU denominator |
+| Zero-transform day alarm                                   | build (cron)                   |
+
 
 **Water**
 
-| Metric | Source |
-|---|---|
-| Playground engagement rate (compiles / visitors) | build |
-| Playground → download conversion | build |
-| Install friction drop-off (init / download clicks) | build |
-| Activation: first transform within 60 min of init | build |
-| W1/W2/W4 retention | build (from existing events) |
-| Ghost → sign-in conversion after wall | partly |
-| Accounts, saved frameworks | have |
-| **Section engagement on the landing page** | build |
+
+| Metric                                             | Source                       |
+| -------------------------------------------------- | ---------------------------- |
+| Playground engagement rate (compiles / visitors)   | build                        |
+| Playground → download conversion                   | build                        |
+| Install friction drop-off (init / download clicks) | build                        |
+| Activation: first transform within 60 min of init  | build                        |
+| W1/W2/W4 retention                                 | build (from existing events) |
+| Ghost → sign-in conversion after wall              | partly                       |
+| Accounts, saved frameworks                         | have                         |
+| **Section engagement on the landing page**         | build                        |
+
 
 ---
 
@@ -163,3 +171,5 @@ Rules for the page: one accent colour, numbers only turn orange when a threshold
 3. Activation, retention, funnel derivations + nightly rollup.
 4. Dashboard restructure into Oxygen / Water with thresholds and the health strip.
 5. Alerting on Oxygen breaches through the existing daily digest.
+6. A detailed event taxonomy bible to be created with MECE details against the events in a tabular format, hosted under Admin section.
+7. A detailed product documentation that is present on saas products doc page, which explains how the product works. This is for my personal reference as I am a non-tech background solopreneur. I dont want to burn lovable credits asking questions for whcih I can read a doc somewhere.  

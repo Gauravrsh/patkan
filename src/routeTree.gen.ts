@@ -19,6 +19,10 @@ import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/
 import { Route as AuthenticatedLibraryRouteImport } from './routes/_authenticated/library'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
 import { Route as AuthenticatedAdminCarouselRouteImport } from './routes/_authenticated/admin.carousel'
+import { Route as AuthenticatedAdminDocsRouteImport } from './routes/_authenticated/admin.docs'
+import { Route as AuthenticatedAdminEventsRouteImport } from './routes/_authenticated/admin.events'
+import { Route as AuthenticatedAdminStoryRouteImport } from './routes/_authenticated/admin.story'
+import { Route as ApiPublicEventsRouteImport } from './routes/api/public/events'
 import { Route as ApiPublicFeedbackRouteImport } from './routes/api/public/feedback'
 import { Route as ApiPublicTemplatesRouteImport } from './routes/api/public/templates'
 import { Route as ApiPublicTransformRouteImport } from './routes/api/public/transform'
@@ -75,6 +79,27 @@ const AuthenticatedAdminCarouselRoute =
     path: '/carousel',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
+const AuthenticatedAdminDocsRoute = AuthenticatedAdminDocsRouteImport.update({
+  id: '/docs',
+  path: '/docs',
+  getParentRoute: () => AuthenticatedAdminRoute,
+} as any)
+const AuthenticatedAdminEventsRoute =
+  AuthenticatedAdminEventsRouteImport.update({
+    id: '/events',
+    path: '/events',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminStoryRoute = AuthenticatedAdminStoryRouteImport.update({
+  id: '/story',
+  path: '/story',
+  getParentRoute: () => AuthenticatedAdminRoute,
+} as any)
+const ApiPublicEventsRoute = ApiPublicEventsRouteImport.update({
+  id: '/api/public/events',
+  path: '/api/public/events',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicFeedbackRoute = ApiPublicFeedbackRouteImport.update({
   id: '/api/public/feedback',
   path: '/api/public/feedback',
@@ -110,6 +135,10 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/library': typeof AuthenticatedLibraryRoute
   '/admin/carousel': typeof AuthenticatedAdminCarouselRoute
+  '/admin/docs': typeof AuthenticatedAdminDocsRoute
+  '/admin/events': typeof AuthenticatedAdminEventsRoute
+  '/admin/story': typeof AuthenticatedAdminStoryRoute
+  '/api/public/events': typeof ApiPublicEventsRoute
   '/api/public/feedback': typeof ApiPublicFeedbackRoute
   '/api/public/templates': typeof ApiPublicTemplatesRoute
   '/api/public/transform': typeof ApiPublicTransformRoute
@@ -125,6 +154,10 @@ export interface FileRoutesByTo {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/library': typeof AuthenticatedLibraryRoute
   '/admin/carousel': typeof AuthenticatedAdminCarouselRoute
+  '/admin/docs': typeof AuthenticatedAdminDocsRoute
+  '/admin/events': typeof AuthenticatedAdminEventsRoute
+  '/admin/story': typeof AuthenticatedAdminStoryRoute
+  '/api/public/events': typeof ApiPublicEventsRoute
   '/api/public/feedback': typeof ApiPublicFeedbackRoute
   '/api/public/templates': typeof ApiPublicTemplatesRoute
   '/api/public/transform': typeof ApiPublicTransformRoute
@@ -143,6 +176,10 @@ export interface FileRoutesById {
   '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
   '/_authenticated/library': typeof AuthenticatedLibraryRoute
   '/_authenticated/admin/carousel': typeof AuthenticatedAdminCarouselRoute
+  '/_authenticated/admin/docs': typeof AuthenticatedAdminDocsRoute
+  '/_authenticated/admin/events': typeof AuthenticatedAdminEventsRoute
+  '/_authenticated/admin/story': typeof AuthenticatedAdminStoryRoute
+  '/api/public/events': typeof ApiPublicEventsRoute
   '/api/public/feedback': typeof ApiPublicFeedbackRoute
   '/api/public/templates': typeof ApiPublicTemplatesRoute
   '/api/public/transform': typeof ApiPublicTransformRoute
@@ -161,6 +198,10 @@ export interface FileRouteTypes {
     | '/admin'
     | '/library'
     | '/admin/carousel'
+    | '/admin/docs'
+    | '/admin/events'
+    | '/admin/story'
+    | '/api/public/events'
     | '/api/public/feedback'
     | '/api/public/templates'
     | '/api/public/transform'
@@ -176,6 +217,10 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/library'
     | '/admin/carousel'
+    | '/admin/docs'
+    | '/admin/events'
+    | '/admin/story'
+    | '/api/public/events'
     | '/api/public/feedback'
     | '/api/public/templates'
     | '/api/public/transform'
@@ -193,6 +238,10 @@ export interface FileRouteTypes {
     | '/_authenticated/admin'
     | '/_authenticated/library'
     | '/_authenticated/admin/carousel'
+    | '/_authenticated/admin/docs'
+    | '/_authenticated/admin/events'
+    | '/_authenticated/admin/story'
+    | '/api/public/events'
     | '/api/public/feedback'
     | '/api/public/templates'
     | '/api/public/transform'
@@ -208,6 +257,7 @@ export interface RootRouteChildren {
   ClaudePromptGeneratorRoute: typeof ClaudePromptGeneratorRoute
   ConnectRoute: typeof ConnectRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  ApiPublicEventsRoute: typeof ApiPublicEventsRoute
   ApiPublicFeedbackRoute: typeof ApiPublicFeedbackRoute
   ApiPublicTemplatesRoute: typeof ApiPublicTemplatesRoute
   ApiPublicTransformRoute: typeof ApiPublicTransformRoute
@@ -287,6 +337,34 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminCarouselRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/admin/docs': {
+      id: '/_authenticated/admin/docs'
+      path: '/docs'
+      fullPath: '/admin/docs'
+      preLoaderRoute: typeof AuthenticatedAdminDocsRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/events': {
+      id: '/_authenticated/admin/events'
+      path: '/events'
+      fullPath: '/admin/events'
+      preLoaderRoute: typeof AuthenticatedAdminEventsRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/story': {
+      id: '/_authenticated/admin/story'
+      path: '/story'
+      fullPath: '/admin/story'
+      preLoaderRoute: typeof AuthenticatedAdminStoryRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/api/public/events': {
+      id: '/api/public/events'
+      path: '/api/public/events'
+      fullPath: '/api/public/events'
+      preLoaderRoute: typeof ApiPublicEventsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/feedback': {
       id: '/api/public/feedback'
       path: '/api/public/feedback'
@@ -327,11 +405,17 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminCarouselRoute: typeof AuthenticatedAdminCarouselRoute
+  AuthenticatedAdminDocsRoute: typeof AuthenticatedAdminDocsRoute
+  AuthenticatedAdminEventsRoute: typeof AuthenticatedAdminEventsRoute
+  AuthenticatedAdminStoryRoute: typeof AuthenticatedAdminStoryRoute
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
 }
 
 const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
   AuthenticatedAdminCarouselRoute: AuthenticatedAdminCarouselRoute,
+  AuthenticatedAdminDocsRoute: AuthenticatedAdminDocsRoute,
+  AuthenticatedAdminEventsRoute: AuthenticatedAdminEventsRoute,
+  AuthenticatedAdminStoryRoute: AuthenticatedAdminStoryRoute,
   AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
 }
 
@@ -358,6 +442,7 @@ const rootRouteChildren: RootRouteChildren = {
   ClaudePromptGeneratorRoute: ClaudePromptGeneratorRoute,
   ConnectRoute: ConnectRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
+  ApiPublicEventsRoute: ApiPublicEventsRoute,
   ApiPublicFeedbackRoute: ApiPublicFeedbackRoute,
   ApiPublicTemplatesRoute: ApiPublicTemplatesRoute,
   ApiPublicTransformRoute: ApiPublicTransformRoute,

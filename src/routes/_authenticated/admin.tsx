@@ -65,6 +65,27 @@ function AdminShell() {
             Usage
           </Link>
           <Link
+            to="/admin/story"
+            activeProps={{ className: "text-foreground font-medium" }}
+            className="text-muted-foreground transition-colors hover:text-foreground"
+          >
+            Story
+          </Link>
+          <Link
+            to="/admin/events"
+            activeProps={{ className: "text-foreground font-medium" }}
+            className="text-muted-foreground transition-colors hover:text-foreground"
+          >
+            Events
+          </Link>
+          <Link
+            to="/admin/docs"
+            activeProps={{ className: "text-foreground font-medium" }}
+            className="text-muted-foreground transition-colors hover:text-foreground"
+          >
+            Docs
+          </Link>
+          <Link
             to="/admin/carousel"
             activeProps={{ className: "text-foreground font-medium" }}
             className="text-muted-foreground transition-colors hover:text-foreground"

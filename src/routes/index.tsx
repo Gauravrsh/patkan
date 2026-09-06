@@ -22,6 +22,9 @@ import {
 
 import { toast } from "sonner";
 
+import { useSectionTracking } from "@/hooks/useSectionTracking";
+import { trackEvent } from "@/lib/telemetry";
+
 import {
   DAILY_FREE_LIMIT,
   DAILY_SIGNED_IN_LIMIT,
@@ -289,6 +292,7 @@ function Landing() {
   const [customPersonas, setCustomPersonas] = useState<string[]>([]);
   const [browserIndex, setBrowserIndex] = useState(0);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const inputStarted = useRef(false);
   const outRef = useRef<HTMLPreElement>(null);
 
   const personaList: PersonaOption[] = [
@@ -316,6 +320,8 @@ function Landing() {
     setPersonaIndex(personas.length + customPersonas.length);
   }
 
+
+  useSectionTracking("/");
 
   // Open the install guide on the browser the visitor is actually using.
   useEffect(() => {
@@ -388,6 +394,7 @@ function Landing() {
         },
       );
       setOutput(result.prompt);
+      trackEvent("playground_compiled", { meta: { engine: result.engine } });
       setEngine(result.engine);
       setPhase("ready");
       setAssumptions(result.assumptions);
@@ -406,12 +413,14 @@ function Landing() {
 
   async function copy() {
     if (!output) return;
+    trackEvent("playground_copied");
     await navigator.clipboard.writeText(output);
     setCopied(true);
     setTimeout(() => setCopied(false), 1500);
   }
 
   function download(file: string) {
+    trackEvent("download_clicked", { meta: { file } });
     fetch(`/${file}`)
       .then((res) => {
         if (!res.ok) throw new Error("Download failed. Try again.");
@@ -437,6 +446,7 @@ function Landing() {
   }
 
   async function sharePatkan() {
+    trackEvent("share_clicked");
     const url = "https://www.patkan.in";
     const text = "Patkan — turn a rough thought into a surgically crafted prompt, instantly.";
     if (typeof navigator !== "undefined" && navigator.share) {
@@ -494,10 +504,18 @@ function Landing() {
           </div>
           <div className="flex items-center gap-3 sm:gap-6">
             <div className="hidden items-center gap-5 text-sm text-muted-foreground md:flex lg:gap-6">
-              <a href="#playground" className="transition-colors hover:text-foreground">
+              <a
+                href="#playground"
+                onClick={() => trackEvent("nav_clicked", { section: "playground" })}
+                className="transition-colors hover:text-foreground"
+              >
                 Playground
               </a>
-              <a href="#install" className="transition-colors hover:text-foreground">
+              <a
+                href="#install"
+                onClick={() => trackEvent("nav_clicked", { section: "install" })}
+                className="transition-colors hover:text-foreground"
+              >
                 Install Guide
               </a>
               {session ? (
@@ -646,6 +664,7 @@ function Landing() {
       <main>
         {/* Hero */}
         <section
+          data-section="hero"
           className={`${shell} grid gap-10 pb-16 pt-10 sm:gap-12 sm:pb-20 sm:pt-14 lg:grid-cols-[1.05fr_.95fr] lg:items-center lg:gap-16 lg:pb-28 lg:pt-20`}
         >
           <div className="order-2 lg:order-1">
@@ -729,11 +748,17 @@ function Landing() {
         </section>
 
         {/* Playground */}
-        <section id="playground" className="scroll-mt-16 border-y bg-card py-16 sm:py-20 md:py-28">
+        <section id="playground" data-section="playground" className="scroll-mt-16 border-y bg-card py-16 sm:py-20 md:py-28">
           <div className={shell}>
             <Playground
               input={input}
-              setInput={setInput}
+              setInput={(value: string) => {
+                if (!inputStarted.current && value.trim()) {
+                  inputStarted.current = true;
+                  trackEvent("playground_input_started");
+                }
+                setInput(value);
+              }}
               targetIndex={targetIndex}
               setTargetIndex={setTargetIndex}
               personaIndex={personaIndex}
@@ -759,7 +784,7 @@ function Landing() {
         </section>
 
         {/* Pillars */}
-        <section className={`${shell} py-16 sm:py-20 md:py-24`}>
+        <section data-section="pillars" className={`${shell} py-16 sm:py-20 md:py-24`}>
           <div aria-hidden className="h-[3px] w-full bg-primary" />
           <div className="border-b border-border md:grid md:grid-cols-[1fr_1.2fr_1fr] md:divide-x md:divide-border">
             {pillars.map(({ number, icon: Icon, heading, body }) => (
@@ -786,7 +811,7 @@ function Landing() {
         </section>
 
         {/* Install guide */}
-        <section id="install" className="scroll-mt-16 border-y bg-card py-16 sm:py-20 md:py-28">
+        <section id="install" data-section="install" className="scroll-mt-16 border-y bg-card py-16 sm:py-20 md:py-28">
           <div className={shell}>
             <div className="flex flex-col justify-between gap-5 md:flex-row md:items-end">
               <div>
@@ -861,7 +886,7 @@ function Landing() {
         </section>
 
         {/* Privacy */}
-        <section className={`${shell} py-16 sm:py-20 md:py-28`}>
+        <section data-section="privacy" className={`${shell} py-16 sm:py-20 md:py-28`}>
           <div className="grid gap-8 lg:grid-cols-[.85fr_1.15fr] lg:gap-12">
             <div>
               <p className="font-mono text-xs uppercase tracking-[0.18em] text-primary">Privacy &amp; Security</p>
@@ -901,7 +926,7 @@ function Landing() {
 
 function ApprovedUrlsTrigger() {
   return (
-    <Popover>
+    <Popover onOpenChange={(open) => open && trackEvent("privacy_modal_viewed")}>
       <PopoverTrigger className="border-b border-primary text-foreground outline-none transition-colors hover:text-primary focus-visible:ring-2 focus-visible:ring-ring">
         these approved URLs ↗
       </PopoverTrigger>
