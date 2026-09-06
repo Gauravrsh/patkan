@@ -97,15 +97,31 @@ function AuthPage() {
       <main className="flex min-h-screen items-center justify-center bg-background px-6 py-16">
         <div className="w-full max-w-sm rounded-lg border bg-card p-8 text-center shadow-sm">
           <p className="text-base leading-relaxed">
-            Thanks for signing-in. There is nothing more to do here. Get your best work done :)
+            You&rsquo;re signed in as{" "}
+            <span className="font-medium">{session.user.email}</span>. Get your best work done :)
           </p>
-          <Button asChild className="mt-6 w-full">
-            <Link to="/">Close</Link>
-          </Button>
+          <div className="mt-6 space-y-2">
+            <Button asChild className="w-full">
+              <Link to="/">Continue to Patkan</Link>
+            </Button>
+            <Button asChild variant="outline" className="w-full">
+              <Link to="/library">Your Library</Link>
+            </Button>
+            <Button
+              variant="ghost"
+              className="w-full"
+              onClick={async () => {
+                await supabase.auth.signOut();
+              }}
+            >
+              Sign out
+            </Button>
+          </div>
         </div>
       </main>
     );
   }
+
 
   return (
     <main className="flex min-h-screen items-center justify-center bg-background px-6 py-16">
