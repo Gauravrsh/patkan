@@ -123,6 +123,37 @@ function AdminPage() {
         </div>
       </header>
 
+      <section className="mt-6">
+        <h2 className="text-xs uppercase tracking-wide text-muted-foreground">Business</h2>
+        <div className="mt-2 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          <Card
+            label="Accounts"
+            value={String(data.business.totalUsers)}
+            hint={`+${data.business.newUsers} this window`}
+          />
+          <Card
+            label="Active signed-in"
+            value={String(data.business.activeSignedIn)}
+            hint="Distinct accounts transforming"
+          />
+          <Card
+            label="Active ghosts"
+            value={String(data.business.activeGhostDevices)}
+            hint="Distinct devices, signed out"
+          />
+          <Card
+            label="Returning"
+            value={String(data.business.returningSubjects)}
+            hint="Active on more than one day"
+          />
+          <Card
+            label="Saved frameworks"
+            value={String(data.business.frameworksTotal)}
+            hint={`+${data.business.frameworksNew} this window`}
+          />
+        </div>
+      </section>
+
       <section className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <Card label="Transforms" value={String(data.total)} />
         <Card label="Cache hit rate" value={pct(data.cacheHitRate)} hint="Served without inference" />
@@ -141,6 +172,7 @@ function AdminPage() {
           hint="Unique devices — sign-up funnel"
         />
       </section>
+
 
       <section className="mt-6 rounded-lg border border-border bg-card p-4">
         <p className="text-xs uppercase tracking-wide text-muted-foreground">Per day</p>
