@@ -19,6 +19,27 @@ const tmp = resolve(root, ".tmp-extension");
 
 const base = JSON.parse(readFileSync(resolve(src, "manifest.json"), "utf8"));
 
+/**
+ * A fork points its build at its own server:
+ *   PATKAN_API_BASE="https://your-host.example" bun scripts/build-extension.mjs
+ * Without it the build targets Patkan's own server, which only serves patkan.in.
+ */
+const apiBase = (process.env.PATKAN_API_BASE || "https://patkan.lovable.app").replace(/\/$/, "");
+
+/** Rewrite the packed copy's DEFAULT_API_BASE and host permission. */
+function applyApiBase(dir, manifest) {
+  const corePath = resolve(dir, "patkan-core.js");
+  const core = readFileSync(corePath, "utf8").replace(
+    /export const DEFAULT_API_BASE = "[^"]*";/,
+    `export const DEFAULT_API_BASE = "${apiBase}";`,
+  );
+  writeFileSync(corePath, core);
+  manifest.host_permissions = manifest.host_permissions.map((h) =>
+    h === "https://patkan.lovable.app/*" ? `${apiBase}/*` : h,
+  );
+  return manifest;
+}
+
 /** Firefox MV3: no service_worker, no sidePanel, needs an explicit add-on id. */
 function firefoxManifest(manifest) {
   const m = structuredClone(manifest);
@@ -40,7 +61,10 @@ function pack(name, manifest) {
   rmSync(tmp, { recursive: true, force: true });
   mkdirSync(tmp, { recursive: true });
   cpSync(src, tmp, { recursive: true });
-  writeFileSync(resolve(tmp, "manifest.json"), JSON.stringify(manifest, null, 2) + "\n");
+  writeFileSync(
+    resolve(tmp, "manifest.json"),
+    JSON.stringify(applyApiBase(tmp, structuredClone(manifest)), null, 2) + "\n",
+  );
   const zip = resolve(out, name);
   rmSync(zip, { force: true });
   execFileSync("zip", ["-r", "-q", zip, "."], { cwd: tmp });
@@ -48,5 +72,6 @@ function pack(name, manifest) {
   console.log("built", name);
 }
 
+console.log("api base:", apiBase);
 pack("patkan-extension.zip", base);
 pack("patkan-extension-firefox.zip", firefoxManifest(base));
