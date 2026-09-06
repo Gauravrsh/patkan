@@ -20,19 +20,13 @@ import {
 import { recordEvent, type Outcome } from "@/lib/patkan-telemetry.server";
 
 
-const CORS_HEADERS: Record<string, string> = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Methods": "POST, OPTIONS",
-  "Access-Control-Allow-Headers": "content-type, authorization, x-patkan-device",
-  "Access-Control-Max-Age": "86400",
-};
-
-function json(body: unknown, status = 200) {
+function jsonWith(body: unknown, status: number, cors: Record<string, string>) {
   return new Response(JSON.stringify(body), {
     status,
-    headers: { "content-type": "application/json", "cache-control": "no-store", ...CORS_HEADERS },
+    headers: { "content-type": "application/json", "cache-control": "no-store", ...cors },
   });
 }
+
 
 function today() {
   return new Date().toISOString().slice(0, 10);
