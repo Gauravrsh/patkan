@@ -123,7 +123,7 @@ export const getStoryStats = createServerFn({ method: "GET" })
           section,
           reach: sessionCount ? sessionsSeen.size / sessionCount : 0,
           holdMs: median(dwellBySection.get(section) ?? []),
-          drop: sessionCount ? (exitBySection.get(section) ?? 0) / sessionCount : 0,
+          drop: sessionCount ? (exitBySection.get(section)?.size ?? 0) / sessionCount : 0,
           assist: sessionCount ? rateSeen - baselineDownload : null,
         };
       })
