@@ -307,11 +307,13 @@
       lastOriginal = null;
       showChip(false);
       reportFeedback(false);
+      track("transform_rejected");
     }
   }
 
   /** The wall is a doorway, not a dead end: one tap opens sign-in. */
   function showLimitCta(message) {
+    track("quota_limit_reached");
     ensureUI();
     const existing = shadow.querySelector(".limitCta");
     if (existing) existing.remove();
@@ -328,8 +330,15 @@
     setTimeout(() => el.remove(), 12000);
   }
 
+  function track(event, detail) {
+    chrome.runtime
+      .sendMessage({ type: "PATKAN_TRACK", payload: { event, host: host.id, surface: "extension-inline", ...detail } })
+      .catch(() => {});
+  }
+
   async function run() {
     if (busy || !target) return;
+    track("trigger_detected");
     const raw = readText(target).replace(/\/\/\s*$/, "").trim();
     if (raw.length < 3) return;
 
@@ -511,7 +520,10 @@
     if (msg?.type === "PATKAN_INSERT" && target) {
       lastOriginal = readText(target);
       const ok = writeText(target, msg.payload.text);
-      if (!ok) toast("Couldn't insert here — the prompt is still in the panel.");
+      if (!ok) {
+        track("injection_failed", { reason: "write-failed" });
+        toast("Couldn't insert here — the prompt is still in the panel.");
+      }
       else showChip(true);
     }
   });

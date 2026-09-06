@@ -7,6 +7,7 @@ const chrome = globalThis.browser ?? globalThis.chrome;
 const hasSidePanel = Boolean(chrome.sidePanel?.open);
 
 chrome.runtime.onInstalled.addListener(() => {
+  trackEvent("extension_initialized");
   Promise.resolve(chrome.sidePanel?.setPanelBehavior?.({ openPanelOnActionClick: true })).catch(() => {});
 });
 
@@ -61,6 +62,39 @@ async function getDeviceId() {
   const id = crypto.randomUUID();
   await chrome.storage.local.set({ deviceId: id });
   return id;
+}
+
+
+/**
+ * Text-free extension telemetry. Only event names, host, and reasons — never
+ * prompt text.
+ */
+async function trackEvent(event, detail = {}) {
+  try {
+    const settings = await getSettings();
+    const deviceId = await getDeviceId();
+    await fetch(settings.apiBase.replace(/\/$/, "") + "/api/public/events", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        sessionId: deviceId,
+        subject: "device:" + deviceId,
+        events: [
+          {
+            kind: "extension",
+            event,
+            host: detail.host,
+            surface: detail.surface,
+            reason: detail.reason,
+            value: detail.value,
+            version: chrome.runtime.getManifest?.().version,
+          },
+        ],
+      }),
+    });
+  } catch {
+    /* telemetry must never break the extension */
+  }
 }
 
 async function transform({ text, persona, dialect, intensity, customInstruction, refinement, host, surface }) {
@@ -197,6 +231,10 @@ chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
   }
   if (msg?.type === "PATKAN_FETCH_USAGE") {
     fetchUsage().then(sendResponse);
+    return true;
+  }
+  if (msg?.type === "PATKAN_TRACK") {
+    trackEvent(msg.payload?.event, msg.payload || {}).then(() => sendResponse({ ok: true }));
     return true;
   }
   if (msg?.type === "PATKAN_FEEDBACK") {
