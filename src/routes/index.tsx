@@ -577,7 +577,35 @@ function Landing() {
                   >
                     Install Guide
                   </a>
-                  {session ? null : (
+                  {session ? (
+                    <>
+                      <Link
+                        to="/library"
+                        onClick={() => setMenuOpen(false)}
+                        className="rounded-md px-2 py-2.5 transition-colors hover:bg-muted"
+                      >
+                        Your Library
+                      </Link>
+                      {isAdmin ? (
+                        <Link
+                          to="/admin"
+                          onClick={() => setMenuOpen(false)}
+                          className="rounded-md px-2 py-2.5 transition-colors hover:bg-muted"
+                        >
+                          Admin
+                        </Link>
+                      ) : null}
+                      <button
+                        onClick={() => {
+                          setMenuOpen(false);
+                          void signOutEverywhere();
+                        }}
+                        className="rounded-md px-2 py-2.5 text-left transition-colors hover:bg-muted"
+                      >
+                        Sign out
+                      </button>
+                    </>
+                  ) : (
                     <Link
                       to="/auth"
                       onClick={() => setMenuOpen(false)}
@@ -586,6 +614,7 @@ function Landing() {
                       Sign in
                     </Link>
                   )}
+
                   <button
                     onClick={() => {
                       setMenuOpen(false);
