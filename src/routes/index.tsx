@@ -263,6 +263,17 @@ const privacy = [
 
 function Landing() {
   const { session } = useAuth();
+  const isAdmin = useIsAdmin(!!session);
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
+
+  async function signOutEverywhere() {
+    await queryClient.cancelQueries();
+    queryClient.clear();
+    await supabase.auth.signOut();
+    void navigate({ to: "/", replace: true });
+  }
+
   const [input, setInput] = useState("");
   const [targetIndex, setTargetIndex] = useState(0);
   const [personaIndex, setPersonaIndex] = useState(0);
