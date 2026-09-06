@@ -14,6 +14,84 @@ export type Database = {
   }
   public: {
     Tables: {
+      extension_events: {
+        Row: {
+          created_at: string
+          event: string
+          host: string | null
+          id: string
+          reason: string | null
+          subject_hash: string
+          surface: string | null
+          value_int: number | null
+          version: string | null
+        }
+        Insert: {
+          created_at?: string
+          event: string
+          host?: string | null
+          id?: string
+          reason?: string | null
+          subject_hash: string
+          surface?: string | null
+          value_int?: number | null
+          version?: string | null
+        }
+        Update: {
+          created_at?: string
+          event?: string
+          host?: string | null
+          id?: string
+          reason?: string | null
+          subject_hash?: string
+          surface?: string | null
+          value_int?: number | null
+          version?: string | null
+        }
+        Relationships: []
+      }
+      page_events: {
+        Row: {
+          created_at: string
+          device: string | null
+          event: string
+          id: string
+          meta: Json
+          path: string
+          referrer_host: string | null
+          section: string | null
+          session_id: string
+          value_int: number | null
+          visitor_hash: string
+        }
+        Insert: {
+          created_at?: string
+          device?: string | null
+          event: string
+          id?: string
+          meta?: Json
+          path?: string
+          referrer_host?: string | null
+          section?: string | null
+          session_id: string
+          value_int?: number | null
+          visitor_hash: string
+        }
+        Update: {
+          created_at?: string
+          device?: string | null
+          event?: string
+          id?: string
+          meta?: Json
+          path?: string
+          referrer_host?: string | null
+          section?: string | null
+          session_id?: string
+          value_int?: number | null
+          visitor_hash?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string
