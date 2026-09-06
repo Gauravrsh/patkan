@@ -88,9 +88,14 @@ async function cacheKey(input: {
 export const Route = createFileRoute("/api/public/transform")({
   server: {
     handlers: {
-      OPTIONS: () => new Response(null, { status: 204, headers: CORS_HEADERS }),
+      OPTIONS: ({ request }) =>
+        new Response(null, { status: 204, headers: corsHeadersFor(request, "POST") }),
       POST: async ({ request }) => {
+        const CORS_HEADERS = corsHeadersFor(request, "POST");
+        const json = (body: unknown, status = 200) => jsonWith(body, status, CORS_HEADERS);
+        if (classifyClient(request) === "blocked") return blockedResponse(request, "POST");
         const startedAt = Date.now();
+
         let payload: Payload;
         try {
           payload = (await request.json()) as Payload;
