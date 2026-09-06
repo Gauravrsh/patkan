@@ -19,6 +19,7 @@ import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/
 import { Route as AuthenticatedLibraryRouteImport } from './routes/_authenticated/library'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
 import { Route as AuthenticatedAdminCarouselRouteImport } from './routes/_authenticated/admin.carousel'
+import { Route as AuthenticatedAdminStoryRouteImport } from './routes/_authenticated/admin.story'
 import { Route as ApiPublicEventsRouteImport } from './routes/api/public/events'
 import { Route as ApiPublicFeedbackRouteImport } from './routes/api/public/feedback'
 import { Route as ApiPublicTemplatesRouteImport } from './routes/api/public/templates'
@@ -76,6 +77,11 @@ const AuthenticatedAdminCarouselRoute =
     path: '/carousel',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
+const AuthenticatedAdminStoryRoute = AuthenticatedAdminStoryRouteImport.update({
+  id: '/story',
+  path: '/story',
+  getParentRoute: () => AuthenticatedAdminRoute,
+} as any)
 const ApiPublicEventsRoute = ApiPublicEventsRouteImport.update({
   id: '/api/public/events',
   path: '/api/public/events',
@@ -116,6 +122,7 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/library': typeof AuthenticatedLibraryRoute
   '/admin/carousel': typeof AuthenticatedAdminCarouselRoute
+  '/admin/story': typeof AuthenticatedAdminStoryRoute
   '/api/public/events': typeof ApiPublicEventsRoute
   '/api/public/feedback': typeof ApiPublicFeedbackRoute
   '/api/public/templates': typeof ApiPublicTemplatesRoute
@@ -132,6 +139,7 @@ export interface FileRoutesByTo {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/library': typeof AuthenticatedLibraryRoute
   '/admin/carousel': typeof AuthenticatedAdminCarouselRoute
+  '/admin/story': typeof AuthenticatedAdminStoryRoute
   '/api/public/events': typeof ApiPublicEventsRoute
   '/api/public/feedback': typeof ApiPublicFeedbackRoute
   '/api/public/templates': typeof ApiPublicTemplatesRoute
@@ -151,6 +159,7 @@ export interface FileRoutesById {
   '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
   '/_authenticated/library': typeof AuthenticatedLibraryRoute
   '/_authenticated/admin/carousel': typeof AuthenticatedAdminCarouselRoute
+  '/_authenticated/admin/story': typeof AuthenticatedAdminStoryRoute
   '/api/public/events': typeof ApiPublicEventsRoute
   '/api/public/feedback': typeof ApiPublicFeedbackRoute
   '/api/public/templates': typeof ApiPublicTemplatesRoute
@@ -170,6 +179,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/library'
     | '/admin/carousel'
+    | '/admin/story'
     | '/api/public/events'
     | '/api/public/feedback'
     | '/api/public/templates'
@@ -186,6 +196,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/library'
     | '/admin/carousel'
+    | '/admin/story'
     | '/api/public/events'
     | '/api/public/feedback'
     | '/api/public/templates'
@@ -204,6 +215,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin'
     | '/_authenticated/library'
     | '/_authenticated/admin/carousel'
+    | '/_authenticated/admin/story'
     | '/api/public/events'
     | '/api/public/feedback'
     | '/api/public/templates'
@@ -300,6 +312,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminCarouselRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/admin/story': {
+      id: '/_authenticated/admin/story'
+      path: '/story'
+      fullPath: '/admin/story'
+      preLoaderRoute: typeof AuthenticatedAdminStoryRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/api/public/events': {
       id: '/api/public/events'
       path: '/api/public/events'
@@ -347,11 +366,13 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminCarouselRoute: typeof AuthenticatedAdminCarouselRoute
+  AuthenticatedAdminStoryRoute: typeof AuthenticatedAdminStoryRoute
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
 }
 
 const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
   AuthenticatedAdminCarouselRoute: AuthenticatedAdminCarouselRoute,
+  AuthenticatedAdminStoryRoute: AuthenticatedAdminStoryRoute,
   AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
 }
 
