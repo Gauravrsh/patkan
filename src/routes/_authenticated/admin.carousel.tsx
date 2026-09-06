@@ -32,44 +32,9 @@ export const Route = createFileRoute("/_authenticated/admin/carousel")({
       },
     ],
   }),
-  component: CarouselGate,
+  component: CarouselPage,
 });
 
-function CarouselGate() {
-  const checkAccess = useServerFn(getMyAdminAccess);
-  const { data, isLoading, error } = useQuery({
-    queryKey: ["my-admin-access"],
-    queryFn: () => checkAccess(),
-    retry: false,
-    staleTime: 5 * 60 * 1000,
-  });
-
-  if (isLoading) {
-    return (
-      <main className="flex min-h-screen items-center justify-center">
-        <Loader2 className="size-6 animate-spin text-muted-foreground" />
-      </main>
-    );
-  }
-
-  if (error || !data?.isAdmin) {
-    return (
-      <main className="flex min-h-screen items-center justify-center px-6 text-center">
-        <div className="max-w-sm">
-          <h1 className="text-xl font-semibold tracking-tight">Not your page</h1>
-          <p className="mt-2 text-sm text-muted-foreground">
-            This page is limited to Patkan admins.
-          </p>
-          <Button asChild variant="outline" className="mt-5">
-            <Link to="/">Back to Patkan</Link>
-          </Button>
-        </div>
-      </main>
-    );
-  }
-
-  return <CarouselPage />;
-}
 
 /* ------------------------------------------------------------------ */
 /*  SLIDE COPY — one entry per `----` fragment. Edit text here only.    */
