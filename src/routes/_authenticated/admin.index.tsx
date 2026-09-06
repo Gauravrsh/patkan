@@ -123,8 +123,34 @@ function AdminPage() {
         </div>
       </header>
 
-      <section className="mt-6">
-        <h2 className="text-xs uppercase tracking-wide text-muted-foreground">Business</h2>
+      <section className="mt-8">
+        <h2 className="text-xs uppercase tracking-wide text-muted-foreground">
+          Oxygen · fatal if it breaks
+        </h2>
+        <div className="mt-2 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          <Card label="Transforms" value={String(data.total)} hint="Prompts built in this window" />
+          <Card
+            label="Error rate"
+            value={pct(data.errorRate)}
+            hint={data.errorRate !== null && data.errorRate > 0.05 ? "Above 5% — investigate" : "Healthy under 5%"}
+          />
+          <Card
+            label="Empty output"
+            value={pct(data.emptyRate)}
+            hint={data.emptyRate !== null && data.emptyRate > 0.02 ? "Above 2% — investigate" : "Healthy under 2%"}
+          />
+          <Card
+            label="Hit the wall"
+            value={String(data.limitedCount)}
+            hint="Daily allowance exhausted"
+          />
+        </div>
+      </section>
+
+      <section className="mt-8">
+        <h2 className="text-xs uppercase tracking-wide text-muted-foreground">
+          Water · no growth if it dries up
+        </h2>
         <div className="mt-2 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           <Card
             label="Accounts"
@@ -147,31 +173,33 @@ function AdminPage() {
             hint="Active on more than one day"
           />
           <Card
+            label="Ghosts at limit"
+            value={String(data.ghostWallDevices)}
+            hint="Unique devices — sign-up funnel"
+          />
+          <Card
+            label="Acceptance"
+            value={pct(data.acceptanceRate)}
+            hint={`${data.acceptanceSample} rated`}
+          />
+          <Card
             label="Saved frameworks"
             value={String(data.business.frameworksTotal)}
             hint={`+${data.business.frameworksNew} this window`}
           />
+          <Card
+            label="Cache hit rate"
+            value={pct(data.cacheHitRate)}
+            hint="Served without inference"
+          />
+          <Card
+            label="Est. spend"
+            value={`$${data.estimatedUsd.toFixed(2)}`}
+            hint="Model cost estimate"
+          />
         </div>
       </section>
 
-      <section className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        <Card label="Transforms" value={String(data.total)} />
-        <Card label="Cache hit rate" value={pct(data.cacheHitRate)} hint="Served without inference" />
-        <Card
-          label="Acceptance"
-          value={pct(data.acceptanceRate)}
-          hint={`${data.acceptanceSample} rated`}
-        />
-        <Card label="Est. spend" value={`$${data.estimatedUsd.toFixed(2)}`} hint="Model cost estimate" />
-        <Card label="Error rate" value={pct(data.errorRate)} />
-        <Card label="Empty output" value={pct(data.emptyRate)} />
-        <Card label="Hit the wall" value={String(data.limitedCount)} hint="429 responses" />
-        <Card
-          label="Ghosts at limit"
-          value={String(data.ghostWallDevices)}
-          hint="Unique devices — sign-up funnel"
-        />
-      </section>
 
 
       <section className="mt-6 rounded-lg border border-border bg-card p-4">
