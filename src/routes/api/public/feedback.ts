@@ -1,13 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
 
+import { blockedResponse, classifyClient, corsHeadersFor } from "@/lib/patkan-access.server";
+
 import { hashSubject } from "@/lib/patkan-telemetry.server";
 
-const CORS_HEADERS: Record<string, string> = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Methods": "POST, OPTIONS",
-  "Access-Control-Allow-Headers": "content-type, authorization, x-patkan-device",
-  "Access-Control-Max-Age": "86400",
-};
+
 
 async function resolveUserId(authHeader: string | null): Promise<string | null> {
   const token = authHeader?.replace(/^Bearer\s+/i, "").trim();

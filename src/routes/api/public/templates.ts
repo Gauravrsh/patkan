@@ -1,14 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
+
+import { blockedResponse, classifyClient, corsHeadersFor } from "@/lib/patkan-access.server";
 import { createClient } from "@supabase/supabase-js";
 
 import type { Database } from "@/integrations/supabase/types";
 
-const CORS_HEADERS: Record<string, string> = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Methods": "GET, OPTIONS",
-  "Access-Control-Allow-Headers": "content-type, authorization",
-  "Access-Control-Max-Age": "86400",
-};
+
 
 function json(body: unknown, status = 200) {
   return new Response(JSON.stringify(body), {
