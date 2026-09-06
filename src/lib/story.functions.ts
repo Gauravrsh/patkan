@@ -107,7 +107,9 @@ export const getStoryStats = createServerFn({ method: "GET" })
         list.push(r.value_int);
         dwellBySection.set(r.section, list);
       } else if (r.event === "exit_section") {
-        exitBySection.set(r.section, (exitBySection.get(r.section) ?? 0) + 1);
+        const set = exitBySection.get(r.section) ?? new Set<string>();
+        set.add(r.session_id);
+        exitBySection.set(r.section, set);
       }
     }
 
