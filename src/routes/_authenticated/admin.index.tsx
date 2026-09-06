@@ -236,11 +236,13 @@ function AdminPage() {
         </table>
       </section>
 
-      <section className="mt-6 grid gap-3 sm:grid-cols-3">
+      <section className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <List title="Top hosts" rows={data.hosts} />
         <List title="Personas" rows={data.personas} />
         <List title="Dialects" rows={data.dialects} />
+        <List title="Surfaces" rows={data.business.surfaces} />
       </section>
+
     </main>
   );
 }
