@@ -18,6 +18,14 @@ import {
   type EngineMessage,
 } from "@/lib/patkan-engines.server";
 import { recordEvent, type Outcome } from "@/lib/patkan-telemetry.server";
+import {
+  blockedResponse,
+  classifyClient,
+  consumeIpQuota,
+  corsHeadersFor,
+  IP_DAILY_CEILING,
+} from "@/lib/patkan-access.server";
+
 
 
 function jsonWith(body: unknown, status: number, cors: Record<string, string>) {
