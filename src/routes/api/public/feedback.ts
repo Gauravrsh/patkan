@@ -31,8 +31,11 @@ async function resolveUserId(authHeader: string | null): Promise<string | null> 
 export const Route = createFileRoute("/api/public/feedback")({
   server: {
     handlers: {
-      OPTIONS: () => new Response(null, { status: 204, headers: CORS_HEADERS }),
+      OPTIONS: ({ request }) =>
+        new Response(null, { status: 204, headers: corsHeadersFor(request, "POST") }),
       POST: async ({ request }) => {
+        const CORS_HEADERS = corsHeadersFor(request, "POST");
+        if (classifyClient(request) === "blocked") return blockedResponse(request, "POST");
         let body: { deviceId?: string; accepted?: boolean };
         try {
           body = (await request.json()) as typeof body;

@@ -27,8 +27,11 @@ async function resolveUserId(authHeader: string | null): Promise<string | null> 
 export const Route = createFileRoute("/api/public/usage")({
   server: {
     handlers: {
-      OPTIONS: () => new Response(null, { status: 204, headers: CORS_HEADERS }),
+      OPTIONS: ({ request }) =>
+        new Response(null, { status: 204, headers: corsHeadersFor(request, "GET") }),
       GET: async ({ request }) => {
+        const CORS_HEADERS = corsHeadersFor(request, "GET");
+        if (classifyClient(request) === "blocked") return blockedResponse(request, "GET");
         const url = new URL(request.url);
         const deviceId = (
           url.searchParams.get("deviceId") ?? request.headers.get("x-patkan-device") ?? ""

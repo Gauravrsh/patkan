@@ -7,18 +7,22 @@ import type { Database } from "@/integrations/supabase/types";
 
 
 
-function json(body: unknown, status = 200) {
+function jsonWith(body: unknown, status: number, cors: Record<string, string>) {
   return new Response(JSON.stringify(body), {
     status,
-    headers: { "content-type": "application/json", "cache-control": "no-store", ...CORS_HEADERS },
+    headers: { "content-type": "application/json", "cache-control": "no-store", ...cors },
   });
 }
 
 export const Route = createFileRoute("/api/public/templates")({
   server: {
     handlers: {
-      OPTIONS: () => new Response(null, { status: 204, headers: CORS_HEADERS }),
+      OPTIONS: ({ request }) =>
+        new Response(null, { status: 204, headers: corsHeadersFor(request, "GET") }),
       GET: async ({ request }) => {
+        const json = (body: unknown, status = 200) =>
+          jsonWith(body, status, corsHeadersFor(request, "GET"));
+        if (classifyClient(request) === "blocked") return blockedResponse(request, "GET");
         const token = request.headers.get("authorization")?.replace(/^Bearer\s+/i, "").trim();
         if (!token) return json({ error: "Sign in to load your frameworks." }, 401);
 
