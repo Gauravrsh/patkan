@@ -30,7 +30,7 @@ interface QueuedEvent {
   path?: string;
   value?: number;
   device?: "mobile" | "desktop";
-  referrerHost?: string;
+  referrerHost?: string | undefined;
   meta?: Record<string, string | number | boolean>;
 }
 
