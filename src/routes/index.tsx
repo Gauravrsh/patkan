@@ -1,4 +1,5 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useQueryClient } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
 import {
   ArrowDownToLine,
@@ -14,6 +15,7 @@ import {
   Share2,
   ShieldCheck,
   Sparkles,
+  UserRound,
   Volume2,
   Zap,
 } from "lucide-react";
@@ -29,7 +31,17 @@ import {
 } from "@/lib/patkan-core";
 import { streamTransform, type EngineId } from "@/lib/patkan-stream";
 import { useAuth } from "@/hooks/useAuth";
+import { useIsAdmin } from "@/hooks/useIsAdmin";
+import { supabase } from "@/integrations/supabase/client";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import {
   Sheet,
   SheetContent,
@@ -38,6 +50,7 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import patkanMark from "@/assets/patkan-mark.png";
+
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -250,6 +263,17 @@ const privacy = [
 
 function Landing() {
   const { session } = useAuth();
+  const isAdmin = useIsAdmin(!!session);
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
+
+  async function signOutEverywhere() {
+    await queryClient.cancelQueries();
+    queryClient.clear();
+    await supabase.auth.signOut();
+    void navigate({ to: "/", replace: true });
+  }
+
   const [input, setInput] = useState("");
   const [targetIndex, setTargetIndex] = useState(0);
   const [personaIndex, setPersonaIndex] = useState(0);
@@ -476,13 +500,39 @@ function Landing() {
               <a href="#install" className="transition-colors hover:text-foreground">
                 Install Guide
               </a>
-              {session ? null : (
+              {session ? (
+                <DropdownMenu>
+                  <DropdownMenuTrigger className="inline-flex items-center gap-1.5 transition-colors hover:text-foreground">
+                    <UserRound className="size-4" aria-hidden />
+                    Account
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-56">
+                    <DropdownMenuLabel className="truncate font-normal text-muted-foreground">
+                      {session.user.email}
+                    </DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem asChild>
+                      <Link to="/library">Your Library</Link>
+                    </DropdownMenuItem>
+                    {isAdmin ? (
+                      <DropdownMenuItem asChild>
+                        <Link to="/admin">Admin</Link>
+                      </DropdownMenuItem>
+                    ) : null}
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onSelect={() => void signOutEverywhere()}>
+                      Sign out
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              ) : (
                 <Link to="/auth" className="transition-colors hover:text-foreground">
                   Sign in
                 </Link>
               )}
 
             </div>
+
             <button
               onClick={sharePatkan}
               aria-label="Share Patkan"
@@ -527,7 +577,35 @@ function Landing() {
                   >
                     Install Guide
                   </a>
-                  {session ? null : (
+                  {session ? (
+                    <>
+                      <Link
+                        to="/library"
+                        onClick={() => setMenuOpen(false)}
+                        className="rounded-md px-2 py-2.5 transition-colors hover:bg-muted"
+                      >
+                        Your Library
+                      </Link>
+                      {isAdmin ? (
+                        <Link
+                          to="/admin"
+                          onClick={() => setMenuOpen(false)}
+                          className="rounded-md px-2 py-2.5 transition-colors hover:bg-muted"
+                        >
+                          Admin
+                        </Link>
+                      ) : null}
+                      <button
+                        onClick={() => {
+                          setMenuOpen(false);
+                          void signOutEverywhere();
+                        }}
+                        className="rounded-md px-2 py-2.5 text-left transition-colors hover:bg-muted"
+                      >
+                        Sign out
+                      </button>
+                    </>
+                  ) : (
                     <Link
                       to="/auth"
                       onClick={() => setMenuOpen(false)}
@@ -536,6 +614,7 @@ function Landing() {
                       Sign in
                     </Link>
                   )}
+
                   <button
                     onClick={() => {
                       setMenuOpen(false);

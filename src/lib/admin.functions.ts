@@ -21,6 +21,17 @@ export interface EngineStat {
   ttfbP50: number | null;
 }
 
+export interface BusinessStats {
+  totalUsers: number;
+  newUsers: number;
+  activeSignedIn: number;
+  activeGhostDevices: number;
+  returningSubjects: number;
+  frameworksTotal: number;
+  frameworksNew: number;
+  surfaces: Breakdown[];
+}
+
 export interface AdminStats {
   windowDays: number;
   total: number;
@@ -38,7 +49,9 @@ export interface AdminStats {
   ghostWalls: number;
   ghostWallDevices: number;
   estimatedUsd: number;
+  business: BusinessStats;
 }
+
 
 function percentile(values: number[], p: number): number | null {
   if (!values.length) return null;
@@ -136,7 +149,42 @@ export const getAdminStats = createServerFn({ method: "GET" })
       estimatedUsd += (e.output_chars / 4 / 1e6) * rate.out;
     }
 
+    // Business side: accounts and saved frameworks, from their own tables.
+    const [usersAll, usersNew, frameworksAll, frameworksNew] = await Promise.all([
+      supabaseAdmin.from("profiles").select("id", { count: "exact", head: true }),
+      supabaseAdmin.from("profiles").select("id", { count: "exact", head: true }).gte("created_at", since),
+      supabaseAdmin.from("prompt_templates").select("id", { count: "exact", head: true }),
+      supabaseAdmin
+        .from("prompt_templates")
+        .select("id", { count: "exact", head: true })
+        .gte("created_at", since),
+    ]);
+
+    const daysBySubject = new Map<string, Set<string>>();
+    for (const e of events) {
+      const set = daysBySubject.get(e.subject_hash) ?? new Set<string>();
+      set.add(e.created_at.slice(0, 10));
+      daysBySubject.set(e.subject_hash, set);
+    }
+
+    const business: BusinessStats = {
+      totalUsers: usersAll.count ?? 0,
+      newUsers: usersNew.count ?? 0,
+      activeSignedIn: new Set(
+        events.filter((e) => e.subject_kind === "user").map((e) => e.subject_hash),
+      ).size,
+      activeGhostDevices: new Set(
+        events.filter((e) => e.subject_kind !== "user").map((e) => e.subject_hash),
+      ).size,
+      returningSubjects: [...daysBySubject.values()].filter((s) => s.size > 1).length,
+      frameworksTotal: frameworksAll.count ?? 0,
+      frameworksNew: frameworksNew.count ?? 0,
+      surfaces: topCounts(events.map((e) => e.surface)),
+    };
+
     return {
+      business,
+
       windowDays: data.days,
       total,
       perDay: [...dayMap.values()].sort((a, b) => a.day.localeCompare(b.day)),
