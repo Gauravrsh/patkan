@@ -292,6 +292,7 @@ function Landing() {
   const [customPersonas, setCustomPersonas] = useState<string[]>([]);
   const [browserIndex, setBrowserIndex] = useState(0);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const inputStarted = useRef(false);
   const outRef = useRef<HTMLPreElement>(null);
 
   const personaList: PersonaOption[] = [
