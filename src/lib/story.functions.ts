@@ -94,7 +94,7 @@ export const getStoryStats = createServerFn({ method: "GET" })
 
     const seenBySection = new Map<string, Set<string>>();
     const dwellBySection = new Map<string, number[]>();
-    const exitBySection = new Map<string, number>();
+    const exitBySection = new Map<string, Set<string>>();
 
     for (const r of rows) {
       if (!r.section) continue;
