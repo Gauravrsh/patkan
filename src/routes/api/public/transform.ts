@@ -18,21 +18,23 @@ import {
   type EngineMessage,
 } from "@/lib/patkan-engines.server";
 import { recordEvent, type Outcome } from "@/lib/patkan-telemetry.server";
+import {
+  blockedResponse,
+  classifyClient,
+  consumeIpQuota,
+  corsHeadersFor,
+  IP_DAILY_CEILING,
+} from "@/lib/patkan-access.server";
 
 
-const CORS_HEADERS: Record<string, string> = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Methods": "POST, OPTIONS",
-  "Access-Control-Allow-Headers": "content-type, authorization, x-patkan-device",
-  "Access-Control-Max-Age": "86400",
-};
 
-function json(body: unknown, status = 200) {
+function jsonWith(body: unknown, status: number, cors: Record<string, string>) {
   return new Response(JSON.stringify(body), {
     status,
-    headers: { "content-type": "application/json", "cache-control": "no-store", ...CORS_HEADERS },
+    headers: { "content-type": "application/json", "cache-control": "no-store", ...cors },
   });
 }
+
 
 function today() {
   return new Date().toISOString().slice(0, 10);
@@ -94,9 +96,14 @@ async function cacheKey(input: {
 export const Route = createFileRoute("/api/public/transform")({
   server: {
     handlers: {
-      OPTIONS: () => new Response(null, { status: 204, headers: CORS_HEADERS }),
+      OPTIONS: ({ request }) =>
+        new Response(null, { status: 204, headers: corsHeadersFor(request, "POST") }),
       POST: async ({ request }) => {
+        const CORS_HEADERS = corsHeadersFor(request, "POST");
+        const json = (body: unknown, status = 200) => jsonWith(body, status, CORS_HEADERS);
+        if (classifyClient(request) === "blocked") return blockedResponse(request, "POST");
         const startedAt = Date.now();
+
         let payload: Payload;
         try {
           payload = (await request.json()) as Payload;
@@ -238,7 +245,22 @@ export const Route = createFileRoute("/api/public/transform")({
           }
         }
 
+        // Shared ceiling per IP: new device ids can't multiply the free allowance.
+        if (!(await consumeIpQuota(supabaseAdmin, request, day))) {
+          telemetry({ outcome: "limited" });
+          return json(
+            {
+              error: `This network has used its ${IP_DAILY_CEILING} Patkan transforms for today. The counter resets at midnight UTC.`,
+              limitReached: true,
+              used: usedBefore,
+              limit,
+            },
+            429,
+          );
+        }
+
         // Atomic claim: two simultaneous requests can never both pass the wall.
+
         const { data: quota, error: quotaError } = await supabaseAdmin.rpc("consume_quota", {
           _subject_key: subjectKey,
           _day: day,

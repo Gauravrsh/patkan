@@ -1,13 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
 
+import { blockedResponse, classifyClient, corsHeadersFor } from "@/lib/patkan-access.server";
+
 import { dailyLimitFor } from "@/lib/patkan-core";
 
-const CORS_HEADERS: Record<string, string> = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Methods": "GET, OPTIONS",
-  "Access-Control-Allow-Headers": "content-type, authorization, x-patkan-device",
-  "Access-Control-Max-Age": "86400",
-};
+
 
 async function resolveUserId(authHeader: string | null): Promise<string | null> {
   const token = authHeader?.replace(/^Bearer\s+/i, "").trim();
@@ -30,8 +27,11 @@ async function resolveUserId(authHeader: string | null): Promise<string | null> 
 export const Route = createFileRoute("/api/public/usage")({
   server: {
     handlers: {
-      OPTIONS: () => new Response(null, { status: 204, headers: CORS_HEADERS }),
+      OPTIONS: ({ request }) =>
+        new Response(null, { status: 204, headers: corsHeadersFor(request, "GET") }),
       GET: async ({ request }) => {
+        const CORS_HEADERS = corsHeadersFor(request, "GET");
+        if (classifyClient(request) === "blocked") return blockedResponse(request, "GET");
         const url = new URL(request.url);
         const deviceId = (
           url.searchParams.get("deviceId") ?? request.headers.get("x-patkan-device") ?? ""
