@@ -1,4 +1,5 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useQueryClient } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
 import {
   ArrowDownToLine,
@@ -14,6 +15,7 @@ import {
   Share2,
   ShieldCheck,
   Sparkles,
+  UserRound,
   Volume2,
   Zap,
 } from "lucide-react";
@@ -29,7 +31,17 @@ import {
 } from "@/lib/patkan-core";
 import { streamTransform, type EngineId } from "@/lib/patkan-stream";
 import { useAuth } from "@/hooks/useAuth";
+import { useIsAdmin } from "@/hooks/useIsAdmin";
+import { supabase } from "@/integrations/supabase/client";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import {
   Sheet,
   SheetContent,
@@ -38,6 +50,7 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import patkanMark from "@/assets/patkan-mark.png";
+
 
 export const Route = createFileRoute("/")({
   head: () => ({
