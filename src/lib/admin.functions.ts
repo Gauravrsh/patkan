@@ -21,6 +21,17 @@ export interface EngineStat {
   ttfbP50: number | null;
 }
 
+export interface BusinessStats {
+  totalUsers: number;
+  newUsers: number;
+  activeSignedIn: number;
+  activeGhostDevices: number;
+  returningSubjects: number;
+  frameworksTotal: number;
+  frameworksNew: number;
+  surfaces: Breakdown[];
+}
+
 export interface AdminStats {
   windowDays: number;
   total: number;
@@ -38,7 +49,9 @@ export interface AdminStats {
   ghostWalls: number;
   ghostWallDevices: number;
   estimatedUsd: number;
+  business: BusinessStats;
 }
+
 
 function percentile(values: number[], p: number): number | null {
   if (!values.length) return null;
