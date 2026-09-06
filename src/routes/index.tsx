@@ -500,13 +500,39 @@ function Landing() {
               <a href="#install" className="transition-colors hover:text-foreground">
                 Install Guide
               </a>
-              {session ? null : (
+              {session ? (
+                <DropdownMenu>
+                  <DropdownMenuTrigger className="inline-flex items-center gap-1.5 transition-colors hover:text-foreground">
+                    <UserRound className="size-4" aria-hidden />
+                    Account
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-56">
+                    <DropdownMenuLabel className="truncate font-normal text-muted-foreground">
+                      {session.user.email}
+                    </DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem asChild>
+                      <Link to="/library">Your Library</Link>
+                    </DropdownMenuItem>
+                    {isAdmin ? (
+                      <DropdownMenuItem asChild>
+                        <Link to="/admin">Admin</Link>
+                      </DropdownMenuItem>
+                    ) : null}
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onSelect={() => void signOutEverywhere()}>
+                      Sign out
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              ) : (
                 <Link to="/auth" className="transition-colors hover:text-foreground">
                   Sign in
                 </Link>
               )}
 
             </div>
+
             <button
               onClick={sharePatkan}
               aria-label="Share Patkan"
