@@ -78,15 +78,22 @@ export const Route = createFileRoute("/api/public/events")({
         new Response(null, { status: 204, headers: corsHeadersFor(request, "POST") }),
       POST: async ({ request }) => {
         const CORS = corsHeadersFor(request, "POST");
-        if (classifyClient(request) === "blocked") return blockedResponse(request, "POST");
+        if (classifyClient(request) === "blocked") {
+          console.warn("patkan events: rejected origin", request.headers.get("origin"));
+          return blockedResponse(request, "POST");
+        }
 
         const raw = await request.text();
-        if (raw.length > 20_000) return new Response(null, { status: 204, headers: CORS });
+        if (raw.length > 20_000) {
+          console.warn("patkan events: batch dropped, oversized", raw.length);
+          return new Response(null, { status: 204, headers: CORS });
+        }
 
         let parsed: z.infer<typeof payload>;
         try {
           parsed = payload.parse(JSON.parse(raw));
-        } catch {
+        } catch (err) {
+          console.warn("patkan events: batch dropped, invalid payload", String(err).slice(0, 300));
           return new Response(null, { status: 204, headers: CORS });
         }
 
@@ -120,8 +127,14 @@ export const Route = createFileRoute("/api/public/events")({
           }));
 
         try {
-          if (pageRows.length) await supabaseAdmin.from("page_events").insert(pageRows);
-          if (extRows.length) await supabaseAdmin.from("extension_events").insert(extRows);
+          if (pageRows.length) {
+            const { error } = await supabaseAdmin.from("page_events").insert(pageRows);
+            if (error) console.error("patkan events: page insert rejected", error.message);
+          }
+          if (extRows.length) {
+            const { error } = await supabaseAdmin.from("extension_events").insert(extRows);
+            if (error) console.error("patkan events: extension insert rejected", error.message);
+          }
         } catch (err) {
           console.error("patkan events: insert failed", err);
         }
