@@ -117,6 +117,14 @@ export const Route = createFileRoute("/api/public/transform")({
           return json({ error: `Input is too long (max ${MAX_INPUT_CHARS} characters).` }, 400);
         }
 
+        if (payload.customInstruction && payload.customInstruction.length > MAX_INPUT_CHARS) {
+          return json({ error: `Custom instruction is too long (max ${MAX_INPUT_CHARS} characters).` }, 400);
+        }
+
+        if (payload.refinement && payload.refinement.length > MAX_INPUT_CHARS) {
+          return json({ error: `Refinement is too long (max ${MAX_INPUT_CHARS} characters).` }, 400);
+        }
+
         const userId = await resolveUserId(request.headers.get("authorization"));
         const deviceId = (payload.deviceId ?? request.headers.get("x-patkan-device") ?? "").slice(0, 80);
         if (!userId && !deviceId) {
