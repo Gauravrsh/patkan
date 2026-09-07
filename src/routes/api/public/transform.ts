@@ -252,8 +252,19 @@ export const Route = createFileRoute("/api/public/transform")({
           }
         }
 
-        // Shared ceiling per IP: new device ids can't multiply the free allowance.
-        if (!(await consumeIpQuota(supabaseAdmin, request, day))) {
+        // Both allowance claims run together — the outcome is unchanged, only
+        // the waiting is. Shared ceiling per IP stops new device ids from
+        // multiplying the free allowance.
+        const [ipAllowed, quotaRes] = await Promise.all([
+          consumeIpQuota(supabaseAdmin, request, day),
+          supabaseAdmin.rpc("consume_quota", {
+            _subject_key: subjectKey,
+            _day: day,
+            _limit: limit,
+          }),
+        ]);
+
+        if (!ipAllowed) {
           await telemetry({ outcome: "limited" });
           return json(
             {
@@ -266,13 +277,7 @@ export const Route = createFileRoute("/api/public/transform")({
           );
         }
 
-        // Atomic claim: two simultaneous requests can never both pass the wall.
-
-        const { data: quota, error: quotaError } = await supabaseAdmin.rpc("consume_quota", {
-          _subject_key: subjectKey,
-          _day: day,
-          _limit: limit,
-        });
+        const { data: quota, error: quotaError } = quotaRes;
         if (quotaError) {
           console.error("patkan quota: rpc failed", quotaError);
           return json({ error: "Couldn't check your daily allowance. Try again." }, 500);
