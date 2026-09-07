@@ -165,9 +165,9 @@ $("go").addEventListener("click", async () => {
   $("note").textContent =
     res.engine === "primary"
       ? "Ready"
-      : res.engine === "fallback"
-        ? "Ready — backup engine"
-        : "Ready — offline draft";
+      : !res.engine || res.engine === "local"
+        ? "Ready — offline draft"
+        : "Ready — backup engine";
   $("copy").disabled = false;
   $("insert").disabled = false;
   if (res.assumptions?.length) $("assumed").textContent = "Assumed: " + res.assumptions.join(" · ");

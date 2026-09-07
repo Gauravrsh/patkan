@@ -1194,9 +1194,9 @@ function Playground(props: PlaygroundProps) {
             <p className="mt-3 text-xs text-muted-foreground">
               {engine === "primary"
                 ? "Ready"
-                : engine === "fallback"
-                  ? "Ready — backup engine"
-                  : "Ready — offline draft"}
+                : engine === "local"
+                  ? "Ready — offline draft"
+                  : "Ready — backup engine"}
             </p>
           )}
 
