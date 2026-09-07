@@ -176,19 +176,23 @@ export const Route = createFileRoute("/api/public/transform")({
           customInstruction: payload.customInstruction,
           refinement: payload.refinement,
         });
-        const { data: cached } = await supabaseAdmin
-          .from("prompt_cache")
-          .select("id, output_text, engine, hit_count")
-          .eq("input_hash", hash)
-          .maybeSingle();
-
-        const { data: counter } = await supabaseAdmin
-          .from("usage_counters")
-          .select("count")
-          .eq("subject_key", subjectKey)
-          .eq("day", day)
-          .maybeSingle();
-        const usedBefore = counter?.count ?? 0;
+        // Both reads run together: back-to-back round trips were pure dead air
+        // at the front of every transform.
+        const [cacheRead, counterRead] = await Promise.all([
+          supabaseAdmin
+            .from("prompt_cache")
+            .select("id, output_text, engine, hit_count")
+            .eq("input_hash", hash)
+            .maybeSingle(),
+          supabaseAdmin
+            .from("usage_counters")
+            .select("count")
+            .eq("subject_key", subjectKey)
+            .eq("day", day)
+            .maybeSingle(),
+        ]);
+        const cached = cacheRead.data;
+        const usedBefore = counterRead.data?.count ?? 0;
 
         if (cached) {
           void supabaseAdmin
