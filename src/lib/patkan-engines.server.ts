@@ -10,7 +10,7 @@
  * them, so the UI can label the result honestly.
  */
 
-export type EngineId = "primary" | "fallback" | "local";
+export type EngineId = "primary" | "secondary" | "gateway" | "fallback" | "local";
 
 export interface EngineMessage {
   role: "system" | "user";
