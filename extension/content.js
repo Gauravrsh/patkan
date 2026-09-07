@@ -249,9 +249,9 @@
       label =
         engine === "primary"
           ? "Ready"
-          : engine === "fallback"
-            ? "Ready — backup engine"
-            : "Ready — offline draft";
+          : !engine || engine === "local"
+            ? "Ready — offline draft"
+            : "Ready — backup engine";
     }
     pill.querySelector(".lbl").textContent = label;
     pill.classList.toggle("show", busy || phase === "ready" || pill.classList.contains("show"));

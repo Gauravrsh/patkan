@@ -82,6 +82,9 @@ function topCounts(values: (string | null)[], limit = 8): Breakdown[] {
 /** Rough per-million-token rates for the engines Patkan calls. */
 const RATES: Record<string, { in: number; out: number }> = {
   primary: { in: 0.024, out: 0.104 },
+  secondary: { in: 0.024, out: 0.104 },
+  gateway: { in: 0.048, out: 0.32 },
+  // Historic label, kept so older rows still cost something sensible.
   fallback: { in: 0.048, out: 0.32 },
   local: { in: 0, out: 0 },
 };

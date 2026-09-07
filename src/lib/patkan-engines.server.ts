@@ -10,7 +10,7 @@
  * them, so the UI can label the result honestly.
  */
 
-export type EngineId = "primary" | "fallback" | "local";
+export type EngineId = "primary" | "secondary" | "gateway" | "fallback" | "local";
 
 export interface EngineMessage {
   role: "system" | "user";
@@ -41,6 +41,42 @@ interface Attempt {
   authHeader: "bearer" | "lovable";
 }
 
+/**
+ * An engine that just answered "at capacity" will almost certainly say the same
+ * thing to the next request. Remembering that for a short while removes a dead
+ * second from the front of every transform while the upstream is saturated.
+ */
+const COOLDOWN_MS = 120_000;
+const MAX_COOLDOWN_MS = 600_000;
+/** How long we wait for an engine's first word before moving to the next one. */
+const FIRST_TOKEN_TIMEOUT_MS = 6_000;
+
+const cooldownUntil = new Map<string, number>();
+
+function attemptKey(a: Attempt): string {
+  return `${a.engine}:${a.model}`;
+}
+
+function isCoolingDown(a: Attempt): boolean {
+  const until = cooldownUntil.get(attemptKey(a));
+  if (!until) return false;
+  if (Date.now() >= until) {
+    cooldownUntil.delete(attemptKey(a));
+    return false;
+  }
+  return true;
+}
+
+function startCooldown(a: Attempt, retryAfter?: string | null) {
+  const seconds = Number(retryAfter);
+  const ms =
+    Number.isFinite(seconds) && seconds > 0
+      ? Math.min(MAX_COOLDOWN_MS, seconds * 1000)
+      : COOLDOWN_MS;
+  cooldownUntil.set(attemptKey(a), Date.now() + ms);
+  console.warn(`patkan engine ${a.engine} (${a.model}) cooling down for ${Math.round(ms / 1000)}s`);
+}
+
 function attempts(): Attempt[] {
   const list: Attempt[] = [];
   const nousKey = process.env["NOUS_API_KEY"];
@@ -53,7 +89,7 @@ function attempts(): Attempt[] {
       authHeader: "bearer",
     });
     list.push({
-      engine: "fallback",
+      engine: "secondary",
       url: NOUS_URL,
       key: nousKey,
       model: process.env["PATKAN_ENGINE_SECONDARY_MODEL"] || DEFAULT_SECONDARY_MODEL,
@@ -63,7 +99,7 @@ function attempts(): Attempt[] {
   const lovableKey = process.env["LOVABLE_API_KEY"];
   if (lovableKey) {
     list.push({
-      engine: "fallback",
+      engine: "gateway",
       url: GATEWAY_URL,
       key: lovableKey,
       model: GATEWAY_MODEL,
@@ -73,14 +109,27 @@ function attempts(): Attempt[] {
   return list;
 }
 
+/** Healthy engines first; a cooling-down engine is only a last resort. */
+function orderedAttempts(): Attempt[] {
+  const all = attempts();
+  const warm = all.filter((a) => !isCoolingDown(a));
+  const cold = all.filter((a) => isCoolingDown(a));
+  return [...warm, ...cold];
+}
+
 export function hasEngine(): boolean {
   return attempts().length > 0;
 }
 
-async function openStream(attempt: Attempt, messages: EngineMessage[]): Promise<Response | null> {
+async function openStream(
+  attempt: Attempt,
+  messages: EngineMessage[],
+  signal: AbortSignal,
+): Promise<Response | null> {
   try {
     const res = await fetch(attempt.url, {
       method: "POST",
+      signal,
       headers:
         attempt.authHeader === "bearer"
           ? { "content-type": "application/json", Authorization: `Bearer ${attempt.key}` }
@@ -100,11 +149,16 @@ async function openStream(attempt: Attempt, messages: EngineMessage[]): Promise<
     if (!res.ok || !res.body) {
       const detail = await res.text().catch(() => "");
       console.error(`patkan engine ${attempt.engine} (${attempt.model}) failed`, res.status, detail.slice(0, 400));
+      // "At capacity" or an upstream wobble: stop paying the round trip for it.
+      if (res.status === 429 || res.status >= 500) {
+        startCooldown(attempt, res.headers.get("retry-after"));
+      }
       return null;
     }
     return res;
   } catch (err) {
     console.error(`patkan engine ${attempt.engine} (${attempt.model}) unreachable`, err);
+    startCooldown(attempt);
     return null;
   }
 }
@@ -116,9 +170,27 @@ async function openStream(attempt: Attempt, messages: EngineMessage[]): Promise<
 export async function* streamCompile(messages: EngineMessage[]): AsyncGenerator<EngineChunk> {
   const decoder = new TextDecoder();
 
-  for (const attempt of attempts()) {
-    const res = await openStream(attempt, messages);
-    if (!res?.body) continue;
+  for (const attempt of orderedAttempts()) {
+    // The deadline covers only the wait for the first word. Once tokens flow we
+    // never abort — the generation is already running and billed.
+    const controller = new AbortController();
+    let deadline: ReturnType<typeof setTimeout> | undefined = setTimeout(() => {
+      console.warn(`patkan engine ${attempt.engine} (${attempt.model}) silent past first-word deadline`);
+      startCooldown(attempt);
+      controller.abort();
+    }, FIRST_TOKEN_TIMEOUT_MS);
+    const clearDeadline = () => {
+      if (deadline !== undefined) {
+        clearTimeout(deadline);
+        deadline = undefined;
+      }
+    };
+
+    const res = await openStream(attempt, messages, controller.signal);
+    if (!res?.body) {
+      clearDeadline();
+      continue;
+    }
 
     const reader = res.body.getReader();
     let buffer = "";
@@ -142,6 +214,7 @@ export async function* streamCompile(messages: EngineMessage[]): AsyncGenerator<
             };
             const delta = parsed.choices?.[0]?.delta?.content;
             if (delta) {
+              if (!produced) clearDeadline();
               produced = true;
               yield { engine: attempt.engine, delta };
             }
@@ -152,6 +225,8 @@ export async function* streamCompile(messages: EngineMessage[]): AsyncGenerator<
       }
     } catch (err) {
       console.error(`patkan engine ${attempt.engine} (${attempt.model}) stream broke`, err);
+    } finally {
+      clearDeadline();
     }
 
     // Only fall through to the next engine when this one produced nothing at
