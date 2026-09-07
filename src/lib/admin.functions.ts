@@ -32,6 +32,12 @@ export interface BusinessStats {
   surfaces: Breakdown[];
 }
 
+export interface Reconciliation {
+  charged: number;
+  recorded: number;
+  gap: number;
+}
+
 export interface AdminStats {
   windowDays: number;
   total: number;
@@ -50,6 +56,7 @@ export interface AdminStats {
   ghostWallDevices: number;
   estimatedUsd: number;
   business: BusinessStats;
+  reconciliation: Reconciliation;
 }
 
 
@@ -160,6 +167,24 @@ export const getAdminStats = createServerFn({ method: "GET" })
         .gte("created_at", since),
     ]);
 
+    // Instrumentation guard: quota charged vs performance rows recorded. A gap
+    // means transforms happened that the dashboard cannot see.
+    const sinceDay = since.slice(0, 10);
+    const { data: counters } = await supabaseAdmin
+      .from("usage_counters")
+      .select("subject_key, count")
+      .gte("day", sinceDay)
+      .limit(20000);
+    const charged = (counters ?? [])
+      .filter((c) => !c.subject_key.startsWith("ip:"))
+      .reduce((sum, c) => sum + (c.count ?? 0), 0);
+    const recorded = events.filter((e) => !e.cached && e.outcome !== "limited").length;
+    const reconciliation: Reconciliation = {
+      charged,
+      recorded,
+      gap: Math.max(0, charged - recorded),
+    };
+
     const daysBySubject = new Map<string, Set<string>>();
     for (const e of events) {
       const set = daysBySubject.get(e.subject_hash) ?? new Set<string>();
@@ -184,6 +209,7 @@ export const getAdminStats = createServerFn({ method: "GET" })
 
     return {
       business,
+      reconciliation,
 
       windowDays: data.days,
       total,

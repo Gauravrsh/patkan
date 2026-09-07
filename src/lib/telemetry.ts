@@ -34,6 +34,12 @@ interface QueuedEvent {
   meta?: Record<string, string | number | boolean>;
 }
 
+const IMMEDIATE = new Set<PageEventName>([
+  "playground_compiled",
+  "playground_copied",
+  "download_clicked",
+]);
+
 let queue: QueuedEvent[] = [];
 let timer: ReturnType<typeof setTimeout> | null = null;
 let wired = false;
@@ -120,7 +126,9 @@ export function trackEvent(
     window.addEventListener("pagehide", () => flushEvents(true));
   }
 
-  if (queue.length >= 10) {
+  // Funnel-critical moments flush at once: waiting for the idle timer loses
+  // them whenever the visitor closes or navigates straight after the click.
+  if (IMMEDIATE.has(event) || queue.length >= 10) {
     flushEvents();
     return;
   }

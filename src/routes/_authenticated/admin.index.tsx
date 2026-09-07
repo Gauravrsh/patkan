@@ -144,6 +144,15 @@ function AdminPage() {
             value={String(data.limitedCount)}
             hint="Daily allowance exhausted"
           />
+          <Card
+            label="Recorded vs charged"
+            value={`${data.reconciliation.recorded} / ${data.reconciliation.charged}`}
+            hint={
+              data.reconciliation.gap > 0
+                ? `Instrumentation gap — ${data.reconciliation.gap} transform${data.reconciliation.gap === 1 ? "" : "s"} not recorded`
+                : "Every charged transform is recorded"
+            }
+          />
         </div>
       </section>
 

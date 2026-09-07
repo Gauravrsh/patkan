@@ -137,10 +137,13 @@ export const Route = createFileRoute("/api/public/transform")({
         const { intent, complexity } = classifyLocal(text);
         const wantsStream = payload.stream !== false;
 
+        // Awaited, never `void`: on the worker runtime a promise still in flight
+        // when the response closes is dropped, which silently lost every
+        // streamed transform from the record.
         const telemetry = (
           extra: Partial<Parameters<typeof recordEvent>[1]> & { outcome: Outcome },
         ) =>
-          void recordEvent(supabaseAdmin, {
+          recordEvent(supabaseAdmin, {
             subjectKind,
             subjectKey,
             host,
@@ -194,7 +197,7 @@ export const Route = createFileRoute("/api/public/transform")({
             .eq("id", cached.id);
           const parsed = splitMeta(cached.output_text);
           if (parsed.prompt) {
-            telemetry({
+            await telemetry({
               outcome: "ok",
               cached: true,
               engine: cached.engine,
@@ -247,7 +250,7 @@ export const Route = createFileRoute("/api/public/transform")({
 
         // Shared ceiling per IP: new device ids can't multiply the free allowance.
         if (!(await consumeIpQuota(supabaseAdmin, request, day))) {
-          telemetry({ outcome: "limited" });
+          await telemetry({ outcome: "limited" });
           return json(
             {
               error: `This network has used its ${IP_DAILY_CEILING} Patkan transforms for today. The counter resets at midnight UTC.`,
@@ -275,7 +278,7 @@ export const Route = createFileRoute("/api/public/transform")({
         const nextCount = row?.used ?? usedBefore;
 
         if (!allowed) {
-          telemetry({ outcome: "limited" });
+          await telemetry({ outcome: "limited" });
           return json(
             {
               error: userId
@@ -301,7 +304,7 @@ export const Route = createFileRoute("/api/public/transform")({
 
         if (!hasEngine()) {
           await refund();
-          telemetry({ outcome: "error" });
+          await telemetry({ outcome: "error" });
           return json({ error: "AI is not configured." }, 500);
         }
 
@@ -331,14 +334,14 @@ export const Route = createFileRoute("/api/public/transform")({
           const parsed = splitMeta(full);
           if (!parsed.prompt) {
             await refund();
-            telemetry({ outcome: "empty", engine, ttfbMs: ttfb });
+            await telemetry({ outcome: "empty", engine, ttfbMs: ttfb });
             return json({ error: "The AI returned an empty prompt. Try again." }, 502);
           }
           await supabaseAdmin.from("prompt_cache").upsert(
             { input_hash: hash, input_text: text, output_text: full, engine },
             { onConflict: "input_hash" },
           );
-          telemetry({
+          await telemetry({
             outcome: "ok",
             engine,
             ttfbMs: ttfb,
@@ -382,14 +385,14 @@ export const Route = createFileRoute("/api/public/transform")({
               const parsed = splitMeta(full);
               if (!parsed.prompt) {
                 await refund();
-                telemetry({ outcome: "empty", engine, ttfbMs: ttfb });
+                await telemetry({ outcome: "empty", engine, ttfbMs: ttfb });
                 send({ type: "error", error: "The AI returned an empty prompt. Try again." });
               } else {
                 await supabaseAdmin.from("prompt_cache").upsert(
                   { input_hash: hash, input_text: text, output_text: full, engine },
                   { onConflict: "input_hash" },
                 );
-                telemetry({
+                await telemetry({
                   outcome: "ok",
                   engine,
                   ttfbMs: ttfb,
@@ -407,7 +410,7 @@ export const Route = createFileRoute("/api/public/transform")({
             } catch (err) {
               console.error("patkan transform: stream failed", err);
               await refund();
-              telemetry({ outcome: "error", engine, ttfbMs: ttfb });
+              await telemetry({ outcome: "error", engine, ttfbMs: ttfb });
               send({ type: "error", error: "The stream broke mid-transform. Try again." });
             } finally {
               controller.close();

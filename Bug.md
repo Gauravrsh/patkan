@@ -62,3 +62,40 @@ Entry template:
     document.documentElement.scrollWidth === window.innerWidth (no overflow) at all three.
   status: fixed
 ```
+
+```yaml
+- id: BUG-003
+  date: 2026-09-07
+  title: Streamed transforms were charged but never recorded
+  reported: "Yesterday evening I only did attempt few transforms. Why can't you see the logs?"
+  repro: >
+    usage_counters for 2026-09-06 shows device:a7b5fd71 count 4 at 17:49 UTC, while
+    transform_events has no row after 07:52 UTC that day (and those two are audit calls).
+  root_cause: >
+    src/routes/api/public/transform.ts called telemetry with `void recordEvent(...)`.
+    On the worker runtime the request ends when the response (or streamed response)
+    closes, so the in-flight insert was dropped. Quota survived because consume_quota
+    is awaited before the response. The website and the extension both stream by
+    default, so real usage was the traffic systematically lost.
+  fix: >
+    Every telemetry call on every path (ok, cached, empty, error, limited) is now
+    awaited before the response is returned or the stream is closed. Funnel events
+    (playground_compiled/copied, download_clicked) flush immediately in
+    src/lib/telemetry.ts. The events intake logs rejected batches. /admin shows a
+    recorded-vs-charged tile and the health cron raises an instrumentation-gap breach.
+  verification: >
+    Live streamed transform through an allowed origin produced a matching
+    transform_events row with engine, ttfb_ms and latency_ms populated; the admin
+    reconciliation tile reads parity for the same window.
+  status: fixed
+
+- id: BUG-004
+  date: 2026-09-07
+  title: Data gap — four transforms on 2026-09-06 evening are unrecoverable
+  reported: n/a (consequence of BUG-003)
+  repro: transform_events has no rows between 2026-09-06 07:52 UTC and the BUG-003 fix.
+  root_cause: See BUG-003. No latency, engine or outcome data was ever written.
+  fix: Not backfillable. Recorded here so dashboard history is read as incomplete, not quiet.
+  verification: usage_counters remains the only evidence those transforms happened.
+  status: fixed
+```
