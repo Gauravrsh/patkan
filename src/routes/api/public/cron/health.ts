@@ -46,6 +46,19 @@ export const Route = createFileRoute("/api/public/cron/health")({
           95,
         );
 
+        // Silence alarm: quota charged but nothing recorded means the
+        // instrumentation is down, not that the day was quiet.
+        const sinceDay = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
+        const { data: counters } = await supabaseAdmin
+          .from("usage_counters")
+          .select("subject_key, count")
+          .gte("day", sinceDay)
+          .limit(20000);
+        const charged = (counters ?? [])
+          .filter((c) => !c.subject_key.startsWith("ip:"))
+          .reduce((sum, c) => sum + (c.count ?? 0), 0);
+        const recorded = events.filter((e) => !e.cached && e.outcome !== "limited").length;
+
         const errorRate = total ? errors / total : 0;
         const primaryShare = live.length ? primary / live.length : 1;
 
@@ -58,6 +71,10 @@ export const Route = createFileRoute("/api/public/cron/health")({
           breaches.push(`primary engine served only ${(primaryShare * 100).toFixed(0)}%`);
         }
 
+        if (charged > 0 && recorded < charged) {
+          breaches.push(`instrumentation gap: ${charged} charged, ${recorded} recorded`);
+        }
+
         if (breaches.length) {
           console.error("patkan health digest: THRESHOLD BREACH", { breaches, total, errorRate, p95, primaryShare });
         } else {
@@ -65,7 +82,7 @@ export const Route = createFileRoute("/api/public/cron/health")({
         }
 
         return new Response(
-          JSON.stringify({ total, errorRate, p95, primaryShare, breaches }),
+          JSON.stringify({ total, errorRate, p95, primaryShare, charged, recorded, breaches }),
           { headers: { "content-type": "application/json", "cache-control": "no-store" } },
         );
       },
