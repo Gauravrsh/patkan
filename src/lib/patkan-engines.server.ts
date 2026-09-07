@@ -41,6 +41,42 @@ interface Attempt {
   authHeader: "bearer" | "lovable";
 }
 
+/**
+ * An engine that just answered "at capacity" will almost certainly say the same
+ * thing to the next request. Remembering that for a short while removes a dead
+ * second from the front of every transform while the upstream is saturated.
+ */
+const COOLDOWN_MS = 120_000;
+const MAX_COOLDOWN_MS = 600_000;
+/** How long we wait for an engine's first word before moving to the next one. */
+const FIRST_TOKEN_TIMEOUT_MS = 6_000;
+
+const cooldownUntil = new Map<string, number>();
+
+function attemptKey(a: Attempt): string {
+  return `${a.engine}:${a.model}`;
+}
+
+function isCoolingDown(a: Attempt): boolean {
+  const until = cooldownUntil.get(attemptKey(a));
+  if (!until) return false;
+  if (Date.now() >= until) {
+    cooldownUntil.delete(attemptKey(a));
+    return false;
+  }
+  return true;
+}
+
+function startCooldown(a: Attempt, retryAfter?: string | null) {
+  const seconds = Number(retryAfter);
+  const ms =
+    Number.isFinite(seconds) && seconds > 0
+      ? Math.min(MAX_COOLDOWN_MS, seconds * 1000)
+      : COOLDOWN_MS;
+  cooldownUntil.set(attemptKey(a), Date.now() + ms);
+  console.warn(`patkan engine ${a.engine} (${a.model}) cooling down for ${Math.round(ms / 1000)}s`);
+}
+
 function attempts(): Attempt[] {
   const list: Attempt[] = [];
   const nousKey = process.env["NOUS_API_KEY"];
@@ -53,7 +89,7 @@ function attempts(): Attempt[] {
       authHeader: "bearer",
     });
     list.push({
-      engine: "fallback",
+      engine: "secondary",
       url: NOUS_URL,
       key: nousKey,
       model: process.env["PATKAN_ENGINE_SECONDARY_MODEL"] || DEFAULT_SECONDARY_MODEL,
@@ -63,7 +99,7 @@ function attempts(): Attempt[] {
   const lovableKey = process.env["LOVABLE_API_KEY"];
   if (lovableKey) {
     list.push({
-      engine: "fallback",
+      engine: "gateway",
       url: GATEWAY_URL,
       key: lovableKey,
       model: GATEWAY_MODEL,
@@ -71,6 +107,14 @@ function attempts(): Attempt[] {
     });
   }
   return list;
+}
+
+/** Healthy engines first; a cooling-down engine is only a last resort. */
+function orderedAttempts(): Attempt[] {
+  const all = attempts();
+  const warm = all.filter((a) => !isCoolingDown(a));
+  const cold = all.filter((a) => isCoolingDown(a));
+  return [...warm, ...cold];
 }
 
 export function hasEngine(): boolean {
