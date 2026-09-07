@@ -121,10 +121,15 @@ export function hasEngine(): boolean {
   return attempts().length > 0;
 }
 
-async function openStream(attempt: Attempt, messages: EngineMessage[]): Promise<Response | null> {
+async function openStream(
+  attempt: Attempt,
+  messages: EngineMessage[],
+  signal: AbortSignal,
+): Promise<Response | null> {
   try {
     const res = await fetch(attempt.url, {
       method: "POST",
+      signal,
       headers:
         attempt.authHeader === "bearer"
           ? { "content-type": "application/json", Authorization: `Bearer ${attempt.key}` }
@@ -144,11 +149,16 @@ async function openStream(attempt: Attempt, messages: EngineMessage[]): Promise<
     if (!res.ok || !res.body) {
       const detail = await res.text().catch(() => "");
       console.error(`patkan engine ${attempt.engine} (${attempt.model}) failed`, res.status, detail.slice(0, 400));
+      // "At capacity" or an upstream wobble: stop paying the round trip for it.
+      if (res.status === 429 || res.status >= 500) {
+        startCooldown(attempt, res.headers.get("retry-after"));
+      }
       return null;
     }
     return res;
   } catch (err) {
     console.error(`patkan engine ${attempt.engine} (${attempt.model}) unreachable`, err);
+    startCooldown(attempt);
     return null;
   }
 }
@@ -160,9 +170,27 @@ async function openStream(attempt: Attempt, messages: EngineMessage[]): Promise<
 export async function* streamCompile(messages: EngineMessage[]): AsyncGenerator<EngineChunk> {
   const decoder = new TextDecoder();
 
-  for (const attempt of attempts()) {
-    const res = await openStream(attempt, messages);
-    if (!res?.body) continue;
+  for (const attempt of orderedAttempts()) {
+    // The deadline covers only the wait for the first word. Once tokens flow we
+    // never abort — the generation is already running and billed.
+    const controller = new AbortController();
+    let deadline: ReturnType<typeof setTimeout> | undefined = setTimeout(() => {
+      console.warn(`patkan engine ${attempt.engine} (${attempt.model}) silent past first-word deadline`);
+      startCooldown(attempt);
+      controller.abort();
+    }, FIRST_TOKEN_TIMEOUT_MS);
+    const clearDeadline = () => {
+      if (deadline !== undefined) {
+        clearTimeout(deadline);
+        deadline = undefined;
+      }
+    };
+
+    const res = await openStream(attempt, messages, controller.signal);
+    if (!res?.body) {
+      clearDeadline();
+      continue;
+    }
 
     const reader = res.body.getReader();
     let buffer = "";
@@ -186,6 +214,7 @@ export async function* streamCompile(messages: EngineMessage[]): AsyncGenerator<
             };
             const delta = parsed.choices?.[0]?.delta?.content;
             if (delta) {
+              if (!produced) clearDeadline();
               produced = true;
               yield { engine: attempt.engine, delta };
             }
@@ -196,6 +225,8 @@ export async function* streamCompile(messages: EngineMessage[]): AsyncGenerator<
       }
     } catch (err) {
       console.error(`patkan engine ${attempt.engine} (${attempt.model}) stream broke`, err);
+    } finally {
+      clearDeadline();
     }
 
     // Only fall through to the next engine when this one produced nothing at
