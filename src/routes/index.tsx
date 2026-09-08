@@ -1044,6 +1044,11 @@ function Playground(props: PlaygroundProps) {
   const target = targetAis[targetIndex]!;
   const persona = personaList[personaIndex] ?? personaList[0]!;
   const settled = phase === "ready" || phase === "idle";
+  const [rated, setRated] = useState(false);
+  useEffect(() => {
+    setRated(false);
+  }, [output]);
+
 
   return (
     <div>
