@@ -316,15 +316,6 @@ export const Route = createFileRoute("/api/public/transform")({
           );
         }
 
-        /** Give a claimed transform back when it never produced a prompt. */
-        const refund = async () => {
-          await supabaseAdmin
-            .from("usage_counters")
-            .update({ count: Math.max(0, nextCount - 1), updated_at: new Date().toISOString() })
-            .eq("subject_key", subjectKey)
-            .eq("day", day);
-        };
-
         if (!hasEngine()) {
           await refund();
           await telemetry({ outcome: "error" });
