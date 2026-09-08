@@ -14,7 +14,15 @@ export interface TransformRequest {
 }
 
 
-export type EngineId = "primary" | "secondary" | "gateway" | "fallback" | "local";
+export type EngineId =
+  | "primary"
+  | "secondary"
+  | "tertiary"
+  | "quick"
+  | "gateway"
+  | "fallback"
+  | "local";
+
 
 export interface TransformResult {
   prompt: string;

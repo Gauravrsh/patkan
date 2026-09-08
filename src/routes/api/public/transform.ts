@@ -335,7 +335,7 @@ export const Route = createFileRoute("/api/public/transform")({
           let full = "";
           let engine: EngineId = "local";
           let ttfb: number | undefined;
-          for await (const chunk of streamCompile(messages)) {
+          for await (const chunk of streamCompile(messages, { quick: intensity === "light" })) {
             ttfb ??= Date.now() - startedAt;
             engine = chunk.engine;
             full += chunk.delta;
@@ -381,7 +381,7 @@ export const Route = createFileRoute("/api/public/transform")({
             let engine: EngineId = "local";
             let ttfb: number | undefined;
             try {
-              for await (const chunk of streamCompile(messages)) {
+              for await (const chunk of streamCompile(messages, { quick: intensity === "light" })) {
                 ttfb ??= Date.now() - startedAt;
                 if (chunk.engine !== engine) {
                   engine = chunk.engine;

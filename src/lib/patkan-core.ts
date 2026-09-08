@@ -199,6 +199,7 @@ export interface PromptBlocks {
   role?: string;
   context?: string;
   task: string;
+  questionsFirst?: string;
   successCriterion?: string;
   outputContract?: string;
   constraints?: string[];
@@ -219,6 +220,7 @@ function sectionsFor(blocks: PromptBlocks): Section[] {
   push("role", "Role", blocks.role);
   push("context", "Context", blocks.context);
   push("task", "Task", blocks.task);
+  push("questions_first", "Questions to ask me first", blocks.questionsFirst);
   push("success_criteria", "Success criteria", blocks.successCriterion);
   push("output_format", "Output format", blocks.outputContract);
   if (blocks.constraints?.length) {
@@ -231,6 +233,7 @@ function sectionsFor(blocks: PromptBlocks): Section[] {
   push("verify", "Before answering", blocks.selfCheck);
   return out;
 }
+
 
 export function renderPrompt(blocks: PromptBlocks, dialect: Dialect): string {
   const sections = sectionsFor(blocks);
@@ -281,9 +284,12 @@ export function localScaffold(
     context:
       "Infer the situation from the request below. Where a decisive detail is missing, state the assumption you are making rather than inventing a requirement.",
     task: text,
+    questionsFirst:
+      "Before you start, ask me up to 3 questions whose answers would genuinely change what you produce — numbered, in one message — and wait for my reply. If I skip a question, state the assumption you are making and carry on.",
     constraints: persona.constraints.slice(),
     outputContract: INTENT_CONTRACT[intent],
   };
+
 
   if (intensity === "surgical") {
     blocks.successCriterion =
@@ -308,28 +314,47 @@ const INTENT_CONTRACT: Record<Intent, string> = {
 
 export const META_DELIMITER = "===PATKAN_META===";
 
+/** Reading-research ceiling: past ~1,500 characters a prompt stops being read. */
+export const PROMPT_TARGET_CHARS = 1500;
+export const PROMPT_HARD_CAP_CHARS = 2000;
+export const PROMPT_QUICK_CAP_CHARS = 1200;
+
 export function buildMetaSystemPrompt(dialect: Dialect): string {
   const formatRule =
     dialect === "xml"
-      ? `Wrap each section in lowercase XML tags chosen from: <role>, <context>, <task>, <success_criteria>, <output_format>, <constraints>, <verify>. Claude respects tag boundaries; use them.`
+      ? `Wrap each section in lowercase XML tags chosen from: <role>, <context>, <task>, <questions_first>, <success_criteria>, <output_format>, <constraints>, <verify>. Claude respects tag boundaries; use them.`
       : dialect === "markdown"
-        ? `Use "## " Markdown headings chosen from: Role, Context, Task, Success criteria, Output format, Constraints, Before answering.`
-        : `Use bare uppercase section headers on their own line, chosen from: ROLE, CONTEXT, TASK, SUCCESS CRITERIA, OUTPUT FORMAT, CONSTRAINTS, BEFORE ANSWERING.`;
+        ? `Use "## " Markdown headings chosen from: Role, Context, Task, Questions to ask me first, Success criteria, Output format, Constraints, Before answering.`
+        : `Use bare uppercase section headers on their own line, chosen from: ROLE, CONTEXT, TASK, QUESTIONS TO ASK ME FIRST, SUCCESS CRITERIA, OUTPUT FORMAT, CONSTRAINTS, BEFORE ANSWERING.`;
 
   return `You are Patkan, a prompt compiler. You rewrite a user's rough input into the prompt an expert would have written. You never answer the request itself.
 
 FORMAT
 ${formatRule}
 
+QUESTIONS — mandatory, never omit this section
+- The questions section always appears, directly after the task.
+- Its body must instruct the answerer: ask these questions first, in one numbered message, and wait for the reply; if the user skips a question, state the assumption being made and continue anyway.
+- At most 3 questions. Only questions whose answer would genuinely change the output — never administrative or polite filler.
+- Write them in plain language a non-technical professional understands.
+
+LENGTH — this is a hard contract
+- The rewritten prompt must be under ${PROMPT_TARGET_CHARS} characters — count them. ${PROMPT_HARD_CAP_CHARS} is a hard ceiling you may never cross. A prompt nobody reads is a failed prompt.
+- Section bodies are 1-3 short sentences or 3-5 short bullets. No sub-numbered task lists, no restating the same instruction twice.
+- This length contract governs the prompt you write. Never mention it, or any character count, inside the prompt itself.
+- Get there by cutting sections and words, never by dropping a detail the user gave or the questions section.
+
 JUDGEMENT — this matters more than the format
-- Use only the sections the task actually needs. A factual question needs a sharpened sentence, not a spec. Padding a small ask is a failure.
+- Use only the sections the task actually needs. A factual question needs a sharpened sentence plus its questions section, not a spec. Padding a small ask is a failure.
 - Length must be proportional to the input's real complexity.
 - Preserve every concrete detail from the input: names, numbers, platforms, tools, deadlines. Never drop one, never invent one.
-- Where a decisive detail is missing, instruct the answerer to state an assumption. Do not fabricate the detail.
+- Never state a number, price, percentage, date or name the user did not give. If one is needed, ask for it in the questions section.
+- Where a decisive detail is missing, either ask it in the questions section or instruct the answerer to state an assumption. Do not fabricate the detail.
 - Prefer a measurable success criterion ("done when X") over vague quality words.
 - Give an explicit output contract: exact shape, order and length of the answer.
 - Constraints must include negative space: what to exclude, what not to assume.
 - Never instruct step-by-step reasoning for a simple lookup.
+- Plain, everyday language throughout. The reader may be a designer, a lawyer or a shop owner, not an engineer.
 
 OUTPUT
 Return the rewritten prompt only — no preamble, no explanation, no code fences.
@@ -339,6 +364,7 @@ Then, on its own line, print ${META_DELIMITER} followed by a single minified JSO
 - clarifiers: at most 3, only for details that would genuinely change the answer. Empty array if none.
 - Nothing after the JSON.`;
 }
+
 
 export function buildMetaUserMessage(
   rawInput: string,
@@ -355,10 +381,11 @@ export function buildMetaUserMessage(
   const intensity = opts.intensity ?? "standard";
   const intensityRule =
     intensity === "light"
-      ? "INTENSITY: light. Sharpen wording and add an output contract at most. Do not add role, success criteria or a self-check."
+      ? `INTENSITY: light. Keep the whole prompt under ${PROMPT_QUICK_CAP_CHARS} characters (never say so in the prompt). Sharpen the wording, keep the questions section (2 questions maximum) and an output contract. Do not add role, success criteria or a self-check.`
       : intensity === "surgical"
-        ? "INTENSITY: surgical. Include a measurable success criterion, edge cases, and a short verification clause."
-        : "INTENSITY: standard. Role, context, task and output contract. Skip the self-check.";
+        ? `INTENSITY: surgical. Keep the whole prompt under ${PROMPT_TARGET_CHARS} characters (never say so in the prompt). Include the questions section, a measurable success criterion, edge cases, and a short verification clause.`
+        : `INTENSITY: standard. Keep the whole prompt under ${PROMPT_TARGET_CHARS} characters (never say so in the prompt). Role, context, task, the questions section and an output contract. Skip the self-check.`;
+
 
   const parts = [
     intensityRule,
