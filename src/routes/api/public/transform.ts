@@ -349,7 +349,7 @@ export const Route = createFileRoute("/api/public/transform")({
           if (!parsed.prompt) {
             await refund();
             await telemetry({ outcome: "empty", engine, ttfbMs: ttfb });
-            return json({ error: "The AI returned an empty prompt. Try again." }, 502);
+            return json({ error: "The AI is busy right now. Try again in a moment." }, 502);
           }
           await supabaseAdmin.from("prompt_cache").upsert(
             { input_hash: hash, input_text: text, output_text: full, engine },
@@ -400,7 +400,7 @@ export const Route = createFileRoute("/api/public/transform")({
               if (!parsed.prompt) {
                 await refund();
                 await telemetry({ outcome: "empty", engine, ttfbMs: ttfb });
-                send({ type: "error", error: "The AI returned an empty prompt. Try again." });
+                send({ type: "error", error: "The AI is busy right now. Try again in a moment." });
               } else {
                 await supabaseAdmin.from("prompt_cache").upsert(
                   { input_hash: hash, input_text: text, output_text: full, engine },
