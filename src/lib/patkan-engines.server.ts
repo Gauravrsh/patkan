@@ -66,8 +66,14 @@ interface Attempt {
  */
 const COOLDOWN_MS = 120_000;
 const MAX_COOLDOWN_MS = 600_000;
-/** How long we wait for an engine's first word before moving to the next one. */
-const FIRST_TOKEN_TIMEOUT_MS = 6_000;
+/**
+ * How long we wait for an engine's first word before moving to the next one.
+ * Generous on purpose: a model thinking hard about a big prompt is not a
+ * failure. The last engine in the chain gets no deadline at all — a slow answer
+ * beats no answer.
+ */
+const FIRST_TOKEN_TIMEOUT_MS = 10_000;
+const FIRST_TOKEN_TIMEOUT_LATER_MS = 8_000;
 
 const cooldownUntil = new Map<string, number>();
 
@@ -258,17 +264,25 @@ export async function* streamCompile(
 ): AsyncGenerator<EngineChunk> {
   const decoder = new TextDecoder();
 
-  for (const attempt of orderedAttempts(opts?.quick ?? false)) {
+  const chain = orderedAttempts(opts?.quick ?? false);
+
+  for (const [index, attempt] of chain.entries()) {
     const startedAt = Date.now();
+    const isLast = index === chain.length - 1;
+    const timeoutMs = index === 0 ? FIRST_TOKEN_TIMEOUT_MS : FIRST_TOKEN_TIMEOUT_LATER_MS;
 
     // The deadline covers only the wait for the first word. Once tokens flow we
-    // never abort — the generation is already running and billed.
+    // never abort — the generation is already running and billed. Being slow is
+    // not a refusal, so a timeout does NOT put the engine on cooldown.
     const controller = new AbortController();
-    let deadline: ReturnType<typeof setTimeout> | undefined = setTimeout(() => {
-      console.warn(`patkan engine ${attempt.engine} (${attempt.model}) silent past first-word deadline`);
-      startCooldown(attempt);
-      controller.abort();
-    }, FIRST_TOKEN_TIMEOUT_MS);
+    let deadline: ReturnType<typeof setTimeout> | undefined = isLast
+      ? undefined
+      : setTimeout(() => {
+          console.warn(
+            `patkan engine ${attempt.engine} (${attempt.model}) silent past first-word deadline`,
+          );
+          controller.abort();
+        }, timeoutMs);
     const clearDeadline = () => {
       if (deadline !== undefined) {
         clearTimeout(deadline);

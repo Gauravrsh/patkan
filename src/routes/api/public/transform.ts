@@ -264,7 +264,25 @@ export const Route = createFileRoute("/api/public/transform")({
           }),
         ]);
 
+        const row = Array.isArray(quotaRes.data) ? quotaRes.data[0] : quotaRes.data;
+        const allowed = Boolean(row?.allowed);
+        const nextCount = row?.used ?? usedBefore;
+
+        /** Give a claimed transform back when it never produced a prompt. */
+        const refund = async () => {
+          await supabaseAdmin
+            .from("usage_counters")
+            .update({ count: Math.max(0, nextCount - 1), updated_at: new Date().toISOString() })
+            .eq("subject_key", subjectKey)
+            .eq("day", day);
+        };
+
+        // The two allowance claims run together for speed, so the personal
+        // counter may already be charged when the shared network wall refuses
+        // the request. Hand it straight back — a refused request must never
+        // cost someone a transform.
         if (!ipAllowed) {
+          if (allowed) await refund();
           await telemetry({ outcome: "limited" });
           return json(
             {
@@ -277,14 +295,10 @@ export const Route = createFileRoute("/api/public/transform")({
           );
         }
 
-        const { data: quota, error: quotaError } = quotaRes;
-        if (quotaError) {
-          console.error("patkan quota: rpc failed", quotaError);
+        if (quotaRes.error) {
+          console.error("patkan quota: rpc failed", quotaRes.error);
           return json({ error: "Couldn't check your daily allowance. Try again." }, 500);
         }
-        const row = Array.isArray(quota) ? quota[0] : quota;
-        const allowed = Boolean(row?.allowed);
-        const nextCount = row?.used ?? usedBefore;
 
         if (!allowed) {
           await telemetry({ outcome: "limited" });
@@ -301,15 +315,6 @@ export const Route = createFileRoute("/api/public/transform")({
             429,
           );
         }
-
-        /** Give a claimed transform back when it never produced a prompt. */
-        const refund = async () => {
-          await supabaseAdmin
-            .from("usage_counters")
-            .update({ count: Math.max(0, nextCount - 1), updated_at: new Date().toISOString() })
-            .eq("subject_key", subjectKey)
-            .eq("day", day);
-        };
 
         if (!hasEngine()) {
           await refund();
@@ -344,7 +349,7 @@ export const Route = createFileRoute("/api/public/transform")({
           if (!parsed.prompt) {
             await refund();
             await telemetry({ outcome: "empty", engine, ttfbMs: ttfb });
-            return json({ error: "The AI returned an empty prompt. Try again." }, 502);
+            return json({ error: "The AI is busy right now. Try again in a moment." }, 502);
           }
           await supabaseAdmin.from("prompt_cache").upsert(
             { input_hash: hash, input_text: text, output_text: full, engine },
@@ -395,7 +400,7 @@ export const Route = createFileRoute("/api/public/transform")({
               if (!parsed.prompt) {
                 await refund();
                 await telemetry({ outcome: "empty", engine, ttfbMs: ttfb });
-                send({ type: "error", error: "The AI returned an empty prompt. Try again." });
+                send({ type: "error", error: "The AI is busy right now. Try again in a moment." });
               } else {
                 await supabaseAdmin.from("prompt_cache").upsert(
                   { input_hash: hash, input_text: text, output_text: full, engine },
