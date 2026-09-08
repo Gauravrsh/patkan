@@ -339,13 +339,15 @@ QUESTIONS — mandatory, never omit this section
 - Write them in plain language a non-technical professional understands.
 
 LENGTH — this is a hard contract
-- The rewritten prompt must be under ${PROMPT_TARGET_CHARS} characters, and never above ${PROMPT_HARD_CAP_CHARS}. A prompt nobody reads is a failed prompt.
+- The rewritten prompt must be under ${PROMPT_TARGET_CHARS} characters — count them. ${PROMPT_HARD_CAP_CHARS} is a hard ceiling you may never cross. A prompt nobody reads is a failed prompt.
+- Section bodies are 1-3 short sentences or 3-5 short bullets. No sub-numbered task lists, no restating the same instruction twice.
 - Get there by cutting sections and words, never by dropping a detail the user gave or the questions section.
 
 JUDGEMENT — this matters more than the format
 - Use only the sections the task actually needs. A factual question needs a sharpened sentence plus its questions section, not a spec. Padding a small ask is a failure.
 - Length must be proportional to the input's real complexity.
 - Preserve every concrete detail from the input: names, numbers, platforms, tools, deadlines. Never drop one, never invent one.
+- Never state a number, price, percentage, date or name the user did not give. If one is needed, ask for it in the questions section.
 - Where a decisive detail is missing, either ask it in the questions section or instruct the answerer to state an assumption. Do not fabricate the detail.
 - Prefer a measurable success criterion ("done when X") over vague quality words.
 - Give an explicit output contract: exact shape, order and length of the answer.
