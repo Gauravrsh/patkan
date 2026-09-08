@@ -341,6 +341,7 @@ QUESTIONS — mandatory, never omit this section
 LENGTH — this is a hard contract
 - The rewritten prompt must be under ${PROMPT_TARGET_CHARS} characters — count them. ${PROMPT_HARD_CAP_CHARS} is a hard ceiling you may never cross. A prompt nobody reads is a failed prompt.
 - Section bodies are 1-3 short sentences or 3-5 short bullets. No sub-numbered task lists, no restating the same instruction twice.
+- This length contract governs the prompt you write. Never mention it, or any character count, inside the prompt itself.
 - Get there by cutting sections and words, never by dropping a detail the user gave or the questions section.
 
 JUDGEMENT — this matters more than the format
@@ -380,10 +381,10 @@ export function buildMetaUserMessage(
   const intensity = opts.intensity ?? "standard";
   const intensityRule =
     intensity === "light"
-      ? `INTENSITY: light. Keep the whole prompt under ${PROMPT_QUICK_CAP_CHARS} characters. Sharpen the wording, keep the questions section (2 questions maximum) and an output contract. Do not add role, success criteria or a self-check.`
+      ? `INTENSITY: light. Keep the whole prompt under ${PROMPT_QUICK_CAP_CHARS} characters (never say so in the prompt). Sharpen the wording, keep the questions section (2 questions maximum) and an output contract. Do not add role, success criteria or a self-check.`
       : intensity === "surgical"
-        ? `INTENSITY: surgical. Keep the whole prompt under ${PROMPT_TARGET_CHARS} characters. Include the questions section, a measurable success criterion, edge cases, and a short verification clause.`
-        : `INTENSITY: standard. Keep the whole prompt under ${PROMPT_TARGET_CHARS} characters. Role, context, task, the questions section and an output contract. Skip the self-check.`;
+        ? `INTENSITY: surgical. Keep the whole prompt under ${PROMPT_TARGET_CHARS} characters (never say so in the prompt). Include the questions section, a measurable success criterion, edge cases, and a short verification clause.`
+        : `INTENSITY: standard. Keep the whole prompt under ${PROMPT_TARGET_CHARS} characters (never say so in the prompt). Role, context, task, the questions section and an output contract. Skip the self-check.`;
 
 
   const parts = [
