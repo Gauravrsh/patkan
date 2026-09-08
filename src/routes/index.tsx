@@ -14,6 +14,7 @@ import {
   MousePointer2,
   Share2,
   ShieldCheck,
+  ThumbsDown,
   Sparkles,
   UserRound,
   Volume2,
@@ -411,9 +412,23 @@ function Landing() {
     }
   }
 
+  /**
+   * Quality signal. A copy is the strongest "this was good" a visitor gives us;
+   * the thumbs-down is the only way a bad compile becomes visible at all.
+   */
+  function rate(accepted: boolean) {
+    void fetch("/api/public/feedback", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ deviceId: deviceId(), accepted }),
+      keepalive: true,
+    }).catch(() => {});
+  }
+
   async function copy() {
     if (!output) return;
     trackEvent("playground_copied");
+    rate(true);
     await navigator.clipboard.writeText(output);
     setCopied(true);
     setTimeout(() => setCopied(false), 1500);
@@ -771,6 +786,7 @@ function Landing() {
               busy={busy}
               copied={copied}
               copy={copy}
+              rate={rate}
               transform={transform}
               personaList={personaList}
               addCustomPersona={addCustomPersona}
@@ -987,6 +1003,7 @@ interface PlaygroundProps {
   busy: boolean;
   copied: boolean;
   copy: () => void;
+  rate: (accepted: boolean) => void;
   transform: (refinement?: string) => void;
   remaining: number;
   exhausted: boolean;
@@ -1013,6 +1030,7 @@ function Playground(props: PlaygroundProps) {
     busy,
     copied,
     copy,
+    rate,
     transform,
     remaining,
     exhausted,
@@ -1147,14 +1165,29 @@ function Playground(props: PlaygroundProps) {
         <div className="flex flex-col rounded-lg border bg-muted/40 p-5 shadow-sm sm:p-7 lg:rounded-none lg:border-0 lg:pl-16 lg:shadow-none">
           <div className="flex items-center justify-between gap-3 text-xs">
             <span className="font-semibold tracking-wider">{PHASE_LABEL[phase]}</span>
-            <button
-              onClick={copy}
-              disabled={!output || !settled}
-              className="inline-flex shrink-0 items-center gap-2 text-muted-foreground transition-colors hover:text-foreground disabled:opacity-40"
-            >
-              {copied ? <Check className="size-4" aria-hidden /> : <CopyIcon className="size-4" aria-hidden />}
-              {copied ? "Copied" : "Copy"}
-            </button>
+            <div className="flex shrink-0 items-center gap-4">
+              <button
+                onClick={() => {
+                  rate(false);
+                  setRated(true);
+                  toast.success("Noted — thanks.");
+                }}
+                disabled={!output || !settled || rated}
+                aria-label="This prompt was not useful"
+                className="inline-flex items-center gap-2 text-muted-foreground transition-colors hover:text-foreground disabled:opacity-40"
+              >
+                <ThumbsDown className="size-4" aria-hidden />
+                {rated ? "Thanks" : "Not useful"}
+              </button>
+              <button
+                onClick={copy}
+                disabled={!output || !settled}
+                className="inline-flex items-center gap-2 text-muted-foreground transition-colors hover:text-foreground disabled:opacity-40"
+              >
+                {copied ? <Check className="size-4" aria-hidden /> : <CopyIcon className="size-4" aria-hidden />}
+                {copied ? "Copied" : "Copy"}
+              </button>
+            </div>
           </div>
           <p className="mt-3 truncate font-mono text-[11px] tracking-wide text-muted-foreground">
             compiled for {target[0]} · {persona[0]}
