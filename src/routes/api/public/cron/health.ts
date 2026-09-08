@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 
 import { authenticateCronRequest } from "@/integrations/supabase/cron-auth";
+import { engineHealthSnapshot } from "@/lib/patkan-engines.server";
 
 const THRESHOLDS = { errorRate: 0.05, p95Ms: 12000, primaryShare: 0.7 };
 
@@ -71,6 +72,17 @@ export const Route = createFileRoute("/api/public/cron/health")({
           breaches.push(`primary engine served only ${(primaryShare * 100).toFixed(0)}%`);
         }
 
+        // Per-engine capacity: a model that starts refusing traffic is the
+        // failure that made transforms slow before. Make it loud on day one.
+        const engineHealth = engineHealthSnapshot();
+        for (const e of engineHealth) {
+          if (e.attempts >= 5 && e.rateLimited / e.attempts > 0.2) {
+            breaches.push(
+              `${e.engine} (${e.model}) refused ${e.rateLimited}/${e.attempts} calls`,
+            );
+          }
+        }
+
         if (charged > 0 && recorded < charged) {
           breaches.push(`instrumentation gap: ${charged} charged, ${recorded} recorded`);
         }
@@ -82,7 +94,7 @@ export const Route = createFileRoute("/api/public/cron/health")({
         }
 
         return new Response(
-          JSON.stringify({ total, errorRate, p95, primaryShare, charged, recorded, breaches }),
+          JSON.stringify({ total, errorRate, p95, primaryShare, charged, recorded, engineHealth, breaches }),
           { headers: { "content-type": "application/json", "cache-control": "no-store" } },
         );
       },
