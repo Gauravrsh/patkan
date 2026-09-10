@@ -53,7 +53,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import patkanMark from "@/assets/patkan-mark.png";
+import patkanMark from "@/assets/patkan-mark.svg";
 
 
 export const Route = createFileRoute("/")({
