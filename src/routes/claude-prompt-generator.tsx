@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowDownToLine, ArrowRight, Check, MousePointer2, ShieldCheck, Zap } from "lucide-react";
 import { toast } from "sonner";
 
-import patkanMark from "@/assets/patkan-mark.png";
+import patkanMark from "@/assets/patkan-mark.svg";
 
 export const Route = createFileRoute("/claude-prompt-generator")({
   head: () => ({
