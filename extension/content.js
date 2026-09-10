@@ -456,6 +456,21 @@
     showPill(words >= 5 && !busy);
   }
 
+  /* Trigger guards. `//` inside a URL (https://…), a path (a//b) or a pasted
+     comment must never fire: the trigger only counts when it stands alone at the
+     end of a real sentence, and only once typing has paused. */
+  const TRIGGER_AT_END = /(?:^|[\s\n])\/\/[ \t]*$/;
+  const IDLE_MS = 400;
+  let idleTimer = null;
+
+  function shouldTrigger(text) {
+    if (!TRIGGER_AT_END.test(text)) return false;
+    const before = text.replace(/\/\/[ \t]*$/, "");
+    if (/\\$/.test(before)) return false; // escaped: \// never fires
+    const words = before.trim().split(/\s+/).filter(Boolean).length;
+    return words >= 4;
+  }
+
   document.addEventListener(
     "input",
     (e) => {
@@ -463,13 +478,17 @@
       if (!el) return;
       target = el;
       maybeShowPill();
-      const text = readText(el);
-      if (/\/\/\s*$/.test(text)) {
-        run();
-      }
+      if (idleTimer) clearTimeout(idleTimer);
+      if (!shouldTrigger(readText(el))) return;
+      // A URL momentarily ends in `//` mid-typing; waiting out the pause skips it.
+      idleTimer = setTimeout(() => {
+        idleTimer = null;
+        if (target === el && shouldTrigger(readText(el))) run();
+      }, IDLE_MS);
     },
     true,
   );
+
 
   document.addEventListener(
     "keydown",
