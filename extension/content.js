@@ -336,13 +336,13 @@
       .catch(() => {});
   }
 
-  async function run() {
+  async function run(cleanText) {
     if (busy || !target) return;
     track("trigger_detected");
-    const raw = readText(target).replace(/\/\/\s*$/, "").trim();
+    const raw = typeof cleanText === "string" ? cleanText : readText(target).replace(/\/\/\s*$/, "").trim();
     if (raw.length < 3) return;
 
-    lastOriginal = readText(target);
+    lastOriginal = typeof cleanText === "string" ? cleanText : readText(target);
     sendAnyway = false;
     setPhase("drafting");
     showChip(false);
@@ -478,13 +478,34 @@
       if (!el) return;
       target = el;
       maybeShowPill();
-      if (idleTimer) clearTimeout(idleTimer);
-      if (!shouldTrigger(readText(el))) return;
-      // A URL momentarily ends in `//` mid-typing; waiting out the pause skips it.
-      idleTimer = setTimeout(() => {
-        idleTimer = null;
-        if (target === el && shouldTrigger(readText(el))) run();
-      }, IDLE_MS);
+
+      const text = readText(el);
+
+      if (shouldTrigger(text)) {
+        if (idleTimer) clearTimeout(idleTimer);
+        const clean = stripTrigger(text);
+        writeText(el, clean);
+        lastOriginal = clean;
+        pendingCleanText = clean;
+        idleTimer = setTimeout(() => {
+          idleTimer = null;
+          if (target === el && pendingCleanText) {
+            const current = readText(el).trimEnd();
+            if (current === pendingCleanText.trimEnd()) run(pendingCleanText);
+            pendingCleanText = null;
+          }
+        }, IDLE_MS);
+        return;
+      }
+
+      if (pendingCleanText) {
+        const current = text.trimEnd();
+        if (current !== pendingCleanText.trimEnd()) {
+          pendingCleanText = null;
+          if (idleTimer) clearTimeout(idleTimer);
+          idleTimer = null;
+        }
+      }
     },
     true,
   );
@@ -493,6 +514,18 @@
   document.addEventListener(
     "keydown",
     (e) => {
+      if (e.key === "Enter" && !e.shiftKey && pendingCleanText) {
+        const el = findComposer(e.target);
+        if (el === target) {
+          e.preventDefault();
+          e.stopPropagation();
+          if (idleTimer) clearTimeout(idleTimer);
+          idleTimer = null;
+          run(pendingCleanText);
+          pendingCleanText = null;
+          return;
+        }
+      }
       if (busy && e.key === "Enter" && !e.shiftKey && !sendAnyway) {
         const el = findComposer(e.target);
         if (el === target) {
