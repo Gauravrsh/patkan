@@ -181,7 +181,7 @@
         cursor: pointer;
         padding: 3px 8px;
         border-radius: 999px;
-        font: 500 11px/1 ui-sans-serif, system-ui, sans-serif;
+        font: 500 11px/1 ui-sans-serif, system-ui, -apple-system, sans-serif;
         color: #3a2c1e;
       }
       .chip button:hover { background: #f2e7d8; }
@@ -336,13 +336,13 @@
       .catch(() => {});
   }
 
-  async function run() {
+  async function run(cleanText) {
     if (busy || !target) return;
     track("trigger_detected");
-    const raw = readText(target).replace(/\/\/\s*$/, "").trim();
+    const raw = typeof cleanText === "string" ? cleanText : readText(target).replace(/\/\/\s*$/, "").trim();
     if (raw.length < 3) return;
 
-    lastOriginal = readText(target);
+    lastOriginal = typeof cleanText === "string" ? cleanText : readText(target);
     sendAnyway = false;
     setPhase("drafting");
     showChip(false);
@@ -456,19 +456,25 @@
     showPill(words >= 5 && !busy);
   }
 
-  /* Trigger guards. `//` inside a URL (https://…), a path (a//b) or a pasted
-     comment must never fire: the trigger only counts when it stands alone at the
-     end of a real sentence, and only once typing has paused. */
-  const TRIGGER_AT_END = /(?:^|[\s\n])\/\/[ \t]*$/;
-  const IDLE_MS = 400;
+  /* Trigger guards. `//` at the end of a real sentence fires Patkan; `//`
+     inside a URL (https://…), after a backslash escape (\//), or mid-word
+     (a//b) must not. The trailing slashes are stripped immediately so Enter
+     cannot submit untransformed text during the short idle window. */
+  const TRIGGER_AT_END = /(?<![:\\])\/[ \t]*$/;
+  const IDLE_MS = 150;
   let idleTimer = null;
+  let pendingCleanText = null;
 
   function shouldTrigger(text) {
     if (!TRIGGER_AT_END.test(text)) return false;
-    const before = text.replace(/\/\/[ \t]*$/, "");
+    const before = text.replace(/\/[ \t]*$/, "");
     if (/\\$/.test(before)) return false; // escaped: \// never fires
     const words = before.trim().split(/\s+/).filter(Boolean).length;
     return words >= 4;
+  }
+
+  function stripTrigger(text) {
+    return text.replace(/\/[ \t]*$/, "");
   }
 
   document.addEventListener(
@@ -478,13 +484,34 @@
       if (!el) return;
       target = el;
       maybeShowPill();
-      if (idleTimer) clearTimeout(idleTimer);
-      if (!shouldTrigger(readText(el))) return;
-      // A URL momentarily ends in `//` mid-typing; waiting out the pause skips it.
-      idleTimer = setTimeout(() => {
-        idleTimer = null;
-        if (target === el && shouldTrigger(readText(el))) run();
-      }, IDLE_MS);
+
+      const text = readText(el);
+
+      if (shouldTrigger(text)) {
+        if (idleTimer) clearTimeout(idleTimer);
+        const clean = stripTrigger(text);
+        writeText(el, clean);
+        lastOriginal = clean;
+        pendingCleanText = clean;
+        idleTimer = setTimeout(() => {
+          idleTimer = null;
+          if (target === el && pendingCleanText) {
+            const current = readText(el).trimEnd();
+            if (current === pendingCleanText.trimEnd()) run(pendingCleanText);
+            pendingCleanText = null;
+          }
+        }, IDLE_MS);
+        return;
+      }
+
+      if (pendingCleanText) {
+        const current = text.trimEnd();
+        if (current !== pendingCleanText.trimEnd()) {
+          pendingCleanText = null;
+          if (idleTimer) clearTimeout(idleTimer);
+          idleTimer = null;
+        }
+      }
     },
     true,
   );
@@ -493,6 +520,18 @@
   document.addEventListener(
     "keydown",
     (e) => {
+      if (e.key === "Enter" && !e.shiftKey && pendingCleanText) {
+        const el = findComposer(e.target);
+        if (el === target) {
+          e.preventDefault();
+          e.stopPropagation();
+          if (idleTimer) clearTimeout(idleTimer);
+          idleTimer = null;
+          run(pendingCleanText);
+          pendingCleanText = null;
+          return;
+        }
+      }
       if (busy && e.key === "Enter" && !e.shiftKey && !sendAnyway) {
         const el = findComposer(e.target);
         if (el === target) {
