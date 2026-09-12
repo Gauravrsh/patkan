@@ -98,4 +98,41 @@ Entry template:
   fix: Not backfillable. Recorded here so dashboard history is read as incomplete, not quiet.
   verification: usage_counters remains the only evidence those transforms happened.
   status: fixed
+
+- id: BUG-005
+  date: 2026-09-12
+  title: A single "/" fires Patkan and eats the character
+  severity: critical
+  surface: browser extension (all supported hosts)
+  repro: >
+    In any supported composer, type a sentence of 4+ words ending in a single "/"
+    (e.g. "please review the file src/utils/"). The slash disappears and a rewrite
+    starts. Typing "//" loses its first slash before the second is typed. Pressing
+    Enter while a pending trigger is set runs a rewrite instead of sending.
+  evidence: >
+    extension/content.js line 463: TRIGGER_AT_END = /(?<![:\\])\/[ \t]*$/ — one
+    escaped slash. Live test: "please review src/utils/" -> true,
+    "write a launch email/" -> true, "go to https://" -> true.
+    stripTrigger uses the same single-slash pattern and the input handler writes
+    the stripped text immediately.
+  root_cause: >
+    Regression introduced by my own "word//" trigger fix (9c93df9 -> 6f07bd9).
+    The original rule was /(?:^|[\s\n])\/\/[ \t]*$/ (two slashes, whitespace
+    before). The intent was only to drop the whitespace requirement, but while
+    replacing the leading (?:^|[\s\n]) with the lookbehind (?<![:\\]) one of the
+    two \/ escapes was lost, turning "two slashes at end" into "one slash at end".
+    The ":" lookbehind does not protect "https://" because the character before
+    the final slash is "/", not ":".
+  why_undetected: >
+    The verification suite asserted "//" positives and a few negatives; every "//"
+    case also matches a single-slash rule, so it stayed green. No case asserted
+    that a lone trailing "/" must not trigger. The new immediate-strip behaviour
+    turned a stray-trigger bug into character loss.
+  fix: >
+    Not applied yet — awaiting decision. Intended: restore the two-slash match and
+    strip (/\/\/[ \t]*$/), add negative tests for a lone trailing "/", "https://",
+    "and/or" and "src/utils/", revisit the Enter interception, rebuild both
+    extension packages.
+  status: open
 ```
+
