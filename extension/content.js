@@ -460,22 +460,23 @@
      inside a URL (https://…), after a backslash escape (\//), or mid-word
      (a//b) must not. The trailing slashes are stripped immediately so Enter
      cannot submit untransformed text during the short idle window. */
-  const TRIGGER_AT_END = /(?<![:\\])\/[ \t]*$/;
+  const TRIGGER_AT_END = /(?<![:\\/])\/\/[ \t]*$/;
   const IDLE_MS = 150;
   let idleTimer = null;
   let pendingCleanText = null;
 
   function shouldTrigger(text) {
     if (!TRIGGER_AT_END.test(text)) return false;
-    const before = text.replace(/\/[ \t]*$/, "");
+    const before = text.replace(/\/\/[ \t]*$/, "");
     if (/\\$/.test(before)) return false; // escaped: \// never fires
     const words = before.trim().split(/\s+/).filter(Boolean).length;
     return words >= 4;
   }
 
   function stripTrigger(text) {
-    return text.replace(/\/[ \t]*$/, "");
+    return text.replace(/\/\/[ \t]*$/, "");
   }
+
 
   document.addEventListener(
     "input",

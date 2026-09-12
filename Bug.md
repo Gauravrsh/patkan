@@ -129,10 +129,16 @@ Entry template:
     that a lone trailing "/" must not trigger. The new immediate-strip behaviour
     turned a stray-trigger bug into character loss.
   fix: >
-    Not applied yet — awaiting decision. Intended: restore the two-slash match and
-    strip (/\/\/[ \t]*$/), add negative tests for a lone trailing "/", "https://",
-    "and/or" and "src/utils/", revisit the Enter interception, rebuild both
-    extension packages.
-  status: open
+    TRIGGER_AT_END restored to two slashes with a widened lookbehind:
+    /(?<![:\\/])\/\/[ \t]*$/ — so "https://" (preceded by ":") and "…//" inside a
+    longer slash run never fire. stripTrigger matches /\/\/[ \t]*$/ so only the
+    real trigger is removed. Enter interception kept: it now only fires after a
+    genuine "//" trigger. Both extension packages rebuilt.
+  verification: >
+    node --check passes; 12-case suite green, including negatives for a lone
+    trailing "/", "src/utils/", "https://", "and/or", "a//b", "\//" and inputs
+    under four words. Positives: "write a launch email//" and spaced variants.
+  status: fixed
+
 ```
 
