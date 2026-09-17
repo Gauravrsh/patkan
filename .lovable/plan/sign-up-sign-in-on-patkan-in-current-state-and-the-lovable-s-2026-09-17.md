@@ -16,24 +16,24 @@ Only two accounts exist so far: yours (email + password, 3 Sep) and one new acco
 Two separate things can produce that impression, and both are real today:
 
 1. **The Google button goes through Lovable's sign-in broker.** The button hands off to a Lovable-hosted page (`oauth.lovable.app`) which then shows Google's consent screen. Because the underlying Google app is Lovable's, the consent screen and the intermediate page carry Lovable's name, not Patkan's. Nothing is broken — but to a first-time visitor it reads as "I'm being asked to sign up to some other product."
-
 2. **Email confirmation links can point at a Lovable-hosted address.** The sign-up code sends confirmation links to `patkan.lovable.app` rather than `patkan.in`, and if an address isn't on the backend's allowed-links list the backend silently falls back to its own default address. Some of those addresses sit behind Lovable's own access gate — which shows a Lovable login form. That is exactly the dead end reported earlier in this project, and the redirect target still isn't the real public domain.
 
 ## What I propose to fix
 
 **1. Make every auth link land on patkan.in.**
-Point confirmation and password-reset links, and the Google return address, at `https://patkan.in` whenever the visitor is on any hosted address other than local development. Also add `patkan.in`, `www.patkan.in` and the published address to the backend's allowed-links list so nothing silently falls back.
+Point confirmation and password-reset links, and the Google return address, at `https://patkan.in` whenever the visitor is on any hosted address other than local development. Also add `patkan.in`, `www.patkan.in` and the published address to the backend's allowed-links list so nothing silently falls back. Also clean up the dead code with no loose hanging or defunct ends.
 
 **2. Remove the Lovable branding from the Google path.**
 Two options, your call:
-- **(a) Keep the current broker** and simply set expectations on the page ("you'll briefly see our hosting provider's secure sign-in"). Zero risk, doesn't remove the Lovable name.
-- **(b) Register Patkan's own Google app** and use it directly, so the consent screen says "patkan.in wants access to your Google account". This is the real fix. It needs a Google Cloud project and a client ID/secret from you, plus a short verification for the app name and logo.
 
-**3. Make the first-run journey obvious.**
-Sign-up currently ends on a "check your inbox" message with no next step. After confirming, send people straight to the extension connect page rather than back to a generic page.
+- **(a) Keep the current broker** and simply set expectations on the page ("you'll briefly see our hosting provider's secure sign-in"). Zero risk, doesn't remove the Lovable name. - NO. Why should this be. [Patkan.in](http://Patkan.in) should have nothing to do with user seeing lovable. 
+- **(b) Register Patkan's own Google app** and use it directly, so the consent screen says "patkan.in wants access to your Google account". This is the real fix. It needs a Google Cloud project and a client ID/secret from you, plus a short verification for the app name and logo. ---No. I need a simple straight forward email id and password based authentication flow. 
 
-**4. Confirm the email path actually delivers.**
-Send a real test sign-up to a fresh address, confirm the email arrives, click the link, and confirm it lands on patkan.in signed in. Report exactly what happens rather than assuming.
+**3. Make the first-run journey obvious.**  
+Sign-up currently ends on a "check your inbox" message with no next step. After confirming, send people straight to the extension connect page rather than back to a generic page. ---- It should land them with playground hosted on main landing page.
+
+**4. Confirm the email path actually delivers.**  
+Send a real test sign-up to a fresh address, confirm the email arrives, click the link, and confirm it lands on patkan.in signed in. Report exactly what happens rather than assuming.----okay
 
 ## Technical notes
 
