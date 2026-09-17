@@ -25,23 +25,28 @@ export const Route = createFileRoute("/auth")({
   component: AuthPage,
 });
 
-const PUBLIC_ORIGIN = "https://patkan.lovable.app";
+/** The canonical public home of Patkan. Every emailed link must land here. */
+const PUBLIC_ORIGIN = "https://patkan.in";
+
+/** Where people go once they are signed in: the playground on the landing page. */
+const DEFAULT_NEXT = "/#playground";
 
 /**
- * Auth emails and OAuth callbacks must land on the public site. The editor
- * preview host sits behind its own access gate, so a link pointing there asks
- * the user for a completely unrelated login.
+ * Confirmation and reset links must open on patkan.in. Any Lovable-hosted
+ * address sits behind a separate access gate, which shows the visitor a
+ * sign-in form for a product that is not Patkan.
  */
 function authOrigin() {
   const origin = window.location.origin;
   if (/^https?:\/\/localhost(:\d+)?$/.test(origin) || origin.startsWith("http://127.0.0.1")) {
     return origin;
   }
-  return origin.includes(".lovable.app") && origin !== PUBLIC_ORIGIN ? PUBLIC_ORIGIN : origin;
+  return PUBLIC_ORIGIN;
 }
 
 function AuthPage() {
   const { session, loading } = useAuth();
+  const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [mode, setMode] = useState<"signin" | "signup">("signin");
@@ -50,45 +55,56 @@ function AuthPage() {
 
   function safeNext() {
     const value = new URLSearchParams(window.location.search).get("next");
-    if (!value) return "/";
+    if (!value) return DEFAULT_NEXT;
     try {
       const url = new URL(value, window.location.origin);
-      if (url.origin !== window.location.origin || !url.pathname.startsWith("/")) return "/";
+      if (url.origin !== window.location.origin || !url.pathname.startsWith("/")) return DEFAULT_NEXT;
       return `${url.pathname}${url.search}${url.hash}`;
     } catch {
-      return "/";
+      return DEFAULT_NEXT;
     }
-  }
-
-
-  async function withGoogle() {
-    setMessage(null);
-    const next = safeNext();
-    const result = await lovable.auth.signInWithOAuth("google", {
-      redirect_uri: `${window.location.origin}/auth?next=${encodeURIComponent(next)}`,
-    });
-    if (result.error) setMessage(result.error.message);
   }
 
   async function withEmail(e: React.FormEvent) {
     e.preventDefault();
     setBusy(true);
     setMessage(null);
+    const next = safeNext();
     const fn =
       mode === "signin"
         ? supabase.auth.signInWithPassword({ email, password })
         : supabase.auth.signUp({
             email,
             password,
-            options: { emailRedirectTo: `${authOrigin()}/auth?next=${encodeURIComponent(safeNext())}` },
+            options: { emailRedirectTo: `${authOrigin()}/auth?next=${encodeURIComponent(next)}` },
           });
-    const { error } = await fn;
+    const { error, data } = await fn;
     setBusy(false);
     if (error) {
       setMessage(error.message);
-    } else if (mode === "signup") {
+      return;
+    }
+    if (data.session) {
+      window.location.assign(next);
+      return;
+    }
+    if (mode === "signup") {
       setMessage("Check your inbox to confirm your address, then sign in.");
     }
+  }
+
+  async function forgotPassword() {
+    if (!email) {
+      setMessage("Enter your email address first, then tap this again.");
+      return;
+    }
+    setBusy(true);
+    setMessage(null);
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${authOrigin()}/auth?next=${encodeURIComponent(safeNext())}`,
+    });
+    setBusy(false);
+    setMessage(error ? error.message : "Password reset link sent. Check your inbox.");
   }
 
   if (!loading && session) {
