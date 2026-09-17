@@ -151,15 +151,7 @@ function AuthPage() {
           Your Library of saved frameworks syncs to the extension on every device.
         </p>
 
-        <Button onClick={withGoogle} variant="outline" className="mt-6 w-full">
-          Continue with Google
-        </Button>
-
-        <div className="my-6 flex items-center gap-3 text-xs text-muted-foreground">
-          <span className="h-px flex-1 bg-border" /> or <span className="h-px flex-1 bg-border" />
-        </div>
-
-        <form onSubmit={withEmail} className="space-y-4">
+        <form onSubmit={withEmail} className="mt-6 space-y-4">
           <div className="space-y-1.5">
             <Label htmlFor="email">Email</Label>
             <Input
