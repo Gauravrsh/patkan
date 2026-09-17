@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
-import { lovable } from "@/integrations/lovable";
 import { useAuth } from "@/hooks/useAuth";
 
 export const Route = createFileRoute("/auth")({
@@ -26,23 +25,28 @@ export const Route = createFileRoute("/auth")({
   component: AuthPage,
 });
 
-const PUBLIC_ORIGIN = "https://patkan.lovable.app";
+/** The canonical public home of Patkan. Every emailed link must land here. */
+const PUBLIC_ORIGIN = "https://patkan.in";
+
+/** Where people go once they are signed in: the playground on the landing page. */
+const DEFAULT_NEXT = "/#playground";
 
 /**
- * Auth emails and OAuth callbacks must land on the public site. The editor
- * preview host sits behind its own access gate, so a link pointing there asks
- * the user for a completely unrelated login.
+ * Confirmation and reset links must open on patkan.in. Any Lovable-hosted
+ * address sits behind a separate access gate, which shows the visitor a
+ * sign-in form for a product that is not Patkan.
  */
 function authOrigin() {
   const origin = window.location.origin;
   if (/^https?:\/\/localhost(:\d+)?$/.test(origin) || origin.startsWith("http://127.0.0.1")) {
     return origin;
   }
-  return origin.includes(".lovable.app") && origin !== PUBLIC_ORIGIN ? PUBLIC_ORIGIN : origin;
+  return PUBLIC_ORIGIN;
 }
 
 function AuthPage() {
   const { session, loading } = useAuth();
+  
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [mode, setMode] = useState<"signin" | "signup">("signin");
@@ -51,45 +55,56 @@ function AuthPage() {
 
   function safeNext() {
     const value = new URLSearchParams(window.location.search).get("next");
-    if (!value) return "/";
+    if (!value) return DEFAULT_NEXT;
     try {
       const url = new URL(value, window.location.origin);
-      if (url.origin !== window.location.origin || !url.pathname.startsWith("/")) return "/";
+      if (url.origin !== window.location.origin || !url.pathname.startsWith("/")) return DEFAULT_NEXT;
       return `${url.pathname}${url.search}${url.hash}`;
     } catch {
-      return "/";
+      return DEFAULT_NEXT;
     }
-  }
-
-
-  async function withGoogle() {
-    setMessage(null);
-    const next = safeNext();
-    const result = await lovable.auth.signInWithOAuth("google", {
-      redirect_uri: `${window.location.origin}/auth?next=${encodeURIComponent(next)}`,
-    });
-    if (result.error) setMessage(result.error.message);
   }
 
   async function withEmail(e: React.FormEvent) {
     e.preventDefault();
     setBusy(true);
     setMessage(null);
+    const next = safeNext();
     const fn =
       mode === "signin"
         ? supabase.auth.signInWithPassword({ email, password })
         : supabase.auth.signUp({
             email,
             password,
-            options: { emailRedirectTo: `${authOrigin()}/auth?next=${encodeURIComponent(safeNext())}` },
+            options: { emailRedirectTo: `${authOrigin()}/auth?next=${encodeURIComponent(next)}` },
           });
-    const { error } = await fn;
+    const { error, data } = await fn;
     setBusy(false);
     if (error) {
       setMessage(error.message);
-    } else if (mode === "signup") {
+      return;
+    }
+    if (data.session) {
+      window.location.assign(next);
+      return;
+    }
+    if (mode === "signup") {
       setMessage("Check your inbox to confirm your address, then sign in.");
     }
+  }
+
+  async function forgotPassword() {
+    if (!email) {
+      setMessage("Enter your email address first, then tap this again.");
+      return;
+    }
+    setBusy(true);
+    setMessage(null);
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${authOrigin()}/auth?next=${encodeURIComponent(safeNext())}`,
+    });
+    setBusy(false);
+    setMessage(error ? error.message : "Password reset link sent. Check your inbox.");
   }
 
   if (!loading && session) {
@@ -102,7 +117,7 @@ function AuthPage() {
           </p>
           <div className="mt-6 space-y-2">
             <Button asChild className="w-full">
-              <Link to="/">Continue to Patkan</Link>
+              <a href="/#playground">Continue to Patkan</a>
             </Button>
             <Button asChild variant="outline" className="w-full">
               <Link to="/library">Your Library</Link>
@@ -136,15 +151,7 @@ function AuthPage() {
           Your Library of saved frameworks syncs to the extension on every device.
         </p>
 
-        <Button onClick={withGoogle} variant="outline" className="mt-6 w-full">
-          Continue with Google
-        </Button>
-
-        <div className="my-6 flex items-center gap-3 text-xs text-muted-foreground">
-          <span className="h-px flex-1 bg-border" /> or <span className="h-px flex-1 bg-border" />
-        </div>
-
-        <form onSubmit={withEmail} className="space-y-4">
+        <form onSubmit={withEmail} className="mt-6 space-y-4">
           <div className="space-y-1.5">
             <Label htmlFor="email">Email</Label>
             <Input
@@ -175,13 +182,25 @@ function AuthPage() {
 
         {message ? <p className="mt-4 text-sm text-destructive">{message}</p> : null}
 
-        <button
-          type="button"
-          onClick={() => setMode(mode === "signin" ? "signup" : "signin")}
-          className="mt-6 text-sm text-muted-foreground underline underline-offset-4 hover:text-foreground"
-        >
-          {mode === "signin" ? "No account yet? Sign up" : "Already have an account? Sign in"}
-        </button>
+        <div className="mt-6 flex flex-col items-start gap-2">
+          <button
+            type="button"
+            onClick={() => setMode(mode === "signin" ? "signup" : "signin")}
+            className="text-sm text-muted-foreground underline underline-offset-4 hover:text-foreground"
+          >
+            {mode === "signin" ? "No account yet? Sign up" : "Already have an account? Sign in"}
+          </button>
+          {mode === "signin" ? (
+            <button
+              type="button"
+              onClick={forgotPassword}
+              disabled={busy}
+              className="text-sm text-muted-foreground underline underline-offset-4 hover:text-foreground"
+            >
+              Forgot your password?
+            </button>
+          ) : null}
+        </div>
       </div>
     </main>
   );
