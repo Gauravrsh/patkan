@@ -117,7 +117,7 @@ function AuthPage() {
           </p>
           <div className="mt-6 space-y-2">
             <Button asChild className="w-full">
-              <Link to="/">Continue to Patkan</Link>
+              <a href="/#playground">Continue to Patkan</a>
             </Button>
             <Button asChild variant="outline" className="w-full">
               <Link to="/library">Your Library</Link>
@@ -182,13 +182,25 @@ function AuthPage() {
 
         {message ? <p className="mt-4 text-sm text-destructive">{message}</p> : null}
 
-        <button
-          type="button"
-          onClick={() => setMode(mode === "signin" ? "signup" : "signin")}
-          className="mt-6 text-sm text-muted-foreground underline underline-offset-4 hover:text-foreground"
-        >
-          {mode === "signin" ? "No account yet? Sign up" : "Already have an account? Sign in"}
-        </button>
+        <div className="mt-6 flex flex-col items-start gap-2">
+          <button
+            type="button"
+            onClick={() => setMode(mode === "signin" ? "signup" : "signin")}
+            className="text-sm text-muted-foreground underline underline-offset-4 hover:text-foreground"
+          >
+            {mode === "signin" ? "No account yet? Sign up" : "Already have an account? Sign in"}
+          </button>
+          {mode === "signin" ? (
+            <button
+              type="button"
+              onClick={forgotPassword}
+              disabled={busy}
+              className="text-sm text-muted-foreground underline underline-offset-4 hover:text-foreground"
+            >
+              Forgot your password?
+            </button>
+          ) : null}
+        </div>
       </div>
     </main>
   );
