@@ -131,6 +131,40 @@ function AuthPage() {
     setMessage(error ? error.message : "Password reset link sent. Check your inbox.");
   }
 
+  if (!loading && session && recovering) {
+    return (
+      <main className="flex min-h-screen items-center justify-center bg-background px-6 py-16">
+        <div className="w-full max-w-sm">
+          <Link to="/" className="mb-8 flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
+            <span className="text-base">✦</span> Patkan
+          </Link>
+          <h1 className="text-2xl font-semibold tracking-tight">Choose a new password</h1>
+          <p className="mt-2 text-sm text-muted-foreground">
+            You opened a password-reset link. Set a new password to finish.
+          </p>
+          <form onSubmit={setNewPassword} className="mt-6 space-y-4">
+            <div className="space-y-1.5">
+              <Label htmlFor="new-password">New password</Label>
+              <Input
+                id="new-password"
+                type="password"
+                autoComplete="new-password"
+                required
+                minLength={6}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+            </div>
+            <Button type="submit" className="w-full" disabled={busy}>
+              {busy ? "Working…" : "Save new password"}
+            </Button>
+          </form>
+          {message ? <p className="mt-4 text-sm text-destructive">{message}</p> : null}
+        </div>
+      </main>
+    );
+  }
+
   if (!loading && session) {
     return (
       <main className="flex min-h-screen items-center justify-center bg-background px-6 py-16">
