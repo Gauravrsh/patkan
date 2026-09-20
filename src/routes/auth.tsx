@@ -46,12 +46,36 @@ function authOrigin() {
 
 function AuthPage() {
   const { session, loading } = useAuth();
-  
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [mode, setMode] = useState<"signin" | "signup">("signin");
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
+  const [recovering, setRecovering] = useState(false);
+
+  useEffect(() => {
+    // A password-reset link opens a recovery session. Show a "set new
+    // password" form instead of the signed-in panel, or the person can
+    // never actually choose a new password.
+    const { data: sub } = supabase.auth.onAuthStateChange((event) => {
+      if (event === "PASSWORD_RECOVERY") setRecovering(true);
+    });
+    return () => sub.subscription.unsubscribe();
+  }, []);
+
+  async function setNewPassword(e: React.FormEvent) {
+    e.preventDefault();
+    setBusy(true);
+    setMessage(null);
+    const { error } = await supabase.auth.updateUser({ password });
+    setBusy(false);
+    if (error) {
+      setMessage(error.message);
+      return;
+    }
+    window.location.assign(safeNext());
+  }
 
   function safeNext() {
     const value = new URLSearchParams(window.location.search).get("next");
