@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -46,12 +46,36 @@ function authOrigin() {
 
 function AuthPage() {
   const { session, loading } = useAuth();
-  
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [mode, setMode] = useState<"signin" | "signup">("signin");
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
+  const [recovering, setRecovering] = useState(false);
+
+  useEffect(() => {
+    // A password-reset link opens a recovery session. Show a "set new
+    // password" form instead of the signed-in panel, or the person can
+    // never actually choose a new password.
+    const { data: sub } = supabase.auth.onAuthStateChange((event) => {
+      if (event === "PASSWORD_RECOVERY") setRecovering(true);
+    });
+    return () => sub.subscription.unsubscribe();
+  }, []);
+
+  async function setNewPassword(e: React.FormEvent) {
+    e.preventDefault();
+    setBusy(true);
+    setMessage(null);
+    const { error } = await supabase.auth.updateUser({ password });
+    setBusy(false);
+    if (error) {
+      setMessage(error.message);
+      return;
+    }
+    window.location.assign(safeNext());
+  }
 
   function safeNext() {
     const value = new URLSearchParams(window.location.search).get("next");
@@ -105,6 +129,40 @@ function AuthPage() {
     });
     setBusy(false);
     setMessage(error ? error.message : "Password reset link sent. Check your inbox.");
+  }
+
+  if (!loading && session && recovering) {
+    return (
+      <main className="flex min-h-screen items-center justify-center bg-background px-6 py-16">
+        <div className="w-full max-w-sm">
+          <Link to="/" className="mb-8 flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
+            <span className="text-base">✦</span> Patkan
+          </Link>
+          <h1 className="text-2xl font-semibold tracking-tight">Choose a new password</h1>
+          <p className="mt-2 text-sm text-muted-foreground">
+            You opened a password-reset link. Set a new password to finish.
+          </p>
+          <form onSubmit={setNewPassword} className="mt-6 space-y-4">
+            <div className="space-y-1.5">
+              <Label htmlFor="new-password">New password</Label>
+              <Input
+                id="new-password"
+                type="password"
+                autoComplete="new-password"
+                required
+                minLength={6}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+            </div>
+            <Button type="submit" className="w-full" disabled={busy}>
+              {busy ? "Working…" : "Save new password"}
+            </Button>
+          </form>
+          {message ? <p className="mt-4 text-sm text-destructive">{message}</p> : null}
+        </div>
+      </main>
+    );
   }
 
   if (!loading && session) {
