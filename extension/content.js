@@ -575,7 +575,6 @@
 
 
   chrome.runtime.onMessage.addListener((msg) => {
-    if (msg?.type === "PATKAN_TRIGGER") run();
     if (msg?.type === "PATKAN_INSERT" && target) {
       lastOriginal = readText(target);
       const ok = writeText(target, msg.payload.text);
