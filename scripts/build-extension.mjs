@@ -24,7 +24,7 @@ const base = JSON.parse(readFileSync(resolve(src, "manifest.json"), "utf8"));
  *   PATKAN_API_BASE="https://your-host.example" bun scripts/build-extension.mjs
  * Without it the build targets Patkan's own server, which only serves patkan.in.
  */
-const apiBase = (process.env.PATKAN_API_BASE || "https://patkan.lovable.app").replace(/\/$/, "");
+const apiBase = (process.env.PATKAN_API_BASE || "https://patkan.in").replace(/\/$/, "");
 
 /** Rewrite the packed copy's DEFAULT_API_BASE and host permission. */
 function applyApiBase(dir, manifest) {
@@ -35,7 +35,7 @@ function applyApiBase(dir, manifest) {
   );
   writeFileSync(corePath, core);
   manifest.host_permissions = manifest.host_permissions.map((h) =>
-    h === "https://patkan.lovable.app/*" ? `${apiBase}/*` : h,
+    h === "https://patkan.in/*" ? `${apiBase}/*` : h,
   );
   return manifest;
 }
