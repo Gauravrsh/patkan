@@ -3,7 +3,7 @@
   "name": "Patkan — instant expert prompts",
   "version": "1.0.0",
   "description": "Type a rough sentence, end it with // and Patkan rewrites it into a structured role/context/task/constraints prompt.",
-  "permissions": ["storage", "sidePanel", "activeTab", "clipboardWrite"],
+  "permissions": ["storage", "sidePanel", "clipboardWrite"],
   "host_permissions": [
     "https://chatgpt.com/*",
     "https://chat.openai.com/*",
@@ -23,7 +23,8 @@
     "https://kimi.com/*",
     "https://www.kimi.com/*",
     "https://chat.qwen.ai/*",
-    "https://patkan.lovable.app/*"
+    "https://patkan.in/*",
+    "https://www.patkan.in/*"
   ],
 
   "background": { "service_worker": "background.js", "type": "module" },
@@ -58,7 +59,7 @@
       "run_at": "document_idle"
     },
     {
-      "matches": ["https://patkan.lovable.app/*"],
+      "matches": ["https://patkan.in/*", "https://www.patkan.in/*"],
       "js": ["web-connect.js"],
       "run_at": "document_idle"
     }

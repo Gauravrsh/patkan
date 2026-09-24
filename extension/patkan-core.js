@@ -202,5 +202,5 @@ export function localScaffold(raw, opts = {}) {
   return renderPrompt(sections, dialect);
 }
 
-export const DEFAULT_API_BASE = "https://patkan.lovable.app";
+export const DEFAULT_API_BASE = "https://patkan.in";
 export const DAILY_FREE_LIMIT = 10;
