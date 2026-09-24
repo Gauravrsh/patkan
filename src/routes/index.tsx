@@ -935,6 +935,33 @@ function Landing() {
             ))}
           </div>
         </section>
+
+        {/* Support */}
+        <section data-section="support" id="support" className={`${shell} scroll-mt-24 pb-20 sm:pb-24 md:pb-28`}>
+          <div className="rounded-lg border bg-card p-6 sm:p-8 md:p-10">
+            <div className="grid gap-8 lg:grid-cols-[.85fr_1.15fr] lg:items-center lg:gap-12">
+              <div>
+                <p className="font-mono text-xs uppercase tracking-[0.18em] text-primary">Support</p>
+                <h2 className="mt-3 text-3xl font-semibold leading-tight tracking-tight sm:text-4xl">
+                  Something broken? Write to a human.
+                </h2>
+                <span className="mt-6 block h-px w-16 bg-primary" aria-hidden />
+              </div>
+              <div>
+                <p className="text-base leading-relaxed text-muted-foreground sm:text-lg">
+                  Questions, bug reports, a site where Patkan should work but doesn&apos;t — send it across and
+                  you&apos;ll get a reply from the person who builds Patkan.
+                </p>
+                <a
+                  href="mailto:contact@patkan.in"
+                  className="mt-6 inline-flex h-11 items-center gap-2 rounded-md bg-primary px-5 text-sm font-medium text-primary-foreground shadow-sm transition-colors hover:bg-primary/90"
+                >
+                  Email contact@patkan.in
+                </a>
+              </div>
+            </div>
+          </div>
+        </section>
       </main>
     </div>
   );
