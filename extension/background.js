@@ -256,9 +256,5 @@ chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
   return false;
 });
 
-
-chrome.commands.onCommand.addListener(async (command) => {
-  if (command !== "patkan-transform") return;
-  const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-  if (tab?.id) chrome.tabs.sendMessage(tab.id, { type: "PATKAN_TRIGGER" }).catch(() => {});
-});
+// Patkan has exactly one trigger: `//` typed at the end of a thought.
+// No keyboard shortcut, no command surface.

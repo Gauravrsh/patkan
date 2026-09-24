@@ -31,12 +31,6 @@
   "side_panel": { "default_path": "sidepanel.html" },
   "options_page": "options.html",
   "icons": { "128": "icon128.png" },
-  "commands": {
-    "patkan-transform": {
-      "suggested_key": { "default": "Ctrl+Shift+K", "mac": "Command+Shift+K" },
-      "description": "Patkan the current text box"
-    }
-  },
   "content_scripts": [
     {
       "matches": [
