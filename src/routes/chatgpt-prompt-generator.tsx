@@ -4,89 +4,95 @@ import { toast } from "sonner";
 
 import patkanMark from "@/assets/patkan-mark.svg";
 
-export const Route = createFileRoute("/claude-prompt-generator")({
+export const Route = createFileRoute("/chatgpt-prompt-generator")({
   head: () => ({
     meta: [
-      { title: "Claude Prompt Generator — Patkan" },
+      { title: "ChatGPT Prompt Generator — Patkan" },
       {
         name: "description",
         content:
-          "Turn a rough thought into an expert Claude prompt without leaving claude.ai. Patkan wraps your words in Claude-specific XML tags the moment you type //.",
+          "Turn a rough thought into an expert ChatGPT prompt without leaving chatgpt.com. Patkan wraps your words in clean markdown sections the moment you type //.",
       },
-      { property: "og:title", content: "Claude Prompt Generator — Patkan" },
+      { property: "og:title", content: "ChatGPT Prompt Generator — Patkan" },
       {
         property: "og:description",
         content:
-          "Turn a rough thought into an expert Claude prompt without leaving claude.ai. Patkan wraps your words in Claude-specific XML tags the moment you type //.",
+          "Turn a rough thought into an expert ChatGPT prompt without leaving chatgpt.com. Patkan wraps your words in clean markdown sections the moment you type //.",
       },
       { property: "og:type", content: "website" },
-      { property: "og:url", content: "https://patkan.in/claude-prompt-generator" },
+      { property: "og:url", content: "https://patkan.in/chatgpt-prompt-generator" },
       { property: "og:image", content: "https://patkan.in/og-image.jpg" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:image", content: "https://patkan.in/og-image.jpg" },
     ],
-    links: [{ rel: "canonical", href: "https://patkan.in/claude-prompt-generator" }],
+    links: [{ rel: "canonical", href: "https://patkan.in/chatgpt-prompt-generator" }],
     scripts: [
       {
         type: "application/ld+json",
         children: JSON.stringify({
           "@context": "https://schema.org",
           "@type": "WebPage",
-          name: "Claude Prompt Generator — Patkan",
-          url: "https://patkan.in/claude-prompt-generator",
+          name: "ChatGPT Prompt Generator — Patkan",
+          url: "https://patkan.in/chatgpt-prompt-generator",
           description:
-            "Turn a rough thought into an expert Claude prompt without leaving claude.ai, using Patkan's Claude XML dialect.",
+            "Turn a rough thought into an expert ChatGPT prompt without leaving chatgpt.com, using Patkan's markdown dialect.",
           isPartOf: { "@type": "WebSite", name: "Patkan", url: "https://patkan.in/" },
         }),
       },
     ],
   }),
-  component: ClaudePromptGenerator,
+  component: ChatGptPromptGenerator,
 });
 
 const shell = "mx-auto w-full max-w-6xl px-5 sm:px-6 lg:px-8";
 
 const exampleBefore = "help me write a cold email to a founder about my analytics tool";
 
-const exampleAfter = `<role>You are a senior B2B copywriter who writes concise, founder-to-founder cold email.</role>
+const exampleAfter = `## Role
+Senior B2B copywriter who writes concise, founder-to-founder cold email.
 
-<context>The sender is reaching out about an analytics product. The recipient is a startup founder with limited time.</context>
+## Context
+The sender is reaching out about an analytics product. The recipient is a startup founder with limited time.
 
-<task>Write a cold outreach email introducing the analytics tool.</task>
+## Task
+Write a cold outreach email introducing the analytics tool.
 
-<constraints>
+## Output format
+Subject line, then body. No sign-off placeholders.
+
+## Constraints
 - Under 120 words
 - No buzzwords or hype
 - One clear call to action
-</constraints>
 
-<output_format>Subject line, then body. No sign-off placeholders.</output_format>`;
+## Before answering
+Check that no fact, number or name has been invented, and that the output matches the requested format exactly.`;
 
 const steps: [string, string][] = [
-  ["Type what you want", "Open claude.ai and describe your task in plain, messy words. No structure needed."],
+  ["Type what you want", "Open chatgpt.com and describe your task in plain, messy words. No structure needed."],
   ["End it with //", "Two slashes at the end of your sentence trigger Patkan. Nothing happens until then."],
   [
-    "Watch it become XML",
-    "Your thought is replaced in place by a structured Claude prompt — role, context, task, constraints, and output format wrapped in the XML tags Claude follows best.",
+    "Watch it become markdown",
+    "Your thought is replaced in place by a structured ChatGPT prompt — role, context, task, constraints, and output format under clean markdown headings that ChatGPT follows best.",
   ],
 ];
 
 const faqs = [
   {
-    q: "Why do XML tags matter for Claude?",
-    a: "Anthropic's own prompting guidance recommends separating a prompt into clearly labeled XML sections — role, context, task, constraints, output format. Claude parses these boundaries more reliably than a wall of prose, which means fewer misunderstandings and better first answers. Patkan applies that structure for you automatically.",
+    q: "Why does markdown work better for ChatGPT?",
+    a: "ChatGPT parses markdown natively — its answers come back as headings, bullets, and bold text. When a prompt is split into clearly labeled markdown sections (Role, Context, Task, Constraints, Output format), ChatGPT treats each block as an instruction with a boundary, which means fewer misunderstandings and better first answers. Patkan applies that structure for you automatically.",
   },
   {
-    q: "Do I have to leave claude.ai to use it?",
-    a: "No. Patkan is a browser extension that runs inside the Claude tab. You type, you finish with //, and your text is transformed right in the input box — no copy-pasting, no switching tabs.",
+    q: "Do I have to leave chatgpt.com to use it?",
+    a: "No. Patkan is a browser extension that runs inside the ChatGPT tab. You type, you finish with //, and your text is transformed right in the input box — no copy-pasting, no switching tabs.",
   },
   {
     q: "What does Patkan actually do to my text?",
-    a: "It compiles your rough thought into a structured prompt: it picks an expert persona, adds the context and constraints Claude needs, and wraps each section in XML tags. You can review and edit the result before sending it.",
+    a: "It compiles your rough thought into a structured prompt: it picks an expert persona, adds the context and constraints ChatGPT needs, and puts each section under a markdown heading. You can review and edit the result before sending it.",
   },
   {
     q: "Does it work with other AI tools too?",
-    a: "Yes. The same extension works inside ChatGPT, Gemini, Microsoft Copilot, Perplexity, and more — with the output format adapted to each model. This page just focuses on the Claude XML dialect.",
+    a: "Yes. The same extension works inside Claude, Gemini, Microsoft Copilot, Perplexity, and more — with the output format adapted to each model. Claude gets XML tags; ChatGPT gets markdown headings. There's a separate page for the Claude dialect.",
   },
 ] as const;
 
@@ -106,7 +112,7 @@ function downloadExtension() {
     .catch((err: Error) => toast.error(err.message));
 }
 
-function ClaudePromptGenerator() {
+function ChatGptPromptGenerator() {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <header className="sticky top-0 z-30 border-b bg-background/85 backdrop-blur-md">
@@ -135,15 +141,16 @@ function ClaudePromptGenerator() {
       <main>
         {/* Hero */}
         <section className={`${shell} py-16 sm:py-20 lg:py-28`}>
-          <p className="font-mono text-xs uppercase tracking-[0.18em] text-primary">For Anthropic Claude</p>
+          <p className="font-mono text-xs uppercase tracking-[0.18em] text-primary">For ChatGPT</p>
           <h1 className="mt-4 max-w-3xl text-4xl font-semibold leading-tight tracking-tight sm:text-5xl md:text-6xl">
-            A Claude prompt generator that lives inside Claude
+            A ChatGPT prompt generator that lives inside ChatGPT
           </h1>
           <p className="mt-6 max-w-2xl text-base leading-relaxed text-muted-foreground sm:text-lg">
-            Claude answers best when a prompt is split into labeled XML sections — role, context, task, constraints,
-            output format. Writing that by hand every time is tedious. Patkan does it for you: type your rough thought
-            on claude.ai, end it with <code className="rounded bg-muted px-1.5 py-0.5 font-mono text-sm text-foreground">//</code>,
-            and it becomes a structured Claude prompt in the blink of an eye.
+            ChatGPT answers best when a prompt is split into labeled markdown sections — role, context, task,
+            constraints, output format. Writing that by hand every time is tedious. Patkan does it for you: type your
+            rough thought on chatgpt.com, end it with{" "}
+            <code className="rounded bg-muted px-1.5 py-0.5 font-mono text-sm text-foreground">//</code>, and it
+            becomes a structured ChatGPT prompt in the blink of an eye.
           </p>
           <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
             <button
@@ -168,7 +175,7 @@ function ClaudePromptGenerator() {
             <div className="mx-auto max-w-xl text-center">
               <p className="font-mono text-xs uppercase tracking-[0.18em] text-primary">Before → After</p>
               <h2 className="mt-3 text-3xl font-semibold tracking-tight sm:text-4xl">
-                Same thought. Surgically crafted for Claude.
+                Same thought. Surgically crafted for ChatGPT.
               </h2>
             </div>
             <div className="mt-10 grid gap-6 lg:grid-cols-2 lg:gap-px lg:overflow-hidden lg:rounded-lg lg:border lg:bg-border">
@@ -179,8 +186,8 @@ function ClaudePromptGenerator() {
                 </p>
               </div>
               <div className="rounded-lg border bg-muted/40 p-5 sm:p-7 lg:rounded-none lg:border-0">
-                <p className="text-xs font-semibold tracking-wider">CLAUDE RECEIVES</p>
-                <pre className="mt-4 overflow-auto rounded-md border bg-background p-4 font-mono text-[11px] leading-relaxed whitespace-pre-wrap break-words text-foreground/90 sm:text-xs">
+                <p className="text-xs font-semibold tracking-wider">CHATGPT RECEIVES</p>
+                <pre className="mt-4 max-h-96 overflow-auto rounded-md border bg-background p-4 font-mono text-[11px] leading-relaxed whitespace-pre-wrap break-words text-foreground/90 sm:text-xs">
                   {exampleAfter}
                 </pre>
               </div>
@@ -216,8 +223,8 @@ function ClaudePromptGenerator() {
               },
               {
                 icon: Zap,
-                heading: "Dialects, not templates",
-                body: "Claude gets XML. ChatGPT gets markdown. Gemini gets sections. Each model receives the structure it respects.",
+                heading: "Markdown for ChatGPT, its native tongue",
+                body: "ChatGPT gets markdown headings. Claude gets XML. Each model receives the structure it respects.",
               },
               {
                 icon: ShieldCheck,
@@ -239,7 +246,7 @@ function ClaudePromptGenerator() {
         {/* FAQ */}
         <section className={`${shell} py-16 sm:py-20 md:py-24`}>
           <p className="font-mono text-xs uppercase tracking-[0.18em] text-primary">Questions</p>
-          <h2 className="mt-3 text-3xl font-semibold tracking-tight sm:text-4xl">Claude + Patkan, answered</h2>
+          <h2 className="mt-3 text-3xl font-semibold tracking-tight sm:text-4xl">ChatGPT + Patkan, answered</h2>
           <div className="mt-10 divide-y rounded-lg border">
             {faqs.map(({ q, a }) => (
               <details key={q} className="group p-5 sm:p-6">
@@ -257,7 +264,7 @@ function ClaudePromptGenerator() {
         <section className="border-t bg-card py-16 sm:py-20">
           <div className={`${shell} flex flex-col items-start gap-6 sm:flex-row sm:items-center sm:justify-between`}>
             <div>
-              <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl">Start prompting Claude patkan.</h2>
+              <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl">Start prompting ChatGPT patkan.</h2>
               <p className="mt-2 text-sm text-muted-foreground sm:text-base">
                 10 transforms a day in ghost mode. No sign-up to start.
               </p>
@@ -274,8 +281,8 @@ function ClaudePromptGenerator() {
 
       <footer className="border-t">
         <div className={`${shell} flex flex-wrap items-center justify-end gap-3 py-8 text-xs text-muted-foreground`}>
-          <Link to="/chatgpt-prompt-generator" className="transition-colors hover:text-foreground">
-            ChatGPT prompt generator
+          <Link to="/claude-prompt-generator" className="transition-colors hover:text-foreground">
+            Claude prompt generator
           </Link>
           <Link to="/" className="transition-colors hover:text-foreground">
             Back to patkan.in
