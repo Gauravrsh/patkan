@@ -173,6 +173,7 @@ const browserGuides: BrowserGuide[] = [
     file: "patkan-extension.zip",
     address: "chrome://extensions",
     live: true,
+    store: true,
     steps: chromiumSteps("chrome://extensions", "Toggle the switch in the top right corner to ON."),
   },
   {
