@@ -719,7 +719,8 @@ function Landing() {
                 onClick={getExtension}
                 className="inline-flex h-11 items-center justify-center gap-2 rounded-md bg-primary px-5 text-sm font-medium text-primary-foreground shadow-sm transition-colors hover:bg-primary/90 sm:h-10"
               >
-                <ArrowDownToLine className="size-4" aria-hidden /> Download the extension
+                <ArrowDownToLine className="size-4" aria-hidden />{" "}
+                {activeGuide.store ? `Add to ${activeGuide.name === "Google Chrome" ? "Chrome" : activeGuide.name}` : "Download the extension"}
               </button>
               <button
                 onClick={scrollToPlayground}
