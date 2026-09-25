@@ -147,11 +147,15 @@ const triggerStep: [string, string] = [
   "Type your prompt in ChatGPT, Claude, Gemini, Microsoft Copilot, Perplexity, and more in natural language. End it with // and Patkan takes over.",
 ];
 
+export const CHROME_WEB_STORE_URL =
+  "https://chromewebstore.google.com/detail/patkan-%E2%80%94-instant-expert-p/jcgkfecfliophjfnkokjnifcmalfbnnn";
+
 type BrowserGuide = {
   name: string;
   file: string;
   address: string;
   live: boolean;
+  store?: boolean;
   steps: [string, string][];
 };
 
@@ -169,6 +173,7 @@ const browserGuides: BrowserGuide[] = [
     file: "patkan-extension.zip",
     address: "chrome://extensions",
     live: true,
+    store: true,
     steps: chromiumSteps("chrome://extensions", "Toggle the switch in the top right corner to ON."),
   },
   {
@@ -176,6 +181,7 @@ const browserGuides: BrowserGuide[] = [
     file: "patkan-extension.zip",
     address: "edge://extensions",
     live: true,
+    store: true,
     steps: chromiumSteps("edge://extensions", "Turn on Developer mode in the left sidebar."),
   },
   {
@@ -183,6 +189,7 @@ const browserGuides: BrowserGuide[] = [
     file: "patkan-extension.zip",
     address: "opera://extensions",
     live: true,
+    store: true,
     steps: chromiumSteps("opera://extensions", "Toggle Developer mode in the top right corner to ON."),
   },
   {
@@ -457,6 +464,11 @@ function Landing() {
       document.getElementById("install")?.scrollIntoView({ behavior: "smooth", block: "start" });
       return;
     }
+    if (activeGuide.store) {
+      trackEvent("download_clicked", { meta: { file: "chrome-web-store" } });
+      window.open(CHROME_WEB_STORE_URL, "_blank", "noopener,noreferrer");
+      return;
+    }
     download(activeGuide.file);
   }
 
@@ -707,7 +719,8 @@ function Landing() {
                 onClick={getExtension}
                 className="inline-flex h-11 items-center justify-center gap-2 rounded-md bg-primary px-5 text-sm font-medium text-primary-foreground shadow-sm transition-colors hover:bg-primary/90 sm:h-10"
               >
-                <ArrowDownToLine className="size-4" aria-hidden /> Download the extension
+                <ArrowDownToLine className="size-4" aria-hidden />{" "}
+                {activeGuide.store ? `Add to ${activeGuide.name === "Google Chrome" ? "Chrome" : activeGuide.name}` : "Download the extension"}
               </button>
               <button
                 onClick={scrollToPlayground}
