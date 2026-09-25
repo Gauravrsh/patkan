@@ -1,6 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowDownToLine, ArrowRight, Check, MousePointer2, ShieldCheck, Zap } from "lucide-react";
-import { toast } from "sonner";
 
 import patkanMark from "@/assets/patkan-mark.svg";
 
