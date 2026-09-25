@@ -457,6 +457,11 @@ function Landing() {
       document.getElementById("install")?.scrollIntoView({ behavior: "smooth", block: "start" });
       return;
     }
+    if (activeGuide.store) {
+      trackEvent("download_clicked", { meta: { file: "chrome-web-store" } });
+      window.open(CHROME_WEB_STORE_URL, "_blank", "noopener,noreferrer");
+      return;
+    }
     download(activeGuide.file);
   }
 
