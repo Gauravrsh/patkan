@@ -677,7 +677,7 @@ function Landing() {
                     }}
                     className="mt-2 inline-flex h-10 items-center justify-center gap-2 rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground"
                   >
-                    Get Extension
+                    Add to Desktop
                     <ArrowDownToLine className="size-4" aria-hidden />
                   </button>
                 </nav>
