@@ -96,20 +96,11 @@ const faqs = [
   },
 ] as const;
 
+const CHROME_WEB_STORE_URL =
+  "https://chromewebstore.google.com/detail/patkan-%E2%80%94-instant-expert-p/jcgkfecfliophjfnkokjnifcmalfbnnn";
+
 function downloadExtension() {
-  fetch("/patkan-extension.zip")
-    .then((res) => {
-      if (!res.ok) throw new Error("Download failed. Try again.");
-      return res.blob();
-    })
-    .then((blob) => {
-      const a = document.createElement("a");
-      a.href = URL.createObjectURL(blob);
-      a.download = "patkan-extension.zip";
-      a.click();
-      URL.revokeObjectURL(a.href);
-    })
-    .catch((err: Error) => toast.error(err.message));
+  window.open(CHROME_WEB_STORE_URL, "_blank", "noopener,noreferrer");
 }
 
 function ChatGptPromptGenerator() {
