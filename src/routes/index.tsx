@@ -147,11 +147,15 @@ const triggerStep: [string, string] = [
   "Type your prompt in ChatGPT, Claude, Gemini, Microsoft Copilot, Perplexity, and more in natural language. End it with // and Patkan takes over.",
 ];
 
+export const CHROME_WEB_STORE_URL =
+  "https://chromewebstore.google.com/detail/patkan-%E2%80%94-instant-expert-p/jcgkfecfliophjfnkokjnifcmalfbnnn";
+
 type BrowserGuide = {
   name: string;
   file: string;
   address: string;
   live: boolean;
+  store?: boolean;
   steps: [string, string][];
 };
 
