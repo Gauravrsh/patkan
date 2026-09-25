@@ -181,6 +181,7 @@ const browserGuides: BrowserGuide[] = [
     file: "patkan-extension.zip",
     address: "edge://extensions",
     live: true,
+    store: true,
     steps: chromiumSteps("edge://extensions", "Turn on Developer mode in the left sidebar."),
   },
   {
