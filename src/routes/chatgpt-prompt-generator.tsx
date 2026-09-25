@@ -121,8 +121,8 @@ function ChatGptPromptGenerator() {
             onClick={downloadExtension}
             className="inline-flex h-9 shrink-0 items-center gap-2 rounded-md bg-primary px-3 text-sm font-medium text-primary-foreground shadow-sm transition-colors hover:bg-primary/90 sm:px-4"
           >
-            <span className="hidden sm:inline">Get Extension</span>
-            <span className="sm:hidden">Get</span>
+            <span className="hidden sm:inline">Add to Desktop</span>
+            <span className="sm:hidden">Add</span>
             <ArrowDownToLine className="size-4" aria-hidden />
           </button>
         </div>
