@@ -189,6 +189,7 @@ const browserGuides: BrowserGuide[] = [
     file: "patkan-extension.zip",
     address: "opera://extensions",
     live: true,
+    store: true,
     steps: chromiumSteps("opera://extensions", "Toggle Developer mode in the top right corner to ON."),
   },
   {
