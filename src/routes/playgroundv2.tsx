@@ -555,9 +555,6 @@ function Playground(props: PlaygroundProps) {
                 </button>
               </form>
             )}
-            <p className="mt-3 truncate text-xs leading-relaxed text-muted-foreground sm:text-sm lg:whitespace-normal">
-              {persona[2]}
-            </p>
           </div>
 
           {/* Mobile CTA */}
