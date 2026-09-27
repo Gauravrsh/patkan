@@ -687,33 +687,6 @@ function Landing() {
           </div>
         </section>
 
-        {/* Pillars */}
-        <section data-section="pillars" className={`${shell} py-16 sm:py-20 md:py-24`}>
-          <div aria-hidden className="h-[3px] w-full bg-primary" />
-          <div className="border-b border-border md:grid md:grid-cols-[1fr_1.2fr_1fr] md:divide-x md:divide-border">
-            {pillars.map(({ number, icon: Icon, heading, body }) => (
-              <article
-                key={heading}
-                className="group flex gap-5 border-b border-border py-8 last:border-b-0 md:block md:border-b-0 md:px-10 md:py-12 md:first:pl-0 md:last:pr-0"
-              >
-                <div className="flex w-9 shrink-0 flex-col items-center gap-4 md:w-auto md:flex-row md:items-center md:justify-between">
-                  <span className="font-mono text-xs tracking-widest text-muted-foreground md:text-3xl md:tracking-tight md:text-foreground/25 md:transition-colors md:duration-300 md:group-hover:text-primary">
-                    {number}
-                  </span>
-                  <span aria-hidden className="w-px flex-1 bg-border md:hidden" />
-                  <span className="grid size-8 shrink-0 place-items-center rounded-md border border-border bg-card md:size-10">
-                    <Icon className="size-4 text-primary md:size-5" aria-hidden />
-                  </span>
-                </div>
-                <div className="min-w-0">
-                  <h2 className="text-xl font-semibold tracking-tight sm:text-2xl md:mt-10">{heading}</h2>
-                  <p className="mt-3 text-sm leading-7 text-muted-foreground md:mt-4">{body}</p>
-                </div>
-              </article>
-            ))}
-          </div>
-        </section>
-
         {/* Install guide */}
         <section id="install" data-section="install" className="scroll-mt-16 border-y bg-card py-16 sm:py-20 md:py-28">
           <div className={shell}>
@@ -775,6 +748,35 @@ function Landing() {
           </div>
 
         </section>
+
+        {/* Pillars */}
+        <section data-section="pillars" className={`${shell} py-16 sm:py-20 md:py-24`}>
+          <div aria-hidden className="h-[3px] w-full bg-primary" />
+          <div className="border-b border-border md:grid md:grid-cols-[1fr_1.2fr_1fr] md:divide-x md:divide-border">
+            {pillars.map(({ number, icon: Icon, heading, body }) => (
+              <article
+                key={heading}
+                className="group flex gap-5 border-b border-border py-8 last:border-b-0 md:block md:border-b-0 md:px-10 md:py-12 md:first:pl-0 md:last:pr-0"
+              >
+                <div className="flex w-9 shrink-0 flex-col items-center gap-4 md:w-auto md:flex-row md:items-center md:justify-between">
+                  <span className="font-mono text-xs tracking-widest text-muted-foreground md:text-3xl md:tracking-tight md:text-foreground/25 md:transition-colors md:duration-300 md:group-hover:text-primary">
+                    {number}
+                  </span>
+                  <span aria-hidden className="w-px flex-1 bg-border md:hidden" />
+                  <span className="grid size-8 shrink-0 place-items-center rounded-md border border-border bg-card md:size-10">
+                    <Icon className="size-4 text-primary md:size-5" aria-hidden />
+                  </span>
+                </div>
+                <div className="min-w-0">
+                  <h2 className="text-xl font-semibold tracking-tight sm:text-2xl md:mt-10">{heading}</h2>
+                  <p className="mt-3 text-sm leading-7 text-muted-foreground md:mt-4">{body}</p>
+                </div>
+              </article>
+            ))}
+          </div>
+        </section>
+
+
 
         {/* Privacy */}
         <section data-section="privacy" className={`${shell} py-16 sm:py-20 md:py-28`}>
