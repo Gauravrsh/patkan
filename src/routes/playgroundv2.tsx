@@ -607,47 +607,36 @@ function Playground(props: PlaygroundProps) {
 
         {/* Output card */}
         <div className="flex flex-col rounded-lg border bg-muted/40 p-5 shadow-sm sm:p-7 lg:rounded-none lg:border-0 lg:pl-16 lg:shadow-none">
-          <div className="flex items-center justify-between gap-3 text-xs">
-            <span className="font-semibold tracking-wider">{PHASE_LABEL[phase]}</span>
-            <div className="flex shrink-0 items-center gap-4">
-              <button
-                onClick={() => {
-                  rate(false);
-                  setRated(true);
-                  toast.success("Noted — thanks.");
-                }}
-                disabled={!output || !settled || rated}
-                aria-label="This prompt was not useful"
-                className="inline-flex items-center gap-2 text-muted-foreground transition-colors hover:text-foreground disabled:opacity-40"
-              >
-                <ThumbsDown className="size-4" aria-hidden />
-                {rated ? "Thanks" : "Not useful"}
-              </button>
-              <button
-                onClick={copy}
-                disabled={!output || !settled}
-                className="inline-flex items-center gap-2 text-muted-foreground transition-colors hover:text-foreground disabled:opacity-40"
-              >
-                {copied ? <Check className="size-4" aria-hidden /> : <CopyIcon className="size-4" aria-hidden />}
-                {copied ? "Copied" : "Copy"}
-              </button>
+          <div className="flex items-start justify-between gap-3">
+            <div className="min-w-0">
+              <p className="text-xs font-semibold tracking-wider">
+                {settled ? "UPGRADED PROMPT" : PHASE_LABEL[phase].toUpperCase()}
+              </p>
+              <p className="mt-1 truncate text-xs text-muted-foreground">
+                Ready to paste into {target[0]}
+              </p>
             </div>
+            <button
+              onClick={copy}
+              disabled={!output || !settled}
+              className="inline-flex shrink-0 items-center gap-2 rounded-full bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground shadow-sm transition-colors hover:bg-primary/90 disabled:opacity-40"
+            >
+              {copied ? <Check className="size-4" aria-hidden /> : <CopyIcon className="size-4" aria-hidden />}
+              {copied ? "Copied" : "Copy Prompt"}
+            </button>
           </div>
-          <p className="mt-3 truncate font-mono text-[11px] tracking-wide text-muted-foreground">
-            compiled for {target[0]} · {persona[0]}
-          </p>
           <div className="relative mt-4 overflow-hidden rounded-md border bg-background">
             <pre
               ref={outRef}
               aria-busy={!settled}
-              className={`max-h-56 space-y-2.5 overflow-auto p-4 font-mono text-[11px] leading-relaxed whitespace-pre-wrap break-words sm:max-h-64 sm:p-5 sm:text-xs ${
+              className={`max-h-72 space-y-2.5 overflow-auto p-4 font-mono text-[11px] leading-relaxed whitespace-pre-wrap break-words sm:max-h-96 sm:p-5 sm:text-xs ${
                 settled ? "text-foreground/90 opacity-100" : "text-foreground/70 opacity-60"
               }`}
             >
               {output ? (
                 <PromptOutput text={output} dialect={target[1] as Dialect} />
               ) : (
-                <span className="text-muted-foreground/60">Your compiled prompt will appear here.</span>
+                <EmptySkeleton />
               )}
             </pre>
             {output && (
@@ -665,16 +654,6 @@ function Playground(props: PlaygroundProps) {
                 {assumptions.join(" · ")}
               </p>
             </div>
-          )}
-
-          {phase === "ready" && (
-            <p className="mt-3 text-xs text-muted-foreground">
-              {engine === "primary"
-                ? "Ready"
-                : engine === "local"
-                  ? "Ready — offline draft"
-                  : "Ready — backup engine"}
-            </p>
           )}
 
           {clarifiers.length > 0 && (
