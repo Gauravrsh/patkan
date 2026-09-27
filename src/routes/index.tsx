@@ -5,6 +5,7 @@ import {
   ArrowDownToLine,
   ArrowRight,
   Check,
+  ChevronDown,
   EyeOff,
   Globe2,
   Headphones,
@@ -24,6 +25,7 @@ import {
 import { toast } from "sonner";
 
 import { useSectionTracking } from "@/hooks/useSectionTracking";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { trackEvent } from "@/lib/telemetry";
 
 import {
@@ -721,66 +723,49 @@ function Landing() {
                   Browser Installation Guide
                 </h2>
               </div>
-              <p className="max-w-md text-sm leading-relaxed text-muted-foreground">
-                {"\n"}
-
-              </p>
-
-            </div>
-
-            <div className="relative mt-10">
-              <div className="flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden md:border-b md:gap-1 md:pb-0">
-                {browserGuides.map((guide) => (
+            <div className="mt-10 flex flex-wrap items-center gap-2">
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
                   <button
-                    key={guide.name}
                     type="button"
-                    onClick={() => setBrowserIndex(browserGuides.indexOf(guide))}
-                    aria-pressed={guide === activeGuide}
-                    className={`shrink-0 cursor-pointer rounded-full border px-4 py-2 text-sm transition-colors md:rounded-none md:border-0 md:border-b-2 md:px-4 md:py-3 ${
-                      guide === activeGuide
-                        ? "border-primary bg-primary text-primary-foreground md:bg-transparent md:font-medium md:text-foreground"
-                        : "text-muted-foreground hover:text-foreground md:border-transparent"
-                    }`}
+                    className="inline-flex shrink-0 cursor-pointer items-center gap-2 rounded-full border border-primary bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
                   >
-                    {guide.name}
-                    {!guide.live && <span className="ml-1.5 text-[10px] uppercase tracking-wide">soon</span>}
+                    Google Chrome
+                    <ChevronDown className="size-4" aria-hidden />
                   </button>
-                ))}
-              </div>
-              <div
-                className="pointer-events-none absolute inset-y-0 right-0 w-10 bg-gradient-to-l from-card to-transparent md:hidden"
-                aria-hidden
-              />
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="start">
+                  <DropdownMenuItem>Brave</DropdownMenuItem>
+                  <DropdownMenuItem>Arc</DropdownMenuItem>
+                  <DropdownMenuItem>Opera</DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+              {["Microsoft Edge", "Mozilla Firefox", "Apple Safari"].map((name) => (
+                <span
+                  key={name}
+                  className="inline-flex shrink-0 items-center rounded-full border px-4 py-2 text-sm text-muted-foreground"
+                >
+                  {name}
+                  <span className="ml-1.5 text-[10px] uppercase tracking-wide">soon</span>
+                </span>
+              ))}
             </div>
 
-            <div className="mt-10 grid gap-10 lg:grid-cols-[.78fr_1.22fr] lg:items-center lg:gap-14">
-              <ol className="relative space-y-7 border-l pl-0">
-                {activeGuide.steps.map(([title, detail], index) => (
-                  <li key={title} className="relative grid grid-cols-[2.25rem_1fr] items-start gap-4 pl-0">
-                    <span className="-ml-[1.125rem] flex size-9 items-center justify-center rounded-full border bg-card font-mono text-xs text-primary shadow-sm">
-                      {index + 1}
-                    </span>
-                    <div className="min-w-0">
-                      <h3 className="text-[0.95rem] font-semibold tracking-tight">{title}</h3>
-                      <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">{detail}</p>
-                      {index === 0 && activeGuide.live && (
-                        <button
-                          onClick={() => download(activeGuide.file)}
-                          className="mt-3 inline-flex h-9 items-center gap-2 rounded-md bg-primary px-4 text-xs font-medium text-primary-foreground shadow-sm transition-colors hover:bg-primary/90"
-                        >
-                          <ArrowDownToLine className="size-4" aria-hidden /> Download for {activeGuide.name}
-                        </button>
-                      )}
-                    </div>
-                  </li>
-                ))}
-              </ol>
-              <BrowserMockup address={activeGuide.address} firefox={activeGuide.name === "Mozilla Firefox"} />
+            <div className="mx-auto max-w-2xl pt-12 text-center sm:pt-16">
+              <p className="text-xl font-black tracking-tight sm:text-2xl">
+                {mobile ? "Send directly to your computer's browser." : "2-Click Download"}
+              </p>
+              <button
+                type="button"
+                onClick={getExtension}
+                className="mt-6 inline-flex items-center justify-center rounded-full bg-primary px-8 py-4 text-sm font-bold tracking-tight text-primary-foreground transition-opacity hover:opacity-90 sm:text-base"
+              >
+                Add to Chrome — Verified by Google
+              </button>
+              <p className="mt-4 text-xs text-muted-foreground sm:text-sm">
+                {mobile ? "Google syncs across your signed-in devices." : "Works in Chrome, Brave, Arc & Opera."}
+              </p>
             </div>
-            <p className="mt-8 text-xs leading-relaxed text-muted-foreground">
-              *Live on Google Chrome, Microsoft Edge, Opera and Mozilla Firefox today. Apple Safari requires an
-              Apple-signed build and is underway.
-            </p>
 
           </div>
 
