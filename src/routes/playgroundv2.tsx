@@ -436,7 +436,6 @@ function Playground(props: PlaygroundProps) {
     busy,
     copied,
     copy,
-    rate,
     transform,
     remaining,
     exhausted,
