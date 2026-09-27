@@ -466,14 +466,24 @@ function Playground(props: PlaygroundProps) {
               </p>
             </div>
           ) : (
-            <div className="mt-5 min-h-24 border-b border-dashed pb-6 sm:min-h-28">
+            <div className="relative mt-5 min-h-24 border-b border-dashed pb-6 sm:min-h-28">
+              {!input && (
+                <p
+                  aria-hidden="true"
+                  className="pointer-events-none absolute inset-x-0 top-0 font-sans text-base text-muted-foreground sm:text-lg"
+                >
+                  {ghost || "I want to.."}
+                  <span className="ml-0.5 inline-block w-px animate-pulse border-l border-muted-foreground align-middle text-transparent">
+                    .
+                  </span>
+                </p>
+              )}
               <textarea
                 ref={textareaRef}
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
-                placeholder="I want to.."
                 rows={1}
-                className="w-full resize-none overflow-hidden border-0 bg-transparent p-0 font-sans text-base text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-0 sm:text-lg"
+                className="relative w-full resize-none overflow-hidden border-0 bg-transparent p-0 font-sans text-base text-foreground focus:outline-none focus:ring-0 sm:text-lg"
                 disabled={busy}
               />
             </div>
@@ -481,20 +491,31 @@ function Playground(props: PlaygroundProps) {
 
           <div className="mt-6">
             <p className="font-mono text-[11px] tracking-widest text-muted-foreground">TARGET AI</p>
-            <div className={chipRow}>
-              {targetAis.map(([name], index) => (
-                <Chip key={name} name={name} active={targetIndex === index} onClick={() => setTargetIndex(index)} />
-              ))}
+            <div className="mt-2">
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button
+                    type="button"
+                    className="inline-flex items-center gap-2 rounded-full border px-4 py-1.5 text-sm font-medium transition-colors hover:bg-muted"
+                  >
+                    {target[0]}
+                    <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" />
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="start" className="max-h-72 overflow-y-auto">
+                  {targetAis.map(([name], index) => (
+                    <DropdownMenuItem key={name} onSelect={() => setTargetIndex(index)}>
+                      {name}
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
-            <p className="mt-3 truncate text-xs leading-relaxed text-muted-foreground sm:text-sm lg:whitespace-normal">
-              {target[2]}
-            </p>
           </div>
 
           <div className="mt-6 border-t pt-6">
             <div className="flex flex-wrap items-center justify-between gap-2">
-              <p className="font-mono text-[11px] tracking-widest text-muted-foreground">PERSONA</p>
-              <span className="text-xs text-muted-foreground">{persona[2]}</span>
+              <p className="font-mono text-[11px] tracking-widest text-muted-foreground">SELECT ROLE</p>
             </div>
             <div className={chipRow}>
               {personaList.map(([name], index) => (
