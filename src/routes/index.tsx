@@ -15,7 +15,6 @@ import {
   MousePointer2,
   Share2,
   ShieldCheck,
-  ThumbsDown,
   Sparkles,
   UserRound,
   Volume2,
@@ -104,24 +103,149 @@ const PHASE_LABEL: Record<Phase, string> = {
 
 const shell = "mx-auto w-full max-w-6xl px-5 sm:px-6 lg:px-8";
 
+// Ordered by real-world usage scale, biggest first.
 const targetAis = [
-  ["Gemini", "sectioned", "Google Gemini — sectioned format with clear prompt boundaries"],
   ["ChatGPT", "markdown", "OpenAI ChatGPT — structured markdown with headings"],
+  ["Gemini", "sectioned", "Google Gemini — sectioned format with clear prompt boundaries"],
   ["Claude", "xml", "Anthropic Claude — XML tags for prompt boundaries"],
-  ["Copilot", "markdown", "Microsoft Copilot — structured reasoning with markdown"],
+  ["Microsoft Copilot", "markdown", "Microsoft Copilot — structured reasoning with markdown"],
+  ["Perplexity", "markdown", "Perplexity — structured markdown with headings"],
+  ["DeepSeek", "markdown", "DeepSeek — structured markdown with headings"],
+  ["Grok", "markdown", "Grok — structured markdown with headings"],
+  ["Meta AI", "sectioned", "Meta AI — sectioned format with clear prompt boundaries"],
+  ["Mistral", "markdown", "Mistral — structured markdown with headings"],
+  ["Poe", "markdown", "Poe — structured markdown with headings"],
+  ["Notion AI", "markdown", "Notion AI — structured markdown with headings"],
+  ["Qwen", "markdown", "Qwen — structured markdown with headings"],
+  ["Kimi", "markdown", "Kimi — structured markdown with headings"],
 ] as const;
 
-const personas = [
-  ["Auto", "auto", "Role: an expert in the domain the task implies"],
-  ["Product Manager", "product-manager", "Role: a senior product manager who writes rigorous, decision-ready specs"],
-  ["UX Writer", "ux-writer", "Role: a senior UX writer who produces tight, on-brand product copy"],
-  ["B2B Marketer", "marketer", "Role: a B2B marketer who writes platform-native, high-conversion copy"],
-  ["Engineer", "engineer", "Role: a pragmatic staff engineer who gives implementation-grade answers"],
-  ["Analyst", "analyst", "Role: a data analyst who reasons quantitatively and shows the working"],
+/** Everyday tasks that warm the visitor up instead of a blank box. */
+const GHOST_TASKS = [
+  "Draft a 1-page PRD for our new user onboarding flow",
+  "Write 3 microcopy options for an empty checkout screen",
+  "Rewrite an error message to sound friendly and under 60 characters",
+  "Outline a 3-email nurture sequence for inbound demo leads",
+  "Turn bullet notes from a team call into a 600-word blog draft",
+  "Group 25 competitor keywords into 4 core search intent clusters",
+  "Turn this case study into a 5-slide LinkedIn carousel script",
+  "Write a cold outbound email to a VP of Operations about our demo",
+  "Draft an agenda for a renewal meeting with a quiet client",
+  "Write a polite reply declining a refund outside our 30-day policy",
+  "Write a punchy job post for a Senior Operations Lead",
+  "Draft an announcement explaining our updated remote work guidelines",
+  "Create a 5-question quiz on workplace cybersecurity",
+  "Draft a mutual non-disclosure agreement for a prospective vendor",
+  "Prepare a chronological summary of facts from these witness notes",
+  "Explain tax deductions under Section 80C in plain, simple terms",
+  "Write a 3-bullet commentary on our Q3 marketing budget variance",
+  "Summarize key headwinds and margin trends from this earnings report",
+  "Structure a 4-part hypothesis deck framework for market entry",
+  "Turn rough updates from 5 teams into a weekly executive summary",
+  "Write a standard operating procedure for vendor onboarding",
+  "Draft a polite response declining a speaking invite for the CEO",
+  "Create a 45-minute lesson plan on photosynthesis for 8th graders",
+  "Suggest 5 sharp, curiosity-driven headlines for an interview article",
+  "Draft a press release announcing our new regional partnership",
+  "Write a friendly WhatsApp reply confirming a custom order date",
+  "Write a listing description for a 3-bedroom apartment",
+  "Draft an email comparing term insurance vs endowment plans",
+  "Draft a discharge note explaining home medication instructions",
+  "Draft a 200-word problem statement for an education grant proposal",
 ] as const;
+
+/** Types a task out, holds it, erases it, moves on. Pauses the moment it is not needed. */
+function useGhostTyping(active: boolean) {
+  const [text, setText] = useState("");
+
+  useEffect(() => {
+    if (!active) {
+      setText("");
+      return;
+    }
+    let cancelled = false;
+    let timer: ReturnType<typeof setTimeout>;
+    let taskIndex = Math.floor(Math.random() * GHOST_TASKS.length);
+    let charIndex = 0;
+    let erasing = false;
+
+    const tick = () => {
+      if (cancelled) return;
+      const task = GHOST_TASKS[taskIndex]!;
+      if (!erasing) {
+        charIndex += 1;
+        setText(task.slice(0, charIndex));
+        if (charIndex >= task.length) {
+          erasing = true;
+          timer = setTimeout(tick, 2200);
+          return;
+        }
+        timer = setTimeout(tick, 38);
+      } else {
+        charIndex -= 6;
+        if (charIndex <= 0) {
+          charIndex = 0;
+          erasing = false;
+          taskIndex = (taskIndex + 1) % GHOST_TASKS.length;
+          setText("");
+          timer = setTimeout(tick, 400);
+          return;
+        }
+        setText(task.slice(0, charIndex));
+        timer = setTimeout(tick, 18);
+      }
+    };
+
+    timer = setTimeout(tick, 600);
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+    };
+  }, [active]);
+
+  return text;
+}
+
+/**
+ * The 30 non-tech professions Patkan is built for. Third value is an extra
+ * role instruction for professions without a dedicated engine persona
+ * ("" = the mapped persona's own treatment is enough).
+ */
+const PROFESSIONS: PersonaOption[] = [
+  ["Chartered Accountant", "auto", "Write as a chartered accountant."],
+  ["Content Writer", "auto", "Write as a professional content writer."],
+  ["Corporate Lawyer", "auto", "Write as a corporate lawyer."],
+  ["Customer Success Manager", "auto", "Write as a customer success manager."],
+  ["Customer Support Agent", "auto", "Write as a customer support agent."],
+  ["Doctor", "auto", "Write as a doctor."],
+  ["Equity Research Analyst", "analyst", ""],
+  ["Executive Assistant", "auto", "Write as an executive assistant."],
+  ["Financial Analyst", "analyst", ""],
+  ["HR Business Partner", "auto", "Write as an HR business partner."],
+  ["Insurance Advisor", "auto", "Write as an insurance advisor."],
+  ["Journalist", "auto", "Write as a journalist."],
+  ["Learning & Development Specialist", "auto", "Write as a learning and development specialist."],
+  ["Litigation Advocate", "auto", "Write as a practising litigation advocate."],
+  ["Management Consultant", "auto", "Write as a management consultant."],
+  ["Marketing", "marketer", ""],
+  ["Non-profit Grant Writer", "auto", "Write as a non-profit grant writer."],
+  ["Operations Manager", "auto", "Write as an operations manager."],
+  ["PR Manager", "auto", "Write as a public relations manager."],
+  ["Product Manager", "product-manager", ""],
+  ["Project Manager", "auto", "Write as a project manager."],
+  ["Real Estate Agent", "auto", "Write as a real estate agent."],
+  ["Recruiter", "auto", "Write as a talent recruiter."],
+  ["Sales Representative", "auto", "Write as an experienced B2B sales representative."],
+  ["SEO Specialist", "auto", "Write as an experienced SEO specialist."],
+  ["Small Business Owner", "auto", "Write as a small business owner."],
+  ["Social Media Manager", "auto", "Write as a social media manager."],
+  ["Teacher", "auto", "Write as an experienced teacher."],
+  ["UX / Product Designer", "auto", "Write as a senior UX/product designer."],
+  ["UX Writer", "ux-writer", ""],
+];
 
 type PersonaOption = readonly [string, string, string];
-
+const MARKETER_INDEX = PROFESSIONS.findIndex(([name]) => name === "Marketing");
 
 const pillars = [
   {
@@ -209,10 +333,9 @@ function Landing() {
 
   const [input, setInput] = useState("");
   const [targetIndex, setTargetIndex] = useState(0);
-  const [personaIndex, setPersonaIndex] = useState(0);
+  const [personaIndex, setPersonaIndex] = useState(MARKETER_INDEX);
   const [output, setOutput] = useState("");
   const [phase, setPhase] = useState<Phase>("idle");
-  const [engine, setEngine] = useState<EngineId>("local");
   const [assumptions, setAssumptions] = useState<string[]>([]);
   const [clarifiers, setClarifiers] = useState<{ label: string; refinement: string }[]>([]);
   const [busy, setBusy] = useState(false);
@@ -225,15 +348,15 @@ function Landing() {
   const outRef = useRef<HTMLPreElement>(null);
 
   const personaList: PersonaOption[] = [
-    ...personas,
-    ...customPersonas.map((name) => [name, "auto", `Role: ${name}`] as PersonaOption),
+    ...PROFESSIONS,
+    ...customPersonas.map((name) => [name, "auto", `Write as ${name}.`] as PersonaOption),
   ];
 
   const target = targetAis[targetIndex]!;
-  const persona = personaList[personaIndex] ?? personaList[0]!;
+  const persona = personaList[personaIndex] ?? personaList[MARKETER_INDEX]!;
   const dialect = target[1] as Dialect;
   const personaId = persona[1];
-  const customInstruction = personaIndex >= personas.length ? `Write as ${persona[0]}.` : null;
+  const customInstruction = persona[2] || null;
   const intensity: Intensity = "standard";
 
   function addCustomPersona(name: string) {
@@ -241,11 +364,11 @@ function Landing() {
     if (!clean) return;
     const existing = customPersonas.indexOf(clean);
     if (existing >= 0) {
-      setPersonaIndex(personas.length + existing);
+      setPersonaIndex(PROFESSIONS.length + existing);
       return;
     }
     setCustomPersonas([...customPersonas, clean]);
-    setPersonaIndex(personas.length + customPersonas.length);
+    setPersonaIndex(PROFESSIONS.length + customPersonas.length);
   }
 
 
@@ -305,7 +428,6 @@ function Landing() {
       );
       setOutput(result.prompt);
       trackEvent("playground_compiled", { meta: { engine: result.engine } });
-      setEngine(result.engine);
       setPhase("ready");
       setAssumptions(result.assumptions);
       setClarifiers(result.clarifiers);
@@ -314,7 +436,6 @@ function Landing() {
       }
     } catch (err) {
       setPhase("ready");
-      setEngine("local");
       toast.error(err instanceof Error ? err.message : "Transform failed.");
     } finally {
       setBusy(false);
@@ -668,13 +789,11 @@ function Landing() {
               setPersonaIndex={setPersonaIndex}
               output={output}
               phase={phase}
-              engine={engine}
               assumptions={assumptions}
               clarifiers={clarifiers}
               busy={busy}
               copied={copied}
               copy={copy}
-              rate={rate}
               transform={transform}
               personaList={personaList}
               addCustomPersona={addCustomPersona}
@@ -915,13 +1034,11 @@ interface PlaygroundProps {
   addCustomPersona: (name: string) => void;
   output: string;
   phase: Phase;
-  engine: EngineId;
   assumptions: string[];
   clarifiers: { label: string; refinement: string }[];
   busy: boolean;
   copied: boolean;
   copy: () => void;
-  rate: (accepted: boolean) => void;
   transform: (refinement?: string) => void;
   remaining: number;
   exhausted: boolean;
@@ -942,13 +1059,11 @@ function Playground(props: PlaygroundProps) {
     addCustomPersona,
     output,
     phase,
-    engine,
     assumptions,
     clarifiers,
     busy,
     copied,
     copy,
-    rate,
     transform,
     remaining,
     exhausted,
@@ -960,13 +1075,9 @@ function Playground(props: PlaygroundProps) {
   const [customOpen, setCustomOpen] = useState(false);
   const [customDraft, setCustomDraft] = useState("");
   const target = targetAis[targetIndex]!;
-  const persona = personaList[personaIndex] ?? personaList[0]!;
+  const persona = personaList[personaIndex] ?? personaList[MARKETER_INDEX]!;
   const settled = phase === "ready" || phase === "idle";
-  const [rated, setRated] = useState(false);
-  useEffect(() => {
-    setRated(false);
-  }, [output]);
-
+  const ghost = useGhostTyping(!input && !busy && !exhausted);
 
   return (
     <div>
@@ -1000,71 +1111,104 @@ function Playground(props: PlaygroundProps) {
               </p>
             </div>
           ) : (
-            <div className="mt-5 min-h-24 border-b border-dashed pb-6 sm:min-h-28">
+            <div className="relative mt-5 min-h-24 border-b border-dashed pb-6 sm:min-h-28">
+              {!input && (
+                <p
+                  aria-hidden="true"
+                  className="pointer-events-none absolute inset-x-0 top-0 font-sans text-base text-muted-foreground sm:text-lg"
+                >
+                  {ghost || "I want to.."}
+                  <span className="ml-0.5 inline-block w-px animate-pulse border-l border-muted-foreground align-middle text-transparent">
+                    .
+                  </span>
+                </p>
+              )}
               <textarea
                 ref={textareaRef}
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
-                placeholder="I want to.."
                 rows={1}
-                className="w-full resize-none overflow-hidden border-0 bg-transparent p-0 font-sans text-base text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-0 sm:text-lg"
+                className="relative w-full resize-none overflow-hidden border-0 bg-transparent p-0 font-sans text-base text-foreground focus:outline-none focus:ring-0 sm:text-lg"
                 disabled={busy}
               />
             </div>
           )}
 
-          <div className="mt-6">
-            <p className="font-mono text-[11px] tracking-widest text-muted-foreground">TARGET AI</p>
-            <div className={chipRow}>
-              {targetAis.map(([name], index) => (
-                <Chip key={name} name={name} active={targetIndex === index} onClick={() => setTargetIndex(index)} />
-              ))}
+          <div className="mt-6 flex flex-wrap items-start gap-x-12 gap-y-4">
+            <div>
+              <p className="font-mono text-[11px] tracking-widest text-muted-foreground">TARGET AI</p>
+              <div className="mt-2">
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <button
+                      type="button"
+                      className="inline-flex items-center gap-2 rounded-full border px-4 py-1.5 text-sm font-medium transition-colors hover:bg-muted"
+                    >
+                      {target[0]}
+                      <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" />
+                    </button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="start" className="max-h-72 overflow-y-auto">
+                    {targetAis.map(([name], index) => (
+                      <DropdownMenuItem key={name} onSelect={() => setTargetIndex(index)}>
+                        {name}
+                      </DropdownMenuItem>
+                    ))}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
             </div>
-            <p className="mt-3 truncate text-xs leading-relaxed text-muted-foreground sm:text-sm lg:whitespace-normal">
-              {target[2]}
-            </p>
+            <div>
+              <p className="font-mono text-[11px] tracking-widest text-muted-foreground">SELECT ROLE</p>
+              <div className="mt-2">
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <button
+                      type="button"
+                      className="inline-flex items-center gap-2 rounded-full border px-4 py-1.5 text-sm font-medium transition-colors hover:bg-muted"
+                    >
+                      {persona[0]}
+                      <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" />
+                    </button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="start" className="max-h-72 overflow-y-auto">
+                    {personaList.map(([name], index) => (
+                      <DropdownMenuItem key={name} onSelect={() => setPersonaIndex(index)}>
+                        {name}
+                      </DropdownMenuItem>
+                    ))}
+                    <DropdownMenuItem onSelect={() => setCustomOpen(true)}>Other</DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
+            </div>
           </div>
 
-          <div className="mt-6 border-t pt-6">
-            <div className="flex flex-wrap items-center justify-between gap-2">
-              <p className="font-mono text-[11px] tracking-widest text-muted-foreground">PERSONA</p>
-              <span className="text-xs text-muted-foreground">{persona[2]}</span>
-            </div>
-            <div className={chipRow}>
-              {personaList.map(([name], index) => (
-                <Chip key={name} name={name} active={personaIndex === index} onClick={() => setPersonaIndex(index)} />
-              ))}
-              <Chip name="Other" active={customOpen} onClick={() => setCustomOpen(!customOpen)} />
-            </div>
-            {customOpen && (
-              <form
-                className="mt-3 flex gap-2"
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  addCustomPersona(customDraft);
-                  setCustomDraft("");
-                  setCustomOpen(false);
-                }}
+          {customOpen && (
+            <form
+              className="mt-4 flex max-w-sm gap-2"
+              onSubmit={(e) => {
+                e.preventDefault();
+                addCustomPersona(customDraft);
+                setCustomDraft("");
+                setCustomOpen(false);
+              }}
+            >
+              <input
+                value={customDraft}
+                onChange={(e) => setCustomDraft(e.target.value)}
+                placeholder="Name your persona"
+                maxLength={40}
+                className="h-9 min-w-0 flex-1 rounded-md border bg-background px-3 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+              />
+              <button
+                type="submit"
+                className="h-9 shrink-0 rounded-md bg-primary px-3 text-xs font-medium text-primary-foreground transition-colors hover:bg-primary/90"
               >
-                <input
-                  value={customDraft}
-                  onChange={(e) => setCustomDraft(e.target.value)}
-                  placeholder="Name your persona"
-                  maxLength={40}
-                  className="h-9 min-w-0 flex-1 rounded-md border bg-background px-3 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
-                />
-                <button
-                  type="submit"
-                  className="h-9 shrink-0 rounded-md bg-primary px-3 text-xs font-medium text-primary-foreground transition-colors hover:bg-primary/90"
-                >
-                  Add
-                </button>
-              </form>
-            )}
-            <p className="mt-3 truncate text-xs leading-relaxed text-muted-foreground sm:text-sm lg:whitespace-normal">
-              {persona[2]}
-            </p>
-          </div>
+                Add
+              </button>
+            </form>
+          )}
 
           {/* Mobile CTA */}
           <button
@@ -1086,47 +1230,36 @@ function Playground(props: PlaygroundProps) {
 
         {/* Output card */}
         <div className="flex flex-col rounded-lg border bg-muted/40 p-5 shadow-sm sm:p-7 lg:rounded-none lg:border-0 lg:pl-16 lg:shadow-none">
-          <div className="flex items-center justify-between gap-3 text-xs">
-            <span className="font-semibold tracking-wider">{PHASE_LABEL[phase]}</span>
-            <div className="flex shrink-0 items-center gap-4">
-              <button
-                onClick={() => {
-                  rate(false);
-                  setRated(true);
-                  toast.success("Noted — thanks.");
-                }}
-                disabled={!output || !settled || rated}
-                aria-label="This prompt was not useful"
-                className="inline-flex items-center gap-2 text-muted-foreground transition-colors hover:text-foreground disabled:opacity-40"
-              >
-                <ThumbsDown className="size-4" aria-hidden />
-                {rated ? "Thanks" : "Not useful"}
-              </button>
-              <button
-                onClick={copy}
-                disabled={!output || !settled}
-                className="inline-flex items-center gap-2 text-muted-foreground transition-colors hover:text-foreground disabled:opacity-40"
-              >
-                {copied ? <Check className="size-4" aria-hidden /> : <CopyIcon className="size-4" aria-hidden />}
-                {copied ? "Copied" : "Copy"}
-              </button>
+          <div className="flex items-start justify-between gap-3">
+            <div className="min-w-0">
+              <p className="text-xs font-semibold tracking-wider">
+                {settled ? "UPGRADED PROMPT" : PHASE_LABEL[phase].toUpperCase()}
+              </p>
+              <p className="mt-1 truncate text-xs text-muted-foreground">
+                Ready to paste into {target[0]}
+              </p>
             </div>
+            <button
+              onClick={copy}
+              disabled={!output || !settled}
+              className="inline-flex shrink-0 items-center gap-2 rounded-full bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground shadow-sm transition-colors hover:bg-primary/90 disabled:opacity-40"
+            >
+              {copied ? <Check className="size-4" aria-hidden /> : <CopyIcon className="size-4" aria-hidden />}
+              {copied ? "Copied" : "Copy Prompt"}
+            </button>
           </div>
-          <p className="mt-3 truncate font-mono text-[11px] tracking-wide text-muted-foreground">
-            compiled for {target[0]} · {persona[0]}
-          </p>
           <div className="relative mt-4 overflow-hidden rounded-md border bg-background">
             <pre
               ref={outRef}
               aria-busy={!settled}
-              className={`max-h-56 space-y-2.5 overflow-auto p-4 font-mono text-[11px] leading-relaxed whitespace-pre-wrap break-words sm:max-h-64 sm:p-5 sm:text-xs ${
+              className={`max-h-72 space-y-2.5 overflow-auto p-4 font-mono text-[11px] leading-relaxed whitespace-pre-wrap break-words sm:max-h-96 sm:p-5 sm:text-xs ${
                 settled ? "text-foreground/90 opacity-100" : "text-foreground/70 opacity-60"
               }`}
             >
               {output ? (
                 <PromptOutput text={output} dialect={target[1] as Dialect} />
               ) : (
-                <span className="text-muted-foreground/60">Your compiled prompt will appear here.</span>
+                <EmptySkeleton />
               )}
             </pre>
             {output && (
@@ -1144,16 +1277,6 @@ function Playground(props: PlaygroundProps) {
                 {assumptions.join(" · ")}
               </p>
             </div>
-          )}
-
-          {phase === "ready" && (
-            <p className="mt-3 text-xs text-muted-foreground">
-              {engine === "primary"
-                ? "Ready"
-                : engine === "local"
-                  ? "Ready — offline draft"
-                  : "Ready — backup engine"}
-            </p>
           )}
 
           {clarifiers.length > 0 && (
@@ -1184,6 +1307,23 @@ function Playground(props: PlaygroundProps) {
         </button>
       </div>
     </div>
+  );
+}
+
+function EmptySkeleton() {
+  const rows: (number | string)[] = ["## Role", 70, 45, "## Context & Task", 85, 60, 40, "## Constraints", 55, 35];
+  return (
+    <span className="block select-none opacity-40" aria-hidden>
+      {rows.map((row, i) =>
+        typeof row === "string" ? (
+          <span key={i} className="mt-3 block first:mt-0 text-primary/70">
+            {row}
+          </span>
+        ) : (
+          <span key={i} className="mt-2 block h-2 rounded bg-muted-foreground/25" style={{ width: `${row}%` }} />
+        ),
+      )}
+    </span>
   );
 }
 
