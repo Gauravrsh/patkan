@@ -430,7 +430,6 @@ function Playground(props: PlaygroundProps) {
     addCustomPersona,
     output,
     phase,
-    engine,
     assumptions,
     clarifiers,
     busy,
