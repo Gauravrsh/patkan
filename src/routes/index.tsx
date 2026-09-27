@@ -5,6 +5,7 @@ import {
   ArrowDownToLine,
   ArrowRight,
   Check,
+  ChevronDown,
   EyeOff,
   Globe2,
   Headphones,
@@ -24,6 +25,7 @@ import {
 import { toast } from "sonner";
 
 import { useSectionTracking } from "@/hooks/useSectionTracking";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { trackEvent } from "@/lib/telemetry";
 
 import {
@@ -142,89 +144,8 @@ const pillars = [
   },
 ] as const;
 
-const triggerStep: [string, string] = [
-  "Trigger Patkan",
-  "Type your prompt in ChatGPT, Claude, Gemini, Microsoft Copilot, Perplexity, and more in natural language. End it with // and Patkan takes over.",
-];
-
 export const CHROME_WEB_STORE_URL =
   "https://chromewebstore.google.com/detail/patkan-%E2%80%94-instant-expert-p/jcgkfecfliophjfnkokjnifcmalfbnnn";
-
-type BrowserGuide = {
-  name: string;
-  file: string;
-  address: string;
-  live: boolean;
-  store?: boolean;
-  steps: [string, string][];
-};
-
-const chromiumSteps = (address: string, devToggle: string): [string, string][] => [
-  ["Download & Extract", "Download Patkan and extract the .zip file."],
-  ["Open Extensions", `Type ${address} in your address bar and hit enter.`],
-  ["Enable Developer Mode", devToggle],
-  ["Load Unpacked", 'Click "Load unpacked" and select your extracted folder.'],
-  triggerStep,
-];
-
-const browserGuides: BrowserGuide[] = [
-  {
-    name: "Google Chrome",
-    file: "patkan-extension.zip",
-    address: "chrome://extensions",
-    live: true,
-    store: true,
-    steps: chromiumSteps("chrome://extensions", "Toggle the switch in the top right corner to ON."),
-  },
-  {
-    name: "Microsoft Edge",
-    file: "patkan-extension.zip",
-    address: "edge://extensions",
-    live: true,
-    store: true,
-    steps: chromiumSteps("edge://extensions", "Turn on Developer mode in the left sidebar."),
-  },
-  {
-    name: "Opera",
-    file: "patkan-extension.zip",
-    address: "opera://extensions",
-    live: true,
-    store: true,
-    steps: chromiumSteps("opera://extensions", "Toggle Developer mode in the top right corner to ON."),
-  },
-  {
-    name: "Mozilla Firefox",
-    file: "patkan-extension-firefox.zip",
-    address: "about:debugging#/runtime/this-firefox",
-    live: true,
-    steps: [
-      ["Download the Firefox build", "Download Patkan for Firefox — it is a separate .zip, no need to extract."],
-      ["Open Debugging", "Type about:debugging#/runtime/this-firefox in your address bar and hit enter."],
-      ["Load Temporary Add-on", 'Click "Load Temporary Add-on" and pick the downloaded .zip file.'],
-      [
-        "Allow the AI sites",
-        "Open the Extensions menu, choose Patkan, and allow it to run on the AI sites when Firefox asks.",
-      ],
-      triggerStep,
-    ],
-  },
-  {
-    name: "Apple Safari",
-    file: "patkan-extension.zip",
-    address: "Safari > Settings > Extensions",
-    live: false,
-    steps: [
-      [
-        "Not yet available",
-        "Safari only accepts extensions signed through Apple's developer programme, so Patkan cannot be side-loaded the way it can elsewhere. The Safari build is in progress.",
-      ],
-      [
-        "Meanwhile",
-        "Use Patkan on Chrome, Edge, Opera or Firefox — the same account and the same daily allowance follow you across them.",
-      ],
-    ],
-  },
-];
 
 
 const approvedUrls = [
@@ -275,6 +196,7 @@ const privacy = [
 function Landing() {
   const { session } = useAuth();
   const isAdmin = useIsAdmin(!!session);
+  const mobile = useIsMobile();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
@@ -298,7 +220,6 @@ function Landing() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [usage, setUsage] = useState<{ used: number; limit: number } | null>(null);
   const [customPersonas, setCustomPersonas] = useState<string[]>([]);
-  const [browserIndex, setBrowserIndex] = useState(0);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const inputStarted = useRef(false);
   const outRef = useRef<HTMLPreElement>(null);
@@ -308,7 +229,6 @@ function Landing() {
     ...customPersonas.map((name) => [name, "auto", `Role: ${name}`] as PersonaOption),
   ];
 
-  const activeGuide = browserGuides[browserIndex] ?? browserGuides[0]!;
   const target = targetAis[targetIndex]!;
   const persona = personaList[personaIndex] ?? personaList[0]!;
   const dialect = target[1] as Dialect;
@@ -330,24 +250,6 @@ function Landing() {
 
 
   useSectionTracking("/");
-
-  // Open the install guide on the browser the visitor is actually using.
-  useEffect(() => {
-    const ua = navigator.userAgent;
-    const guess = /OPR\//.test(ua)
-      ? "Opera"
-      : /Edg\//.test(ua)
-        ? "Microsoft Edge"
-        : /Firefox\//.test(ua)
-          ? "Mozilla Firefox"
-          : /Chrome\//.test(ua)
-            ? "Google Chrome"
-            : /Safari\//.test(ua)
-              ? "Apple Safari"
-              : null;
-    const index = browserGuides.findIndex((g) => g.name === guess);
-    if (index > 0) setBrowserIndex(index);
-  }, []);
 
   useEffect(() => {
     if (textareaRef.current) {
@@ -441,35 +343,9 @@ function Landing() {
     setTimeout(() => setCopied(false), 1500);
   }
 
-  function download(file: string) {
-    trackEvent("download_clicked", { meta: { file } });
-    fetch(`/${file}`)
-      .then((res) => {
-        if (!res.ok) throw new Error("Download failed. Try again.");
-        return res.blob();
-      })
-      .then((blob) => {
-        const a = document.createElement("a");
-        a.href = URL.createObjectURL(blob);
-        a.download = file;
-        a.click();
-        URL.revokeObjectURL(a.href);
-      })
-      .catch((err: Error) => toast.error(err.message));
-  }
-
-  // Header/hero buttons follow whichever browser the visitor is on.
   function getExtension() {
-    if (!activeGuide.live) {
-      document.getElementById("install")?.scrollIntoView({ behavior: "smooth", block: "start" });
-      return;
-    }
-    if (activeGuide.store) {
-      trackEvent("download_clicked", { meta: { file: "chrome-web-store" } });
-      window.open(CHROME_WEB_STORE_URL, "_blank", "noopener,noreferrer");
-      return;
-    }
-    download(activeGuide.file);
+    trackEvent("download_clicked", { meta: { file: "chrome-web-store" } });
+    window.open(CHROME_WEB_STORE_URL, "_blank", "noopener,noreferrer");
   }
 
   async function sharePatkan() {
@@ -719,8 +595,7 @@ function Landing() {
                 onClick={getExtension}
                 className="inline-flex h-11 items-center justify-center gap-2 rounded-md bg-primary px-5 text-sm font-medium text-primary-foreground shadow-sm transition-colors hover:bg-primary/90 sm:h-10"
               >
-                <ArrowDownToLine className="size-4" aria-hidden />{" "}
-                {activeGuide.store ? `Add to ${activeGuide.name === "Google Chrome" ? "Chrome" : activeGuide.name}` : "Download the extension"}
+                <ArrowDownToLine className="size-4" aria-hidden /> Add to Chrome
               </button>
               <button
                 onClick={scrollToPlayground}
@@ -849,67 +724,51 @@ function Landing() {
                   Browser Installation Guide
                 </h2>
               </div>
-              <p className="max-w-md text-sm leading-relaxed text-muted-foreground">
-                {"\n"}
-
-              </p>
-
             </div>
 
-            <div className="relative mt-10">
-              <div className="flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden md:border-b md:gap-1 md:pb-0">
-                {browserGuides.map((guide) => (
+            <div className="mt-10 flex flex-wrap items-center gap-2">
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
                   <button
-                    key={guide.name}
                     type="button"
-                    onClick={() => setBrowserIndex(browserGuides.indexOf(guide))}
-                    aria-pressed={guide === activeGuide}
-                    className={`shrink-0 cursor-pointer rounded-full border px-4 py-2 text-sm transition-colors md:rounded-none md:border-0 md:border-b-2 md:px-4 md:py-3 ${
-                      guide === activeGuide
-                        ? "border-primary bg-primary text-primary-foreground md:bg-transparent md:font-medium md:text-foreground"
-                        : "text-muted-foreground hover:text-foreground md:border-transparent"
-                    }`}
+                    className="inline-flex shrink-0 cursor-pointer items-center gap-2 rounded-full border border-primary bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
                   >
-                    {guide.name}
-                    {!guide.live && <span className="ml-1.5 text-[10px] uppercase tracking-wide">soon</span>}
+                    Google Chrome
+                    <ChevronDown className="size-4" aria-hidden />
                   </button>
-                ))}
-              </div>
-              <div
-                className="pointer-events-none absolute inset-y-0 right-0 w-10 bg-gradient-to-l from-card to-transparent md:hidden"
-                aria-hidden
-              />
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="start">
+                  <DropdownMenuItem>Brave</DropdownMenuItem>
+                  <DropdownMenuItem>Arc</DropdownMenuItem>
+                  <DropdownMenuItem>Opera</DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+              {["Microsoft Edge", "Mozilla Firefox", "Apple Safari"].map((name) => (
+                <span
+                  key={name}
+                  className="inline-flex shrink-0 items-center rounded-full border px-4 py-2 text-sm text-muted-foreground"
+                >
+                  {name}
+                  <span className="ml-1.5 text-[10px] uppercase tracking-wide">soon</span>
+                </span>
+              ))}
             </div>
 
-            <div className="mt-10 grid gap-10 lg:grid-cols-[.78fr_1.22fr] lg:items-center lg:gap-14">
-              <ol className="relative space-y-7 border-l pl-0">
-                {activeGuide.steps.map(([title, detail], index) => (
-                  <li key={title} className="relative grid grid-cols-[2.25rem_1fr] items-start gap-4 pl-0">
-                    <span className="-ml-[1.125rem] flex size-9 items-center justify-center rounded-full border bg-card font-mono text-xs text-primary shadow-sm">
-                      {index + 1}
-                    </span>
-                    <div className="min-w-0">
-                      <h3 className="text-[0.95rem] font-semibold tracking-tight">{title}</h3>
-                      <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">{detail}</p>
-                      {index === 0 && activeGuide.live && (
-                        <button
-                          onClick={() => download(activeGuide.file)}
-                          className="mt-3 inline-flex h-9 items-center gap-2 rounded-md bg-primary px-4 text-xs font-medium text-primary-foreground shadow-sm transition-colors hover:bg-primary/90"
-                        >
-                          <ArrowDownToLine className="size-4" aria-hidden /> Download for {activeGuide.name}
-                        </button>
-                      )}
-                    </div>
-                  </li>
-                ))}
-              </ol>
-              <BrowserMockup address={activeGuide.address} firefox={activeGuide.name === "Mozilla Firefox"} />
+            <div className="mx-auto max-w-2xl pt-12 text-center sm:pt-16">
+              <p className="text-xl font-black tracking-tight sm:text-2xl">
+                {mobile ? "Send directly to your computer's browser." : "2-Click Download"}
+              </p>
+              <button
+                type="button"
+                onClick={getExtension}
+                className="mt-6 inline-flex items-center justify-center rounded-full bg-primary px-8 py-4 text-sm font-bold tracking-tight text-primary-foreground transition-opacity hover:opacity-90 sm:text-base"
+              >
+                Add to Chrome — Verified by Google
+              </button>
+              <p className="mt-4 text-xs text-muted-foreground sm:text-sm">
+                {mobile ? "Google syncs across your signed-in devices." : "Works in Chrome, Brave, Arc & Opera."}
+              </p>
             </div>
-            <p className="mt-8 text-xs leading-relaxed text-muted-foreground">
-              *Live on Google Chrome, Microsoft Edge, Opera and Mozilla Firefox today. Apple Safari requires an
-              Apple-signed build and is underway.
-            </p>
-
           </div>
 
         </section>
@@ -1359,106 +1218,6 @@ function CopyIcon({ className }: { className?: string }) {
   );
 }
 
-function Toggle({ on = true }: { on?: boolean }) {
-  return (
-    <span
-      className={`inline-flex h-5 w-9 shrink-0 items-center rounded-full p-0.5 ${on ? "bg-primary" : "bg-muted"}`}
-      aria-hidden
-    >
-      <span className={`size-4 rounded-full bg-background shadow-sm transition-transform ${on ? "translate-x-4" : ""}`} />
-    </span>
-  );
-}
-
-function BrowserMockup({ address, firefox = false }: { address: string; firefox?: boolean }) {
-  return (
-    <div className="mx-auto w-full max-w-md overflow-hidden rounded-xl border bg-background shadow-md lg:max-w-none">
-      <div className="flex items-center gap-2 border-b bg-muted px-3 py-2.5 sm:px-4 sm:py-3">
-        <span className="size-2.5 rounded-full bg-destructive/70" />
-        <span className="size-2.5 rounded-full bg-primary/50" />
-        <span className="size-2.5 rounded-full bg-chart-2/60" />
-        <div className="ml-2 flex-1 truncate rounded-full bg-background px-3 py-1.5 font-mono text-[10px] text-muted-foreground">
-          {address}
-        </div>
-      </div>
-      <div className="p-4 sm:p-6 md:p-7">
-        <div className="flex items-center justify-between gap-3">
-          <h3 className="text-base font-semibold tracking-tight sm:text-lg">
-            {firefox ? "This Firefox" : "Extensions"}
-          </h3>
-          <span className="flex shrink-0 items-center gap-2 text-[11px] text-muted-foreground sm:text-xs">
-            <span className="hidden sm:inline">{firefox ? "Temporary Extensions" : "Developer mode"}</span>
-            <Toggle />
-          </span>
-        </div>
-        <div className="mt-4 flex flex-wrap gap-2 text-[10px] sm:text-[11px]">
-          {(firefox
-            ? ["Load Temporary Add-on", "Inspect", "Reload"]
-            : ["Load unpacked", "Pack extension", "Update"]
-          ).map((item, index) => (
-            <span
-              key={item}
-              className={`rounded-md px-3 py-1.5 font-medium shadow-sm ${
-                index === 0 ? "bg-primary text-primary-foreground" : "border bg-background text-foreground"
-              }`}
-            >
-              {item}
-            </span>
-          ))}
-        </div>
-        <div className="mt-5 grid gap-3 sm:grid-cols-2">
-          <ExtensionCard
-            title="Patkan"
-            description="End any prompt with // in ChatGPT, Claude, Gemini, Microsoft Copilot, Perplexity, and more to trigger Patkan."
-            accent
-          />
-          <ExtensionCard
-            title="uBlock Origin"
-            initial="U"
-            description="An efficient blocker. Easy on CPU and memory."
-          />
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function ExtensionCard({
-  title,
-  initial = "U",
-  description,
-  accent = false,
-}: {
-  title: string;
-  initial?: string;
-  description: string;
-  accent?: boolean;
-}) {
-  return (
-    <div
-      className={`rounded-lg border bg-background p-4 ${
-        accent ? "border-primary shadow-[0_0_0_2px_color-mix(in_oklab,var(--primary)_18%,transparent)]" : ""
-      }`}
-    >
-      <div className="flex items-start justify-between gap-2">
-        {accent ? (
-          <img src={patkanMark} alt="Patkan" width={816} height={816} loading="lazy" className="size-9 rounded-md" />
-        ) : (
-          <span className="flex size-9 items-center justify-center rounded-md bg-muted text-sm font-semibold text-muted-foreground">
-            {initial}
-          </span>
-        )}
-        <Toggle />
-      </div>
-      <h4 className="mt-4 text-sm font-semibold tracking-tight">{title}</h4>
-      <p className="mt-2 min-h-12 text-[11px] leading-relaxed text-muted-foreground">{description}</p>
-      <div className="mt-4 flex gap-2 border-t pt-3 text-[10px] text-muted-foreground">
-        <span className="rounded border px-2 py-1">Details</span>
-        <span className="rounded border px-2 py-1">Remove</span>
-      </div>
-    </div>
-  );
-}
 
 function renderCode(text: string) {
   const parts = text.split(/(`[^`]+`)/g);
