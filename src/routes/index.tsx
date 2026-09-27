@@ -833,7 +833,7 @@ function Landing() {
                   href="mailto:contact@patkan.in"
                   className="mt-6 inline-flex h-11 items-center gap-2 rounded-md bg-primary px-5 text-sm font-medium text-primary-foreground shadow-sm transition-colors hover:bg-primary/90"
                 >
-                  Email:<br />contact@patkan.in
+                  Email: contact@patkan.in
                 </a>
               </div>
             </div>
