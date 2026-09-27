@@ -32,7 +32,7 @@ const sections: { heading: string; body: string[] }[] = [
   {
     heading: "Who we are",
     body: [
-      "Patkan is built and run by Gaurav Sharma, a sole owner based in India. He is the person responsible for your personal data under this policy.",
+      "Patkan is built and run by Gaurav Sharma, based in India. Patkan, operated by Gaurav Sharma, is the data controller (Data Fiduciary) for personal data under this policy. Also read our Terms of Use at patkan.in/terms.",
       "You can reach him at contact@patkan.in. Our postal address is available on request — write to the same email and it will be sent to you.",
       "This policy covers patkan.in and the official Patkan browser extension published by us. It does not cover copies or forks of the open-source code run by anyone else — those operators are responsible for their own data practices.",
     ],
@@ -223,6 +223,9 @@ function PrivacyPolicy() {
         <div className={`${shell} flex flex-wrap items-center justify-between gap-3 py-8 text-xs text-muted-foreground`}>
           <p>patkan.in</p>
           <nav className="flex flex-wrap items-center gap-4" aria-label="Site">
+            <Link to="/terms" className="transition-colors hover:text-foreground">
+              Terms of Use
+            </Link>
             <Link to="/chatgpt-prompt-generator" className="transition-colors hover:text-foreground">
               ChatGPT prompt generator
             </Link>
