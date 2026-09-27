@@ -982,6 +982,9 @@ function Landing() {
             <Link to="/privacy" className="transition-colors hover:text-foreground">
               Privacy Policy
             </Link>
+            <Link to="/terms" className="transition-colors hover:text-foreground">
+              Terms of Use
+            </Link>
           </nav>
         </div>
       </footer>

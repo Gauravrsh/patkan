@@ -277,6 +277,9 @@ function ChatGptPromptGenerator() {
           <Link to="/privacy" className="transition-colors hover:text-foreground">
             Privacy Policy
           </Link>
+            <Link to="/terms" className="transition-colors hover:text-foreground">
+              Terms of Use
+            </Link>
           <Link to="/" className="transition-colors hover:text-foreground">
             Back to patkan.in
           </Link>
