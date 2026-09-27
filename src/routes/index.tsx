@@ -731,8 +731,8 @@ function Landing() {
             </div>
 
             <div className="mx-auto max-w-2xl pt-12 text-center sm:pt-16">
-              <p className="text-xl font-black tracking-tight sm:text-2xl">
-                {mobile ? "Send directly to your computer's browser." : "2-Click Download"}
+              <p key={mobile ? "lead-m" : "lead-d"} className="text-xl font-black tracking-tight sm:text-2xl">
+                <span>{mobile ? "Send directly to your computer's browser." : "2-Click Download"}</span>
               </p>
               <button
                 type="button"
@@ -741,8 +741,8 @@ function Landing() {
               >
                 Add to Chrome — Verified by Google
               </button>
-              <p className="mt-4 text-xs text-muted-foreground sm:text-sm">
-                {mobile ? "Google syncs across your signed-in devices." : "Works in Chrome, Brave, Arc & Opera."}
+              <p key={mobile ? "foot-m" : "foot-d"} className="mt-4 text-xs text-muted-foreground sm:text-sm">
+                <span>{mobile ? "Google syncs across your signed-in devices." : "Works in Chrome, Brave, Arc & Opera."}</span>
               </p>
             </div>
           </div>
