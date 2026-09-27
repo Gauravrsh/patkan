@@ -267,6 +267,9 @@ function ClaudePromptGenerator() {
           <Link to="/chatgpt-prompt-generator" className="transition-colors hover:text-foreground">
             ChatGPT prompt generator
           </Link>
+          <Link to="/privacy" className="transition-colors hover:text-foreground">
+            Privacy Policy
+          </Link>
           <Link to="/" className="transition-colors hover:text-foreground">
             Back to patkan.in
           </Link>
