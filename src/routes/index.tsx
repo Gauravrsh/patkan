@@ -195,7 +195,7 @@ const privacy = [
 
 function Landing() {
   const { session } = useAuth();
-  const isAdmin = useIsAdmin(!!session);
+  const mobile = useIsMobile();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
