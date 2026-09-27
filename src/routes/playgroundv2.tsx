@@ -1,7 +1,14 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
-import { Check, Loader2, Sparkles, ThumbsDown } from "lucide-react";
+import { Check, ChevronDown, Loader2, Sparkles, ThumbsDown } from "lucide-react";
 import { toast } from "sonner";
+
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 import { trackEvent } from "@/lib/telemetry";
 import {
@@ -57,12 +64,108 @@ const PHASE_LABEL: Record<Phase, string> = {
 
 const shell = "mx-auto w-full max-w-6xl px-5 sm:px-6 lg:px-8";
 
+// Ordered by real-world usage scale, biggest first.
 const targetAis = [
-  ["Gemini", "sectioned", "Google Gemini — sectioned format with clear prompt boundaries"],
   ["ChatGPT", "markdown", "OpenAI ChatGPT — structured markdown with headings"],
+  ["Gemini", "sectioned", "Google Gemini — sectioned format with clear prompt boundaries"],
   ["Claude", "xml", "Anthropic Claude — XML tags for prompt boundaries"],
-  ["Copilot", "markdown", "Microsoft Copilot — structured reasoning with markdown"],
+  ["Microsoft Copilot", "markdown", "Microsoft Copilot — structured reasoning with markdown"],
+  ["Perplexity", "markdown", "Perplexity — structured markdown with headings"],
+  ["DeepSeek", "markdown", "DeepSeek — structured markdown with headings"],
+  ["Grok", "markdown", "Grok — structured markdown with headings"],
+  ["Meta AI", "sectioned", "Meta AI — sectioned format with clear prompt boundaries"],
+  ["Mistral", "markdown", "Mistral — structured markdown with headings"],
+  ["Poe", "markdown", "Poe — structured markdown with headings"],
+  ["Notion AI", "markdown", "Notion AI — structured markdown with headings"],
+  ["Qwen", "markdown", "Qwen — structured markdown with headings"],
+  ["Kimi", "markdown", "Kimi — structured markdown with headings"],
 ] as const;
+
+/** Everyday tasks that warm the visitor up instead of a blank box. */
+const GHOST_TASKS = [
+  "Draft a 1-page PRD for our new user onboarding flow",
+  "Write 3 microcopy options for an empty checkout screen",
+  "Rewrite an error message to sound friendly and under 60 characters",
+  "Outline a 3-email nurture sequence for inbound demo leads",
+  "Turn bullet notes from a team call into a 600-word blog draft",
+  "Group 25 competitor keywords into 4 core search intent clusters",
+  "Turn this case study into a 5-slide LinkedIn carousel script",
+  "Write a cold outbound email to a VP of Operations about our demo",
+  "Draft an agenda for a renewal meeting with a quiet client",
+  "Write a polite reply declining a refund outside our 30-day policy",
+  "Write a punchy job post for a Senior Operations Lead",
+  "Draft an announcement explaining our updated remote work guidelines",
+  "Create a 5-question quiz on workplace cybersecurity",
+  "Draft a mutual non-disclosure agreement for a prospective vendor",
+  "Prepare a chronological summary of facts from these witness notes",
+  "Explain tax deductions under Section 80C in plain, simple terms",
+  "Write a 3-bullet commentary on our Q3 marketing budget variance",
+  "Summarize key headwinds and margin trends from this earnings report",
+  "Structure a 4-part hypothesis deck framework for market entry",
+  "Turn rough updates from 5 teams into a weekly executive summary",
+  "Write a standard operating procedure for vendor onboarding",
+  "Draft a polite response declining a speaking invite for the CEO",
+  "Create a 45-minute lesson plan on photosynthesis for 8th graders",
+  "Suggest 5 sharp, curiosity-driven headlines for an interview article",
+  "Draft a press release announcing our new regional partnership",
+  "Write a friendly WhatsApp reply confirming a custom order date",
+  "Write a listing description for a 3-bedroom apartment",
+  "Draft an email comparing term insurance vs endowment plans",
+  "Draft a discharge note explaining home medication instructions",
+  "Draft a 200-word problem statement for an education grant proposal",
+] as const;
+
+/** Types a task out, holds it, erases it, moves on. Pauses the moment it is not needed. */
+function useGhostTyping(active: boolean) {
+  const [text, setText] = useState("");
+
+  useEffect(() => {
+    if (!active) {
+      setText("");
+      return;
+    }
+    let cancelled = false;
+    let timer: ReturnType<typeof setTimeout>;
+    let taskIndex = Math.floor(Math.random() * GHOST_TASKS.length);
+    let charIndex = 0;
+    let erasing = false;
+
+    const tick = () => {
+      if (cancelled) return;
+      const task = GHOST_TASKS[taskIndex]!;
+      if (!erasing) {
+        charIndex += 1;
+        setText(task.slice(0, charIndex));
+        if (charIndex >= task.length) {
+          erasing = true;
+          timer = setTimeout(tick, 2200);
+          return;
+        }
+        timer = setTimeout(tick, 38);
+      } else {
+        charIndex -= 6;
+        if (charIndex <= 0) {
+          charIndex = 0;
+          erasing = false;
+          taskIndex = (taskIndex + 1) % GHOST_TASKS.length;
+          setText("");
+          timer = setTimeout(tick, 400);
+          return;
+        }
+        setText(task.slice(0, charIndex));
+        timer = setTimeout(tick, 18);
+      }
+    };
+
+    timer = setTimeout(tick, 600);
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+    };
+  }, [active]);
+
+  return text;
+}
 
 const personas = [
   ["Auto", "auto", "Role: an expert in the domain the task implies"],
@@ -333,6 +436,7 @@ function Playground(props: PlaygroundProps) {
   const target = targetAis[targetIndex]!;
   const persona = personaList[personaIndex] ?? personaList[0]!;
   const settled = phase === "ready" || phase === "idle";
+  const ghost = useGhostTyping(!input && !busy && !exhausted);
   const [rated, setRated] = useState(false);
   useEffect(() => {
     setRated(false);
@@ -370,14 +474,24 @@ function Playground(props: PlaygroundProps) {
               </p>
             </div>
           ) : (
-            <div className="mt-5 min-h-24 border-b border-dashed pb-6 sm:min-h-28">
+            <div className="relative mt-5 min-h-24 border-b border-dashed pb-6 sm:min-h-28">
+              {!input && (
+                <p
+                  aria-hidden="true"
+                  className="pointer-events-none absolute inset-x-0 top-0 font-sans text-base text-muted-foreground sm:text-lg"
+                >
+                  {ghost || "I want to.."}
+                  <span className="ml-0.5 inline-block w-px animate-pulse border-l border-muted-foreground align-middle text-transparent">
+                    .
+                  </span>
+                </p>
+              )}
               <textarea
                 ref={textareaRef}
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
-                placeholder="I want to.."
                 rows={1}
-                className="w-full resize-none overflow-hidden border-0 bg-transparent p-0 font-sans text-base text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-0 sm:text-lg"
+                className="relative w-full resize-none overflow-hidden border-0 bg-transparent p-0 font-sans text-base text-foreground focus:outline-none focus:ring-0 sm:text-lg"
                 disabled={busy}
               />
             </div>
@@ -385,20 +499,31 @@ function Playground(props: PlaygroundProps) {
 
           <div className="mt-6">
             <p className="font-mono text-[11px] tracking-widest text-muted-foreground">TARGET AI</p>
-            <div className={chipRow}>
-              {targetAis.map(([name], index) => (
-                <Chip key={name} name={name} active={targetIndex === index} onClick={() => setTargetIndex(index)} />
-              ))}
+            <div className="mt-2">
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button
+                    type="button"
+                    className="inline-flex items-center gap-2 rounded-full border px-4 py-1.5 text-sm font-medium transition-colors hover:bg-muted"
+                  >
+                    {target[0]}
+                    <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" />
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="start" className="max-h-72 overflow-y-auto">
+                  {targetAis.map(([name], index) => (
+                    <DropdownMenuItem key={name} onSelect={() => setTargetIndex(index)}>
+                      {name}
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
-            <p className="mt-3 truncate text-xs leading-relaxed text-muted-foreground sm:text-sm lg:whitespace-normal">
-              {target[2]}
-            </p>
           </div>
 
           <div className="mt-6 border-t pt-6">
             <div className="flex flex-wrap items-center justify-between gap-2">
-              <p className="font-mono text-[11px] tracking-widest text-muted-foreground">PERSONA</p>
-              <span className="text-xs text-muted-foreground">{persona[2]}</span>
+              <p className="font-mono text-[11px] tracking-widest text-muted-foreground">SELECT ROLE</p>
             </div>
             <div className={chipRow}>
               {personaList.map(([name], index) => (
@@ -431,9 +556,6 @@ function Playground(props: PlaygroundProps) {
                 </button>
               </form>
             )}
-            <p className="mt-3 truncate text-xs leading-relaxed text-muted-foreground sm:text-sm lg:whitespace-normal">
-              {persona[2]}
-            </p>
           </div>
 
           {/* Mobile CTA */}
