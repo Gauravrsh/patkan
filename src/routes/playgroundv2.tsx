@@ -167,23 +167,53 @@ function useGhostTyping(active: boolean) {
   return text;
 }
 
-const personas = [
-  ["Auto", "auto", "Role: an expert in the domain the task implies"],
-  ["Product Manager", "product-manager", "Role: a senior product manager who writes rigorous, decision-ready specs"],
-  ["UX Writer", "ux-writer", "Role: a senior UX writer who produces tight, on-brand product copy"],
-  ["B2B Marketer", "marketer", "Role: a B2B marketer who writes platform-native, high-conversion copy"],
-  ["Engineer", "engineer", "Role: a pragmatic staff engineer who gives implementation-grade answers"],
-  ["Analyst", "analyst", "Role: a data analyst who reasons quantitatively and shows the working"],
-] as const;
+/**
+ * The 30 non-tech professions Patkan is built for. Third value is an extra
+ * role instruction for professions without a dedicated engine persona
+ * ("" = the mapped persona's own treatment is enough).
+ */
+const PROFESSIONS: PersonaOption[] = [
+  ["Product Manager", "product-manager", ""],
+  ["UX / Product Designer", "auto", "Write as a senior UX/product designer."],
+  ["UX Writer", "ux-writer", ""],
+  ["Marketer", "marketer", ""],
+  ["Content Writer", "auto", "Write as a professional content writer."],
+  ["SEO Specialist", "auto", "Write as an experienced SEO specialist."],
+  ["Social Media Manager", "auto", "Write as a social media manager."],
+  ["Sales Representative", "auto", "Write as an experienced B2B sales representative."],
+  ["Customer Success Manager", "auto", "Write as a customer success manager."],
+  ["Customer Support Agent", "auto", "Write as a customer support agent."],
+  ["Recruiter", "auto", "Write as a talent recruiter."],
+  ["HR Business Partner", "auto", "Write as an HR business partner."],
+  ["Learning & Development Specialist", "auto", "Write as a learning and development specialist."],
+  ["Corporate Lawyer", "auto", "Write as a corporate lawyer."],
+  ["Litigation Advocate", "auto", "Write as a practising litigation advocate."],
+  ["Chartered Accountant", "auto", "Write as a chartered accountant."],
+  ["Financial Analyst", "analyst", ""],
+  ["Equity Research Analyst", "analyst", ""],
+  ["Management Consultant", "auto", "Write as a management consultant."],
+  ["Project Manager", "auto", "Write as a project manager."],
+  ["Operations Manager", "auto", "Write as an operations manager."],
+  ["Executive Assistant", "auto", "Write as an executive assistant."],
+  ["Teacher", "auto", "Write as an experienced teacher."],
+  ["Journalist", "auto", "Write as a journalist."],
+  ["PR Manager", "auto", "Write as a public relations manager."],
+  ["Small Business Owner", "auto", "Write as a small business owner."],
+  ["Real Estate Agent", "auto", "Write as a real estate agent."],
+  ["Insurance Advisor", "auto", "Write as an insurance advisor."],
+  ["Doctor", "auto", "Write as a doctor."],
+  ["Non-profit Grant Writer", "auto", "Write as a non-profit grant writer."],
+];
 
 type PersonaOption = readonly [string, string, string];
+const MARKETER_INDEX = PROFESSIONS.findIndex(([name]) => name === "Marketer");
 
 function PlaygroundV2Page() {
   const { session } = useAuth();
 
   const [input, setInput] = useState("");
   const [targetIndex, setTargetIndex] = useState(0);
-  const [personaIndex, setPersonaIndex] = useState(0);
+  const [personaIndex, setPersonaIndex] = useState(MARKETER_INDEX);
   const [output, setOutput] = useState("");
   const [phase, setPhase] = useState<Phase>("idle");
   const [engine, setEngine] = useState<EngineId>("local");
@@ -198,15 +228,15 @@ function PlaygroundV2Page() {
   const outRef = useRef<HTMLPreElement>(null);
 
   const personaList: PersonaOption[] = [
-    ...personas,
-    ...customPersonas.map((name) => [name, "auto", `Role: ${name}`] as PersonaOption),
+    ...PROFESSIONS,
+    ...customPersonas.map((name) => [name, "auto", `Write as ${name}.`] as PersonaOption),
   ];
 
   const target = targetAis[targetIndex]!;
-  const persona = personaList[personaIndex] ?? personaList[0]!;
+  const persona = personaList[personaIndex] ?? personaList[MARKETER_INDEX]!;
   const dialect = target[1] as Dialect;
   const personaId = persona[1];
-  const customInstruction = personaIndex >= personas.length ? `Write as ${persona[0]}.` : null;
+  const customInstruction = persona[2] || null;
   const intensity: Intensity = "standard";
 
   function addCustomPersona(name: string) {
@@ -214,11 +244,11 @@ function PlaygroundV2Page() {
     if (!clean) return;
     const existing = customPersonas.indexOf(clean);
     if (existing >= 0) {
-      setPersonaIndex(personas.length + existing);
+      setPersonaIndex(PROFESSIONS.length + existing);
       return;
     }
     setCustomPersonas([...customPersonas, clean]);
-    setPersonaIndex(personas.length + customPersonas.length);
+    setPersonaIndex(PROFESSIONS.length + customPersonas.length);
   }
 
   useEffect(() => {
@@ -361,22 +391,6 @@ function PlaygroundV2Page() {
   );
 }
 
-const chipRow =
-  "mt-3 flex gap-2 max-lg:flex-nowrap max-lg:overflow-x-auto max-lg:pb-1 max-lg:[mask-image:linear-gradient(to_right,black_86%,transparent)] lg:flex-wrap";
-
-function Chip({ name, active, onClick }: { name: string; active: boolean; onClick?: () => void }) {
-  const base =
-    "shrink-0 rounded-full border px-3.5 py-1.5 text-xs transition-colors cursor-pointer select-none";
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={`${base} ${active ? "border-primary bg-primary text-primary-foreground" : "text-muted-foreground hover:bg-muted"}`}
-    >
-      {name}
-    </button>
-  );
-}
 
 interface PlaygroundProps {
   input: string;
@@ -434,7 +448,7 @@ function Playground(props: PlaygroundProps) {
   const [customOpen, setCustomOpen] = useState(false);
   const [customDraft, setCustomDraft] = useState("");
   const target = targetAis[targetIndex]!;
-  const persona = personaList[personaIndex] ?? personaList[0]!;
+  const persona = personaList[personaIndex] ?? personaList[MARKETER_INDEX]!;
   const settled = phase === "ready" || phase === "idle";
   const ghost = useGhostTyping(!input && !busy && !exhausted);
   const [rated, setRated] = useState(false);
