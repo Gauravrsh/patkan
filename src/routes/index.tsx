@@ -142,89 +142,8 @@ const pillars = [
   },
 ] as const;
 
-const triggerStep: [string, string] = [
-  "Trigger Patkan",
-  "Type your prompt in ChatGPT, Claude, Gemini, Microsoft Copilot, Perplexity, and more in natural language. End it with // and Patkan takes over.",
-];
-
 export const CHROME_WEB_STORE_URL =
   "https://chromewebstore.google.com/detail/patkan-%E2%80%94-instant-expert-p/jcgkfecfliophjfnkokjnifcmalfbnnn";
-
-type BrowserGuide = {
-  name: string;
-  file: string;
-  address: string;
-  live: boolean;
-  store?: boolean;
-  steps: [string, string][];
-};
-
-const chromiumSteps = (address: string, devToggle: string): [string, string][] => [
-  ["Download & Extract", "Download Patkan and extract the .zip file."],
-  ["Open Extensions", `Type ${address} in your address bar and hit enter.`],
-  ["Enable Developer Mode", devToggle],
-  ["Load Unpacked", 'Click "Load unpacked" and select your extracted folder.'],
-  triggerStep,
-];
-
-const browserGuides: BrowserGuide[] = [
-  {
-    name: "Google Chrome",
-    file: "patkan-extension.zip",
-    address: "chrome://extensions",
-    live: true,
-    store: true,
-    steps: chromiumSteps("chrome://extensions", "Toggle the switch in the top right corner to ON."),
-  },
-  {
-    name: "Microsoft Edge",
-    file: "patkan-extension.zip",
-    address: "edge://extensions",
-    live: true,
-    store: true,
-    steps: chromiumSteps("edge://extensions", "Turn on Developer mode in the left sidebar."),
-  },
-  {
-    name: "Opera",
-    file: "patkan-extension.zip",
-    address: "opera://extensions",
-    live: true,
-    store: true,
-    steps: chromiumSteps("opera://extensions", "Toggle Developer mode in the top right corner to ON."),
-  },
-  {
-    name: "Mozilla Firefox",
-    file: "patkan-extension-firefox.zip",
-    address: "about:debugging#/runtime/this-firefox",
-    live: true,
-    steps: [
-      ["Download the Firefox build", "Download Patkan for Firefox — it is a separate .zip, no need to extract."],
-      ["Open Debugging", "Type about:debugging#/runtime/this-firefox in your address bar and hit enter."],
-      ["Load Temporary Add-on", 'Click "Load Temporary Add-on" and pick the downloaded .zip file.'],
-      [
-        "Allow the AI sites",
-        "Open the Extensions menu, choose Patkan, and allow it to run on the AI sites when Firefox asks.",
-      ],
-      triggerStep,
-    ],
-  },
-  {
-    name: "Apple Safari",
-    file: "patkan-extension.zip",
-    address: "Safari > Settings > Extensions",
-    live: false,
-    steps: [
-      [
-        "Not yet available",
-        "Safari only accepts extensions signed through Apple's developer programme, so Patkan cannot be side-loaded the way it can elsewhere. The Safari build is in progress.",
-      ],
-      [
-        "Meanwhile",
-        "Use Patkan on Chrome, Edge, Opera or Firefox — the same account and the same daily allowance follow you across them.",
-      ],
-    ],
-  },
-];
 
 
 const approvedUrls = [
@@ -298,7 +217,6 @@ function Landing() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [usage, setUsage] = useState<{ used: number; limit: number } | null>(null);
   const [customPersonas, setCustomPersonas] = useState<string[]>([]);
-  const [browserIndex, setBrowserIndex] = useState(0);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const inputStarted = useRef(false);
   const outRef = useRef<HTMLPreElement>(null);
@@ -308,7 +226,6 @@ function Landing() {
     ...customPersonas.map((name) => [name, "auto", `Role: ${name}`] as PersonaOption),
   ];
 
-  const activeGuide = browserGuides[browserIndex] ?? browserGuides[0]!;
   const target = targetAis[targetIndex]!;
   const persona = personaList[personaIndex] ?? personaList[0]!;
   const dialect = target[1] as Dialect;
@@ -330,24 +247,6 @@ function Landing() {
 
 
   useSectionTracking("/");
-
-  // Open the install guide on the browser the visitor is actually using.
-  useEffect(() => {
-    const ua = navigator.userAgent;
-    const guess = /OPR\//.test(ua)
-      ? "Opera"
-      : /Edg\//.test(ua)
-        ? "Microsoft Edge"
-        : /Firefox\//.test(ua)
-          ? "Mozilla Firefox"
-          : /Chrome\//.test(ua)
-            ? "Google Chrome"
-            : /Safari\//.test(ua)
-              ? "Apple Safari"
-              : null;
-    const index = browserGuides.findIndex((g) => g.name === guess);
-    if (index > 0) setBrowserIndex(index);
-  }, []);
 
   useEffect(() => {
     if (textareaRef.current) {
@@ -441,35 +340,9 @@ function Landing() {
     setTimeout(() => setCopied(false), 1500);
   }
 
-  function download(file: string) {
-    trackEvent("download_clicked", { meta: { file } });
-    fetch(`/${file}`)
-      .then((res) => {
-        if (!res.ok) throw new Error("Download failed. Try again.");
-        return res.blob();
-      })
-      .then((blob) => {
-        const a = document.createElement("a");
-        a.href = URL.createObjectURL(blob);
-        a.download = file;
-        a.click();
-        URL.revokeObjectURL(a.href);
-      })
-      .catch((err: Error) => toast.error(err.message));
-  }
-
-  // Header/hero buttons follow whichever browser the visitor is on.
   function getExtension() {
-    if (!activeGuide.live) {
-      document.getElementById("install")?.scrollIntoView({ behavior: "smooth", block: "start" });
-      return;
-    }
-    if (activeGuide.store) {
-      trackEvent("download_clicked", { meta: { file: "chrome-web-store" } });
-      window.open(CHROME_WEB_STORE_URL, "_blank", "noopener,noreferrer");
-      return;
-    }
-    download(activeGuide.file);
+    trackEvent("download_clicked", { meta: { file: "chrome-web-store" } });
+    window.open(CHROME_WEB_STORE_URL, "_blank", "noopener,noreferrer");
   }
 
   async function sharePatkan() {
@@ -719,8 +592,7 @@ function Landing() {
                 onClick={getExtension}
                 className="inline-flex h-11 items-center justify-center gap-2 rounded-md bg-primary px-5 text-sm font-medium text-primary-foreground shadow-sm transition-colors hover:bg-primary/90 sm:h-10"
               >
-                <ArrowDownToLine className="size-4" aria-hidden />{" "}
-                {activeGuide.store ? `Add to ${activeGuide.name === "Google Chrome" ? "Chrome" : activeGuide.name}` : "Download the extension"}
+                <ArrowDownToLine className="size-4" aria-hidden /> Add to Chrome
               </button>
               <button
                 onClick={scrollToPlayground}
