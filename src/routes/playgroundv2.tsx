@@ -681,6 +681,23 @@ function Playground(props: PlaygroundProps) {
   );
 }
 
+function EmptySkeleton() {
+  const rows: (number | string)[] = ["## Role", 70, 45, "## Context & Task", 85, 60, 40, "## Constraints", 55, 35];
+  return (
+    <span className="block select-none opacity-40" aria-hidden>
+      {rows.map((row, i) =>
+        typeof row === "string" ? (
+          <span key={i} className="mt-3 block first:mt-0 text-primary/70">
+            {row}
+          </span>
+        ) : (
+          <span key={i} className="mt-2 block h-2 rounded bg-muted-foreground/25" style={{ width: `${row}%` }} />
+        ),
+      )}
+    </span>
+  );
+}
+
 function PromptOutput({ text, dialect }: { text: string; dialect: Dialect }) {
   return (
     <>
