@@ -434,6 +434,7 @@ function Playground(props: PlaygroundProps) {
   const [customOpen, setCustomOpen] = useState(false);
   const [customDraft, setCustomDraft] = useState("");
   const target = targetAis[targetIndex]!;
+  const persona = personaList[personaIndex] ?? personaList[0]!;
   const settled = phase === "ready" || phase === "idle";
   const ghost = useGhostTyping(!input && !busy && !exhausted);
   const [rated, setRated] = useState(false);
