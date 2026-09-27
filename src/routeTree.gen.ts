@@ -18,6 +18,7 @@ import { Route as ConnectRouteImport } from './routes/connect'
 import { Route as Playgroundv2RouteImport } from './routes/playgroundv2'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as TermsRouteImport } from './routes/terms'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedLibraryRouteImport } from './routes/_authenticated/library'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
@@ -74,6 +75,11 @@ const PrivacyRoute = PrivacyRouteImport.update({
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
   path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TermsRoute = TermsRouteImport.update({
+  id: '/terms',
+  path: '/terms',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
@@ -153,6 +159,7 @@ export interface FileRoutesByFullPath {
   '/playgroundv2': typeof Playgroundv2Route
   '/privacy': typeof PrivacyRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/terms': typeof TermsRoute
   '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/library': typeof AuthenticatedLibraryRoute
   '/admin/carousel': typeof AuthenticatedAdminCarouselRoute
@@ -176,6 +183,7 @@ export interface FileRoutesByTo {
   '/playgroundv2': typeof Playgroundv2Route
   '/privacy': typeof PrivacyRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/terms': typeof TermsRoute
   '/library': typeof AuthenticatedLibraryRoute
   '/admin/carousel': typeof AuthenticatedAdminCarouselRoute
   '/admin/docs': typeof AuthenticatedAdminDocsRoute
@@ -200,6 +208,7 @@ export interface FileRoutesById {
   '/playgroundv2': typeof Playgroundv2Route
   '/privacy': typeof PrivacyRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/terms': typeof TermsRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
   '/_authenticated/library': typeof AuthenticatedLibraryRoute
   '/_authenticated/admin/carousel': typeof AuthenticatedAdminCarouselRoute
@@ -225,6 +234,7 @@ export interface FileRouteTypes {
     | '/playgroundv2'
     | '/privacy'
     | '/sitemap.xml'
+    | '/terms'
     | '/admin'
     | '/library'
     | '/admin/carousel'
@@ -248,6 +258,7 @@ export interface FileRouteTypes {
     | '/playgroundv2'
     | '/privacy'
     | '/sitemap.xml'
+    | '/terms'
     | '/library'
     | '/admin/carousel'
     | '/admin/docs'
@@ -271,6 +282,7 @@ export interface FileRouteTypes {
     | '/playgroundv2'
     | '/privacy'
     | '/sitemap.xml'
+    | '/terms'
     | '/_authenticated/admin'
     | '/_authenticated/library'
     | '/_authenticated/admin/carousel'
@@ -296,6 +308,7 @@ export interface RootRouteChildren {
   Playgroundv2Route: typeof Playgroundv2Route
   PrivacyRoute: typeof PrivacyRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  TermsRoute: typeof TermsRoute
   ApiPublicEventsRoute: typeof ApiPublicEventsRoute
   ApiPublicFeedbackRoute: typeof ApiPublicFeedbackRoute
   ApiPublicTemplatesRoute: typeof ApiPublicTemplatesRoute
@@ -367,6 +380,13 @@ declare module '@tanstack/react-router' {
       path: '/sitemap.xml'
       fullPath: '/sitemap.xml'
       preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/terms': {
+      id: '/terms'
+      path: '/terms'
+      fullPath: '/terms'
+      preLoaderRoute: typeof TermsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/admin': {
@@ -505,6 +525,7 @@ const rootRouteChildren: RootRouteChildren = {
   Playgroundv2Route: Playgroundv2Route,
   PrivacyRoute: PrivacyRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
+  TermsRoute: TermsRoute,
   ApiPublicEventsRoute: ApiPublicEventsRoute,
   ApiPublicFeedbackRoute: ApiPublicFeedbackRoute,
   ApiPublicTemplatesRoute: ApiPublicTemplatesRoute,

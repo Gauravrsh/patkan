@@ -32,7 +32,7 @@ const sections: { heading: string; body: string[] }[] = [
   {
     heading: "Who we are",
     body: [
-      "Patkan is built and run by Gaurav Sharma, a sole owner based in India. Patkan, operated by Gaurav Sharma, is the data controller (Data Fiduciary) for personal data under this policy. Also read our Terms of Use at patkan.in/terms.",
+      "Patkan is built and run by Gaurav Sharma, based in India. Patkan, operated by Gaurav Sharma, is the data controller (Data Fiduciary) for personal data under this policy. Also read our Terms of Use at patkan.in/terms.",
       "You can reach him at contact@patkan.in. Our postal address is available on request — write to the same email and it will be sent to you.",
       "This policy covers patkan.in and the official Patkan browser extension published by us. It does not cover copies or forks of the open-source code run by anyone else — those operators are responsible for their own data practices.",
     ],
