@@ -15,7 +15,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as ChatgptPromptGeneratorRouteImport } from './routes/chatgpt-prompt-generator'
 import { Route as ClaudePromptGeneratorRouteImport } from './routes/claude-prompt-generator'
 import { Route as ConnectRouteImport } from './routes/connect'
-import { Route as Installationguidev2RouteImport } from './routes/installationguidev2'
+import { Route as Playgroundv2RouteImport } from './routes/playgroundv2'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedLibraryRouteImport } from './routes/_authenticated/library'
@@ -60,9 +60,9 @@ const ConnectRoute = ConnectRouteImport.update({
   path: '/connect',
   getParentRoute: () => rootRouteImport,
 } as any)
-const Installationguidev2Route = Installationguidev2RouteImport.update({
-  id: '/installationguidev2',
-  path: '/installationguidev2',
+const Playgroundv2Route = Playgroundv2RouteImport.update({
+  id: '/playgroundv2',
+  path: '/playgroundv2',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
@@ -144,7 +144,7 @@ export interface FileRoutesByFullPath {
   '/chatgpt-prompt-generator': typeof ChatgptPromptGeneratorRoute
   '/claude-prompt-generator': typeof ClaudePromptGeneratorRoute
   '/connect': typeof ConnectRoute
-  '/installationguidev2': typeof Installationguidev2Route
+  '/playgroundv2': typeof Playgroundv2Route
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/library': typeof AuthenticatedLibraryRoute
@@ -166,7 +166,7 @@ export interface FileRoutesByTo {
   '/chatgpt-prompt-generator': typeof ChatgptPromptGeneratorRoute
   '/claude-prompt-generator': typeof ClaudePromptGeneratorRoute
   '/connect': typeof ConnectRoute
-  '/installationguidev2': typeof Installationguidev2Route
+  '/playgroundv2': typeof Playgroundv2Route
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/library': typeof AuthenticatedLibraryRoute
   '/admin/carousel': typeof AuthenticatedAdminCarouselRoute
@@ -189,7 +189,7 @@ export interface FileRoutesById {
   '/chatgpt-prompt-generator': typeof ChatgptPromptGeneratorRoute
   '/claude-prompt-generator': typeof ClaudePromptGeneratorRoute
   '/connect': typeof ConnectRoute
-  '/installationguidev2': typeof Installationguidev2Route
+  '/playgroundv2': typeof Playgroundv2Route
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
   '/_authenticated/library': typeof AuthenticatedLibraryRoute
@@ -213,7 +213,7 @@ export interface FileRouteTypes {
     | '/chatgpt-prompt-generator'
     | '/claude-prompt-generator'
     | '/connect'
-    | '/installationguidev2'
+    | '/playgroundv2'
     | '/sitemap.xml'
     | '/admin'
     | '/library'
@@ -235,7 +235,7 @@ export interface FileRouteTypes {
     | '/chatgpt-prompt-generator'
     | '/claude-prompt-generator'
     | '/connect'
-    | '/installationguidev2'
+    | '/playgroundv2'
     | '/sitemap.xml'
     | '/library'
     | '/admin/carousel'
@@ -257,7 +257,7 @@ export interface FileRouteTypes {
     | '/chatgpt-prompt-generator'
     | '/claude-prompt-generator'
     | '/connect'
-    | '/installationguidev2'
+    | '/playgroundv2'
     | '/sitemap.xml'
     | '/_authenticated/admin'
     | '/_authenticated/library'
@@ -281,7 +281,7 @@ export interface RootRouteChildren {
   ChatgptPromptGeneratorRoute: typeof ChatgptPromptGeneratorRoute
   ClaudePromptGeneratorRoute: typeof ClaudePromptGeneratorRoute
   ConnectRoute: typeof ConnectRoute
-  Installationguidev2Route: typeof Installationguidev2Route
+  Playgroundv2Route: typeof Playgroundv2Route
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   ApiPublicEventsRoute: typeof ApiPublicEventsRoute
   ApiPublicFeedbackRoute: typeof ApiPublicFeedbackRoute
@@ -335,11 +335,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ConnectRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/installationguidev2': {
-      id: '/installationguidev2'
-      path: '/installationguidev2'
-      fullPath: '/installationguidev2'
-      preLoaderRoute: typeof Installationguidev2RouteImport
+    '/playgroundv2': {
+      id: '/playgroundv2'
+      path: '/playgroundv2'
+      fullPath: '/playgroundv2'
+      preLoaderRoute: typeof Playgroundv2RouteImport
       parentRoute: typeof rootRouteImport
     }
     '/sitemap.xml': {
@@ -482,7 +482,7 @@ const rootRouteChildren: RootRouteChildren = {
   ChatgptPromptGeneratorRoute: ChatgptPromptGeneratorRoute,
   ClaudePromptGeneratorRoute: ClaudePromptGeneratorRoute,
   ConnectRoute: ConnectRoute,
-  Installationguidev2Route: Installationguidev2Route,
+  Playgroundv2Route: Playgroundv2Route,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   ApiPublicEventsRoute: ApiPublicEventsRoute,
   ApiPublicFeedbackRoute: ApiPublicFeedbackRoute,
