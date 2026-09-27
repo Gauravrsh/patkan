@@ -920,6 +920,8 @@ function Landing() {
                 Read the full privacy policy <ArrowRight className="size-4" aria-hidden />
               </Link>
             </div>
+          </div>
+
 
           <div className="mt-12 grid gap-px overflow-hidden rounded-lg border bg-border sm:mt-16 md:grid-cols-2">
             {privacy.map(({ icon: Icon, heading, body }, index) => (
