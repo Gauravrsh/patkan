@@ -511,66 +511,81 @@ function Playground(props: PlaygroundProps) {
             </div>
           )}
 
-          <div className="mt-6">
-            <p className="font-mono text-[11px] tracking-widest text-muted-foreground">TARGET AI</p>
-            <div className="mt-2">
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <button
-                    type="button"
-                    className="inline-flex items-center gap-2 rounded-full border px-4 py-1.5 text-sm font-medium transition-colors hover:bg-muted"
-                  >
-                    {target[0]}
-                    <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" />
-                  </button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="start" className="max-h-72 overflow-y-auto">
-                  {targetAis.map(([name], index) => (
-                    <DropdownMenuItem key={name} onSelect={() => setTargetIndex(index)}>
-                      {name}
-                    </DropdownMenuItem>
-                  ))}
-                </DropdownMenuContent>
-              </DropdownMenu>
+          <div className="mt-6 flex flex-wrap items-start gap-x-12 gap-y-4">
+            <div>
+              <p className="font-mono text-[11px] tracking-widest text-muted-foreground">TARGET AI</p>
+              <div className="mt-2">
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <button
+                      type="button"
+                      className="inline-flex items-center gap-2 rounded-full border px-4 py-1.5 text-sm font-medium transition-colors hover:bg-muted"
+                    >
+                      {target[0]}
+                      <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" />
+                    </button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="start" className="max-h-72 overflow-y-auto">
+                    {targetAis.map(([name], index) => (
+                      <DropdownMenuItem key={name} onSelect={() => setTargetIndex(index)}>
+                        {name}
+                      </DropdownMenuItem>
+                    ))}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
+            </div>
+            <div>
+              <p className="font-mono text-[11px] tracking-widest text-muted-foreground">SELECT ROLE</p>
+              <div className="mt-2">
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <button
+                      type="button"
+                      className="inline-flex items-center gap-2 rounded-full border px-4 py-1.5 text-sm font-medium transition-colors hover:bg-muted"
+                    >
+                      {persona[0]}
+                      <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" />
+                    </button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="start" className="max-h-72 overflow-y-auto">
+                    {personaList.map(([name], index) => (
+                      <DropdownMenuItem key={name} onSelect={() => setPersonaIndex(index)}>
+                        {name}
+                      </DropdownMenuItem>
+                    ))}
+                    <DropdownMenuItem onSelect={() => setCustomOpen(true)}>Other</DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
             </div>
           </div>
 
-          <div className="mt-6 border-t pt-6">
-            <div className="flex flex-wrap items-center justify-between gap-2">
-              <p className="font-mono text-[11px] tracking-widest text-muted-foreground">SELECT ROLE</p>
-            </div>
-            <div className={chipRow}>
-              {personaList.map(([name], index) => (
-                <Chip key={name} name={name} active={personaIndex === index} onClick={() => setPersonaIndex(index)} />
-              ))}
-              <Chip name="Other" active={customOpen} onClick={() => setCustomOpen(!customOpen)} />
-            </div>
-            {customOpen && (
-              <form
-                className="mt-3 flex gap-2"
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  addCustomPersona(customDraft);
-                  setCustomDraft("");
-                  setCustomOpen(false);
-                }}
+          {customOpen && (
+            <form
+              className="mt-4 flex max-w-sm gap-2"
+              onSubmit={(e) => {
+                e.preventDefault();
+                addCustomPersona(customDraft);
+                setCustomDraft("");
+                setCustomOpen(false);
+              }}
+            >
+              <input
+                value={customDraft}
+                onChange={(e) => setCustomDraft(e.target.value)}
+                placeholder="Name your persona"
+                maxLength={40}
+                className="h-9 min-w-0 flex-1 rounded-md border bg-background px-3 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+              />
+              <button
+                type="submit"
+                className="h-9 shrink-0 rounded-md bg-primary px-3 text-xs font-medium text-primary-foreground transition-colors hover:bg-primary/90"
               >
-                <input
-                  value={customDraft}
-                  onChange={(e) => setCustomDraft(e.target.value)}
-                  placeholder="Name your persona"
-                  maxLength={40}
-                  className="h-9 min-w-0 flex-1 rounded-md border bg-background px-3 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
-                />
-                <button
-                  type="submit"
-                  className="h-9 shrink-0 rounded-md bg-primary px-3 text-xs font-medium text-primary-foreground transition-colors hover:bg-primary/90"
-                >
-                  Add
-                </button>
-              </form>
-            )}
-          </div>
+                Add
+              </button>
+            </form>
+          )}
 
           {/* Mobile CTA */}
           <button
