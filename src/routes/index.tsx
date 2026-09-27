@@ -731,13 +731,16 @@ function Landing() {
                 <DropdownMenuTrigger asChild>
                   <button
                     type="button"
-                    className="inline-flex shrink-0 cursor-pointer items-center gap-2 rounded-full border border-primary bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+                    className="inline-flex shrink-0 cursor-pointer items-center gap-2 rounded-full border border-primary bg-background px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-accent"
                   >
                     Google Chrome
                     <ChevronDown className="size-4" aria-hidden />
                   </button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="start">
+                  <DropdownMenuLabel className="px-2 py-1.5 font-mono text-[10px] uppercase tracking-wide text-muted-foreground">
+                    also works on
+                  </DropdownMenuLabel>
                   <DropdownMenuItem>Brave</DropdownMenuItem>
                   <DropdownMenuItem>Arc</DropdownMenuItem>
                   <DropdownMenuItem>Opera</DropdownMenuItem>
