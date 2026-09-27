@@ -724,6 +724,7 @@ function Landing() {
                   Browser Installation Guide
                 </h2>
               </div>
+            </div>
 
             <div className="mt-10 flex flex-wrap items-center gap-2">
               <DropdownMenu>
