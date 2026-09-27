@@ -42,38 +42,32 @@ function InstallSection() {
 
   const copy = mobile
     ? {
-        headline: "On your phone?",
-        sub: "Tap below to add Patkan to your computer.",
-        cta: "Add to Desktop — Verified by Google",
-        foot: "Ready on your laptop the next time you open it.",
+        lead: "Send directly to your computer's browser.",
+        foot: "Google syncs across your signed-in devices.",
       }
     : {
-        headline: "Two clicks.",
-        sub: "Click below. Confirm with Google. You're done.",
-        cta: "Add to Chrome — Verified by Google",
-        foot: "Free. Works in Chrome, Brave, Edge & Opera.",
+        lead: "2-Click Download",
+        foot: "Works in Chrome, Brave, Edge & Opera.",
       };
 
   return (
-    <section className="bg-background px-5 py-14 text-foreground">
+    <section className="bg-background px-6 py-20 text-foreground sm:py-24">
       <div className="mx-auto max-w-2xl text-center">
-        <h2 className="text-3xl font-black leading-[1.05] tracking-tight sm:text-4xl">
-          {copy.headline}
-        </h2>
-        <p className="mt-3 text-base text-muted-foreground sm:text-lg">
-          {copy.sub}
+        <p className="text-xl font-black tracking-tight sm:text-2xl">
+          {copy.lead}
         </p>
         <button
           type="button"
           onClick={() => window.open(STORE_URL, "_blank", "noopener,noreferrer")}
-          className="mt-6 rounded-full bg-primary px-7 py-3.5 text-sm font-bold tracking-tight text-primary-foreground transition-opacity hover:opacity-90"
+          className="mt-6 rounded-full bg-primary px-8 py-4 text-sm font-bold tracking-tight text-primary-foreground transition-opacity hover:opacity-90 sm:text-base"
         >
-          {copy.cta}
+          Add to Chrome — Verified by Google
         </button>
-        <p className="mt-3 text-xs text-muted-foreground sm:text-sm">
+        <p className="mt-4 text-xs text-muted-foreground sm:text-sm">
           {copy.foot}
         </p>
       </div>
     </section>
   );
 }
+
