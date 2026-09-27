@@ -451,10 +451,6 @@ function Playground(props: PlaygroundProps) {
   const persona = personaList[personaIndex] ?? personaList[MARKETER_INDEX]!;
   const settled = phase === "ready" || phase === "idle";
   const ghost = useGhostTyping(!input && !busy && !exhausted);
-  const [rated, setRated] = useState(false);
-  useEffect(() => {
-    setRated(false);
-  }, [output]);
 
   return (
     <div>
