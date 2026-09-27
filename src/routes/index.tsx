@@ -752,7 +752,7 @@ function Landing() {
                   className="inline-flex shrink-0 items-center rounded-full border px-4 py-2 text-sm text-muted-foreground"
                 >
                   {name}
-                  <span className="ml-1.5 text-[10px] uppercase tracking-wide">soon</span>
+                  <span className="ml-1.5 font-mono text-[10px] uppercase tracking-wide">soon</span>
                 </span>
               ))}
             </div>
