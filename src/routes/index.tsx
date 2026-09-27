@@ -769,7 +769,6 @@ function Landing() {
                 {mobile ? "Google syncs across your signed-in devices." : "Works in Chrome, Brave, Arc & Opera."}
               </p>
             </div>
-            </div>
           </div>
 
         </section>
