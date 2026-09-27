@@ -16,6 +16,7 @@ import { Route as ChatgptPromptGeneratorRouteImport } from './routes/chatgpt-pro
 import { Route as ClaudePromptGeneratorRouteImport } from './routes/claude-prompt-generator'
 import { Route as ConnectRouteImport } from './routes/connect'
 import { Route as Playgroundv2RouteImport } from './routes/playgroundv2'
+import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedLibraryRouteImport } from './routes/_authenticated/library'
@@ -63,6 +64,11 @@ const ConnectRoute = ConnectRouteImport.update({
 const Playgroundv2Route = Playgroundv2RouteImport.update({
   id: '/playgroundv2',
   path: '/playgroundv2',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrivacyRoute = PrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
@@ -145,6 +151,7 @@ export interface FileRoutesByFullPath {
   '/claude-prompt-generator': typeof ClaudePromptGeneratorRoute
   '/connect': typeof ConnectRoute
   '/playgroundv2': typeof Playgroundv2Route
+  '/privacy': typeof PrivacyRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/library': typeof AuthenticatedLibraryRoute
@@ -167,6 +174,7 @@ export interface FileRoutesByTo {
   '/claude-prompt-generator': typeof ClaudePromptGeneratorRoute
   '/connect': typeof ConnectRoute
   '/playgroundv2': typeof Playgroundv2Route
+  '/privacy': typeof PrivacyRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/library': typeof AuthenticatedLibraryRoute
   '/admin/carousel': typeof AuthenticatedAdminCarouselRoute
@@ -190,6 +198,7 @@ export interface FileRoutesById {
   '/claude-prompt-generator': typeof ClaudePromptGeneratorRoute
   '/connect': typeof ConnectRoute
   '/playgroundv2': typeof Playgroundv2Route
+  '/privacy': typeof PrivacyRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
   '/_authenticated/library': typeof AuthenticatedLibraryRoute
@@ -214,6 +223,7 @@ export interface FileRouteTypes {
     | '/claude-prompt-generator'
     | '/connect'
     | '/playgroundv2'
+    | '/privacy'
     | '/sitemap.xml'
     | '/admin'
     | '/library'
@@ -236,6 +246,7 @@ export interface FileRouteTypes {
     | '/claude-prompt-generator'
     | '/connect'
     | '/playgroundv2'
+    | '/privacy'
     | '/sitemap.xml'
     | '/library'
     | '/admin/carousel'
@@ -258,6 +269,7 @@ export interface FileRouteTypes {
     | '/claude-prompt-generator'
     | '/connect'
     | '/playgroundv2'
+    | '/privacy'
     | '/sitemap.xml'
     | '/_authenticated/admin'
     | '/_authenticated/library'
@@ -282,6 +294,7 @@ export interface RootRouteChildren {
   ClaudePromptGeneratorRoute: typeof ClaudePromptGeneratorRoute
   ConnectRoute: typeof ConnectRoute
   Playgroundv2Route: typeof Playgroundv2Route
+  PrivacyRoute: typeof PrivacyRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   ApiPublicEventsRoute: typeof ApiPublicEventsRoute
   ApiPublicFeedbackRoute: typeof ApiPublicFeedbackRoute
@@ -340,6 +353,13 @@ declare module '@tanstack/react-router' {
       path: '/playgroundv2'
       fullPath: '/playgroundv2'
       preLoaderRoute: typeof Playgroundv2RouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/privacy': {
+      id: '/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof PrivacyRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/sitemap.xml': {
@@ -483,6 +503,7 @@ const rootRouteChildren: RootRouteChildren = {
   ClaudePromptGeneratorRoute: ClaudePromptGeneratorRoute,
   ConnectRoute: ConnectRoute,
   Playgroundv2Route: Playgroundv2Route,
+  PrivacyRoute: PrivacyRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   ApiPublicEventsRoute: ApiPublicEventsRoute,
   ApiPublicFeedbackRoute: ApiPublicFeedbackRoute,

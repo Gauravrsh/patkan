@@ -907,12 +907,19 @@ function Landing() {
               </h2>
               <span className="mt-6 block h-px w-16 bg-primary" aria-hidden />
             </div>
-            <p className="text-base leading-relaxed text-muted-foreground sm:text-lg">
-              No background tracking. No keystroke logging. No reading your chat history. Patkan is hardcoded strictly
-              to <ApprovedUrlsTrigger /> and takes no action until you type{" "}
-              <code className="font-mono text-foreground">//</code>. What you type compiles in RAM and vanishes.
-            </p>
-          </div>
+            <div>
+              <p className="text-base leading-relaxed text-muted-foreground sm:text-lg">
+                No background tracking. No keystroke logging. No reading your chat history. Patkan is hardcoded strictly
+                to <ApprovedUrlsTrigger /> and takes no action until you type{" "}
+                <code className="font-mono text-foreground">//</code>. What you type compiles in RAM and vanishes.
+              </p>
+              <Link
+                to="/privacy"
+                className="mt-5 inline-flex items-center gap-1.5 text-sm font-medium text-primary transition-colors hover:text-primary/80"
+              >
+                Read the full privacy policy <ArrowRight className="size-4" aria-hidden />
+              </Link>
+            </div>
 
           <div className="mt-12 grid gap-px overflow-hidden rounded-lg border bg-border sm:mt-16 md:grid-cols-2">
             {privacy.map(({ icon: Icon, heading, body }, index) => (
@@ -963,12 +970,15 @@ function Landing() {
       <footer className="border-t">
         <div className={`${shell} flex flex-wrap items-center justify-between gap-3 py-8 text-xs text-muted-foreground`}>
           <p>patkan.in</p>
-          <nav className="flex flex-wrap items-center gap-4" aria-label="Prompt generators">
+          <nav className="flex flex-wrap items-center gap-4" aria-label="Footer">
             <Link to="/chatgpt-prompt-generator" className="transition-colors hover:text-foreground">
               ChatGPT prompt generator
             </Link>
             <Link to="/claude-prompt-generator" className="transition-colors hover:text-foreground">
               Claude prompt generator
+            </Link>
+            <Link to="/privacy" className="transition-colors hover:text-foreground">
+              Privacy Policy
             </Link>
           </nav>
         </div>
