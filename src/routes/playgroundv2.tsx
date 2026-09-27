@@ -1,7 +1,14 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
-import { Check, Loader2, Sparkles, ThumbsDown } from "lucide-react";
+import { Check, ChevronDown, Loader2, Sparkles, ThumbsDown } from "lucide-react";
 import { toast } from "sonner";
+
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 import { trackEvent } from "@/lib/telemetry";
 import {
