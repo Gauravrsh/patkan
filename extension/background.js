@@ -215,7 +215,15 @@ async function openSignIn() {
   await chrome.tabs.create({ url: settings.apiBase.replace(/\/$/, "") + "/connect" });
 }
 
-chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
+chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
+  if (msg?.type === "PATKAN_SET_SESSION") {
+    const url = sender?.url || "";
+    const trusted = url.startsWith("https://patkan.in/") || url.startsWith("https://www.patkan.in/");
+    if (!trusted || sender?.id !== chrome.runtime.id) {
+      sendResponse({ ok: false });
+      return false;
+    }
+  }
   if (msg?.type === "PATKAN_TRANSFORM") {
     transform(msg.payload).then(sendResponse);
     return true;
