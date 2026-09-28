@@ -53,8 +53,15 @@ function setUsage(used, limit) {
 
 async function loadTemplates(settings) {
   if (!settings.session?.access_token) {
-    $("note").innerHTML =
-      'Running in ghost mode. <a href="#" id="signin">Connect an account</a> for saved frameworks.';
+    const signin = document.createElement("a");
+    signin.href = "#";
+    signin.id = "signin";
+    signin.textContent = "Connect an account";
+    $("note").replaceChildren(
+      document.createTextNode("Running in ghost mode. "),
+      signin,
+      document.createTextNode(" for saved frameworks."),
+    );
     $("signin")?.addEventListener("click", (e) => {
       e.preventDefault();
       chrome.tabs.create({ url: (settings.apiBase || DEFAULT_API_BASE) + "/connect" });

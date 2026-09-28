@@ -188,7 +188,13 @@
     `;
     pill = document.createElement("div");
     pill.className = "pill";
-    pill.innerHTML = '<span class="ico">✦</span><span class="lbl">Type // to Patkan</span>';
+    const icoEl = document.createElement("span");
+    icoEl.className = "ico";
+    icoEl.textContent = "✦";
+    const lblEl = document.createElement("span");
+    lblEl.className = "lbl";
+    lblEl.textContent = "Type // to Patkan";
+    pill.append(icoEl, lblEl);
     pill.addEventListener("mousedown", (e) => {
       e.preventDefault();
       run();
@@ -241,7 +247,15 @@
     ensureUI();
     busy = phase === "drafting" || phase === "sharpening";
     const spinning = busy;
-    pill.querySelector(".ico").innerHTML = spinning ? '<span class="spin">◠</span>' : "✦";
+    const ico = pill.querySelector(".ico");
+    if (spinning) {
+      const s = document.createElement("span");
+      s.className = "spin";
+      s.textContent = "◠";
+      ico.replaceChildren(s);
+    } else {
+      ico.replaceChildren(document.createTextNode("✦"));
+    }
     let label = restingLabel;
     if (phase === "drafting") label = "Drafting…";
     else if (phase === "sharpening") label = "Sharpening — one moment";
