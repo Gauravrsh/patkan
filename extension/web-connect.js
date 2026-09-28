@@ -4,7 +4,7 @@
   const chrome = globalThis.browser ?? globalThis.chrome;
 
   window.addEventListener("message", (event) => {
-    if (event.source !== window) return;
+    if (event.source !== window || event.origin !== window.location.origin) return;
     const data = event.data;
     if (!data || data.type !== "PATKAN_SESSION") return;
     Promise.resolve(chrome.runtime.sendMessage({ type: "PATKAN_SET_SESSION", payload: data.payload }))
