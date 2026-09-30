@@ -8,7 +8,6 @@ import {
   Check,
   ChevronDown,
   EyeOff,
-  Globe2,
   Headphones,
   Loader2,
   LockKeyhole,
@@ -314,17 +313,8 @@ const privacy = [
     heading: "Blind to the rest of the web",
     body: "Patkan cannot see your other tabs, bank logins, emails, or browsing history. The browser sandbox strictly confines it to the AI sites in its approved list — `ChatGPT`, `Claude`, `Gemini`, `Microsoft Copilot`, `Perplexity`, and more.",
   },
-  {
-    icon: Zap,
-    heading: "Zero memory. Zero retention.",
-    body: "Your rough input compiles in RAM and immediately replaces your text. No prompt logs, no chat databases, and zero model training on what you write.",
-  },
-  {
-    icon: Globe2,
-    heading: "100% open and auditable",
-    body: "No obfuscated binary blobs. Because you install Patkan unpacked, you can open the folder, inspect every line of plain JavaScript, and verify every network call in DevTools before you click load.",
-  },
 ] as const;
+
 
 
 function Landing() {
@@ -921,7 +911,7 @@ function Landing() {
               <p className="text-base leading-relaxed text-muted-foreground sm:text-lg">
                 No background tracking. No keystroke logging. No reading your chat history. Patkan is hardcoded strictly
                 to <ApprovedUrlsTrigger /> and takes no action until you type{" "}
-                <code className="font-mono text-foreground">//</code>. What you type compiles in RAM and vanishes.
+                <code className="font-mono text-foreground">//</code>.
               </p>
               <Link
                 to="/privacy"
