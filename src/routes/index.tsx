@@ -60,15 +60,17 @@ import patkanMark from "@/assets/patkan-mark.svg";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Patkan — Expert prompts, instantly" },
+      { title: "Patkan — Prompt generator for ChatGPT, Gemini and Claude" },
       {
         name: "description",
-        content: "Turn a rough thought into a surgically crafted prompt without leaving your AI chat.",
+        content:
+          "Turn a rough thought into a clear, well-structured prompt without leaving your AI chat. End your line with // and Patkan rewrites it for ChatGPT, Gemini or Claude.",
       },
-      { property: "og:title", content: "Patkan — Expert prompts, instantly" },
+      { property: "og:title", content: "Patkan — Prompt generator for ChatGPT, Gemini and Claude" },
       {
         property: "og:description",
-        content: "Turn a rough thought into a surgically crafted prompt without leaving your AI chat.",
+        content:
+          "Turn a rough thought into a clear, well-structured prompt without leaving your AI chat. End your line with // and Patkan rewrites it.",
       },
       { property: "og:type", content: "website" },
       { property: "og:url", content: "https://patkan.in/" },
@@ -77,7 +79,14 @@ export const Route = createFileRoute("/")({
       { name: "twitter:image", content: "https://patkan.in/og-image.jpg" },
     ],
     links: [{ rel: "canonical", href: "https://patkan.in/" }],
-
+    scripts: [
+      ldScript([
+        organizationLd,
+        softwareLd,
+        { "@type": "WebSite", "@id": "https://patkan.in/#website", name: "Patkan", url: "https://patkan.in/", publisher: { "@id": "https://patkan.in/#organization" } },
+        pageLd({ name: "Patkan — Prompt generator for ChatGPT, Gemini and Claude", path: "/", description: PATKAN_DEFINITION, dateModified: "2026-09-30" }),
+      ]),
+    ],
   }),
   component: Landing,
 });
@@ -737,7 +746,7 @@ function Landing() {
             <div className="flex items-start justify-between gap-3 border-b p-5 sm:p-7 md:p-8">
               <div className="min-w-0">
                 <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
-                  <h1 className="text-[2.6rem] font-semibold leading-none tracking-tight sm:text-5xl">patkan</h1>
+                  <h1 className="text-[2.6rem] font-semibold leading-none tracking-tight sm:text-5xl">patkan<span className="sr-only"> — prompt generator for ChatGPT, Gemini and Claude</span></h1>
                   <span className="text-xl text-muted-foreground sm:text-2xl">पट्कन</span>
                 </div>
                 <p className="mt-3 font-mono text-xs text-muted-foreground sm:text-sm">/ˈpʌʈ.kən/</p>

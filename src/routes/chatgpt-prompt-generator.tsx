@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowDownToLine, ArrowRight, Check, MousePointer2, ShieldCheck, Zap } from "lucide-react";
 
+import { ldScript, organizationLd, pageLd, softwareLd } from "@/lib/seo";
 import patkanMark from "@/assets/patkan-mark.svg";
 
 export const Route = createFileRoute("/chatgpt-prompt-generator")({
@@ -26,18 +27,16 @@ export const Route = createFileRoute("/chatgpt-prompt-generator")({
     ],
     links: [{ rel: "canonical", href: "https://patkan.in/chatgpt-prompt-generator" }],
     scripts: [
-      {
-        type: "application/ld+json",
-        children: JSON.stringify({
-          "@context": "https://schema.org",
-          "@type": "WebPage",
+      ldScript([
+        organizationLd,
+        softwareLd,
+        pageLd({
           name: "ChatGPT Prompt Generator — Patkan",
-          url: "https://patkan.in/chatgpt-prompt-generator",
-          description:
-            "Turn a rough thought into an expert ChatGPT prompt without leaving chatgpt.com, using Patkan's markdown dialect.",
-          isPartOf: { "@type": "WebSite", name: "Patkan", url: "https://patkan.in/" },
+          path: "/chatgpt-prompt-generator",
+          description: "Turn a rough thought into an expert ChatGPT prompt without leaving the chat. End your line with // and Patkan rewrites it.",
+          dateModified: "2026-09-30",
         }),
-      },
+      ]),
     ],
   }),
   component: ChatGptPromptGenerator,
