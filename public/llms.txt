@@ -17,6 +17,7 @@ Key facts:
 - [Home](https://patkan.in/): What Patkan does, a live playground and install steps.
 - [ChatGPT prompt generator](https://patkan.in/chatgpt-prompt-generator): Write better ChatGPT prompts with //.
 - [Claude prompt generator](https://patkan.in/claude-prompt-generator): Write better Claude prompts with //.
+- [Gemini prompt generator](https://patkan.in/gemini-prompt-generator): Write better Gemini prompts with //.
 
 ## Legal
 - [Privacy Policy](https://patkan.in/privacy)

@@ -266,6 +266,9 @@ function ClaudePromptGenerator() {
           <Link to="/chatgpt-prompt-generator" className="transition-colors hover:text-foreground">
             ChatGPT prompt generator
           </Link>
+          <Link to="/gemini-prompt-generator" className="transition-colors hover:text-foreground">
+            Gemini prompt generator
+          </Link>
           <Link to="/privacy" className="transition-colors hover:text-foreground">
             Privacy Policy
           </Link>
