@@ -33,6 +33,9 @@ After: a prompt with a clear role (a B2B copywriter), context (a busy startup fo
 - Chrome Web Store: https://chromewebstore.google.com/detail/patkan-%E2%80%94-instant-expert-p/jcgkfecfliophjfnkokjnifcmalfbnnn
 - LinkedIn page: https://www.linkedin.com/company/patkan-in/
 - Website: https://patkan.in
+- ChatGPT prompt generator: https://patkan.in/chatgpt-prompt-generator
+- Claude prompt generator: https://patkan.in/claude-prompt-generator
+- Gemini prompt generator: https://patkan.in/gemini-prompt-generator
 - Privacy Policy: https://patkan.in/privacy
 - Terms of Use: https://patkan.in/terms
 - Contact: contact@patkan.in

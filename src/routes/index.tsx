@@ -979,6 +979,9 @@ function Landing() {
             <Link to="/claude-prompt-generator" className="transition-colors hover:text-foreground">
               Claude prompt generator
             </Link>
+            <Link to="/gemini-prompt-generator" className="transition-colors hover:text-foreground">
+              Gemini prompt generator
+            </Link>
             <Link to="/privacy" className="transition-colors hover:text-foreground">
               Privacy Policy
             </Link>

@@ -1,96 +1,96 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowDownToLine, ArrowRight, Check, MousePointer2, ShieldCheck, Zap } from "lucide-react";
+import { ArrowDownToLine, ArrowRight, MousePointer2, ShieldCheck, Zap } from "lucide-react";
 
 import { ldScript, organizationLd, pageLd, softwareLd } from "@/lib/seo";
 import patkanMark from "@/assets/patkan-mark.svg";
 
-export const Route = createFileRoute("/chatgpt-prompt-generator")({
+const DESCRIPTION =
+  "Turn a rough thought into an expert Gemini prompt without leaving gemini.google.com. Patkan gives your words the clear sections Gemini follows, the moment you type //.";
+
+export const Route = createFileRoute("/gemini-prompt-generator")({
   head: () => ({
     meta: [
-      { title: "ChatGPT Prompt Generator — Patkan" },
-      {
-        name: "description",
-        content:
-          "Turn a rough thought into an expert ChatGPT prompt without leaving chatgpt.com. Patkan wraps your words in clean markdown sections the moment you type //.",
-      },
-      { property: "og:title", content: "ChatGPT Prompt Generator — Patkan" },
-      {
-        property: "og:description",
-        content:
-          "Turn a rough thought into an expert ChatGPT prompt without leaving chatgpt.com. Patkan wraps your words in clean markdown sections the moment you type //.",
-      },
+      { title: "Gemini Prompt Generator — Patkan" },
+      { name: "description", content: DESCRIPTION },
+      { property: "og:title", content: "Gemini Prompt Generator — Patkan" },
+      { property: "og:description", content: DESCRIPTION },
       { property: "og:type", content: "website" },
-      { property: "og:url", content: "https://patkan.in/chatgpt-prompt-generator" },
+      { property: "og:url", content: "https://patkan.in/gemini-prompt-generator" },
       { property: "og:image", content: "https://patkan.in/og-image.jpg" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:image", content: "https://patkan.in/og-image.jpg" },
     ],
-    links: [{ rel: "canonical", href: "https://patkan.in/chatgpt-prompt-generator" }],
+    links: [{ rel: "canonical", href: "https://patkan.in/gemini-prompt-generator" }],
     scripts: [
       ldScript([
         organizationLd,
         softwareLd,
         pageLd({
-          name: "ChatGPT Prompt Generator — Patkan",
-          path: "/chatgpt-prompt-generator",
-          description: "Turn a rough thought into an expert ChatGPT prompt without leaving the chat. End your line with // and Patkan rewrites it.",
+          name: "Gemini Prompt Generator — Patkan",
+          path: "/gemini-prompt-generator",
+          description:
+            "Turn a rough thought into an expert Gemini prompt without leaving the chat. End your line with // and Patkan rewrites it.",
           dateModified: "2026-09-30",
         }),
       ]),
     ],
   }),
-  component: ChatGptPromptGenerator,
+  component: GeminiPromptGenerator,
 });
 
 const shell = "mx-auto w-full max-w-6xl px-5 sm:px-6 lg:px-8";
 
 const exampleBefore = "help me write a cold email to a founder about my analytics tool";
 
-const exampleAfter = `## Role
+const exampleAfter = `ROLE
 Senior B2B copywriter who writes concise, founder-to-founder cold email.
 
-## Context
+CONTEXT
 The sender is reaching out about an analytics product. The recipient is a startup founder with limited time.
 
-## Task
+TASK
 Write a cold outreach email introducing the analytics tool.
 
-## Output format
+OUTPUT FORMAT
 Subject line, then body. No sign-off placeholders.
 
-## Constraints
+CONSTRAINTS
 - Under 120 words
 - No buzzwords or hype
 - One clear call to action
 
-## Before answering
-Check that no fact, number or name has been invented, and that the output matches the requested format exactly.`;
+BEFORE ANSWERING
+Check that no fact, number or name has been invented, and that the answer matches the requested format exactly.`;
 
 const steps: [string, string][] = [
-  ["Type what you want", "Open chatgpt.com and describe your task in plain, messy words. No structure needed."],
+  ["Type what you want", "Open gemini.google.com and describe your task in plain, messy words. No structure needed."],
   ["End it with //", "Two slashes at the end of your sentence trigger Patkan. Nothing happens until then."],
   [
-    "Watch it become markdown",
-    "Your thought is replaced in place by a structured ChatGPT prompt — role, context, task, constraints, and output format under clean markdown headings that ChatGPT follows best.",
+    "Watch it become sections",
+    "Your thought is replaced in place by a structured Gemini prompt — role, context, task, output format and constraints, each under its own clear heading.",
   ],
 ];
 
 const faqs = [
   {
-    q: "Why does markdown work better for ChatGPT?",
-    a: "ChatGPT parses markdown natively — its answers come back as headings, bullets, and bold text. When a prompt is split into clearly labeled markdown sections (Role, Context, Task, Constraints, Output format), ChatGPT treats each block as an instruction with a boundary, which means fewer misunderstandings and better first answers. Patkan applies that structure for you automatically.",
+    q: "Why does clear structure matter for Gemini?",
+    a: "Gemini reads a prompt as one block of text. When the role, the task, the limits and the format are not separated, it fills the gaps itself — padding the answer with chatter, assuming details that were never given, or drifting away from what you asked. Plain uppercase section headings draw those lines for it. Patkan writes them for you.",
   },
   {
-    q: "Do I have to leave chatgpt.com to use it?",
-    a: "No. Patkan is a browser extension that runs inside the ChatGPT tab. You type, you finish with //, and your text is transformed right in the input box — no copy-pasting, no switching tabs.",
+    q: "Do I have to leave gemini.google.com to use it?",
+    a: "No. Patkan is a browser extension that runs inside the Gemini tab. You type, you finish with //, and your text is rewritten right in the input box — no copying, no switching tabs.",
+  },
+  {
+    q: "Does it work in Google AI Studio too?",
+    a: "Yes. Patkan runs on both gemini.google.com and aistudio.google.com, and applies the same sectioned structure in each.",
   },
   {
     q: "What does Patkan actually do to my text?",
-    a: "It compiles your rough thought into a structured prompt: it picks an expert persona, adds the context and constraints ChatGPT needs, and puts each section under a markdown heading. You can review and edit the result before sending it.",
+    a: "It compiles your rough thought into a structured prompt: it picks an expert role, adds the context and limits Gemini needs, and states the format you want back. You can read and edit the result before you send it.",
   },
   {
     q: "Does it work with other AI tools too?",
-    a: "Yes. The same extension works inside Claude, Gemini, Microsoft Copilot, Perplexity, and more — with the output format adapted to each model. Claude gets XML tags; ChatGPT gets markdown headings. There's a separate page for the Claude dialect.",
+    a: "Yes. The same extension works inside ChatGPT, Claude, Microsoft Copilot, Perplexity and more, with the structure adapted to each one. This page is about the Gemini dialect.",
   },
 ] as const;
 
@@ -101,7 +101,7 @@ function downloadExtension() {
   window.open(CHROME_WEB_STORE_URL, "_blank", "noopener,noreferrer");
 }
 
-function ChatGptPromptGenerator() {
+function GeminiPromptGenerator() {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <header className="sticky top-0 z-30 border-b bg-background/85 backdrop-blur-md">
@@ -130,16 +130,16 @@ function ChatGptPromptGenerator() {
       <main>
         {/* Hero */}
         <section className={`${shell} py-16 sm:py-20 lg:py-28`}>
-          <p className="font-mono text-xs uppercase tracking-[0.18em] text-primary">For ChatGPT</p>
+          <p className="font-mono text-xs uppercase tracking-[0.18em] text-primary">For Google Gemini</p>
           <h1 className="mt-4 max-w-3xl text-4xl font-semibold leading-tight tracking-tight sm:text-5xl md:text-6xl">
-            A ChatGPT prompt generator that lives inside ChatGPT
+            A Gemini prompt generator that lives inside Gemini
           </h1>
           <p className="mt-6 max-w-2xl text-base leading-relaxed text-muted-foreground sm:text-lg">
-            ChatGPT answers best when a prompt is split into labeled markdown sections — role, context, task,
-            constraints, output format. Writing that by hand every time is tedious. Patkan does it for you: type your
-            rough thought on chatgpt.com, end it with{" "}
+            Gemini answers best when a prompt has clear, unmistakable boundaries — role, context, task, constraints,
+            output format. Writing that by hand every time is tedious. Patkan does it for you: type your rough thought
+            on gemini.google.com, end it with{" "}
             <code className="rounded bg-muted px-1.5 py-0.5 font-mono text-sm text-foreground">//</code>, and it
-            becomes a structured ChatGPT prompt in the blink of an eye.
+            becomes a structured Gemini prompt in the blink of an eye.
           </p>
           <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
             <button
@@ -164,19 +164,20 @@ function ChatGptPromptGenerator() {
             <div className="mx-auto max-w-xl text-center">
               <p className="font-mono text-xs uppercase tracking-[0.18em] text-primary">Before → After</p>
               <h2 className="mt-3 text-3xl font-semibold tracking-tight sm:text-4xl">
-                Same thought. Surgically crafted for ChatGPT.
+                Same thought. Surgically crafted for Gemini.
               </h2>
             </div>
             <div className="mt-10 grid gap-6 lg:grid-cols-2 lg:gap-px lg:overflow-hidden lg:rounded-lg lg:border lg:bg-border">
               <div className="rounded-lg border bg-background p-5 sm:p-7 lg:rounded-none lg:border-0">
                 <p className="text-xs font-semibold tracking-wider">YOU TYPE</p>
                 <p className="mt-4 text-base leading-relaxed sm:text-lg">
-                  {exampleBefore} <code className="rounded bg-muted px-1.5 py-0.5 font-mono text-sm text-primary">//</code>
+                  {exampleBefore}{" "}
+                  <code className="rounded bg-muted px-1.5 py-0.5 font-mono text-sm text-primary">//</code>
                 </p>
               </div>
               <div className="rounded-lg border bg-muted/40 p-5 sm:p-7 lg:rounded-none lg:border-0">
-                <p className="text-xs font-semibold tracking-wider">CHATGPT RECEIVES</p>
-                <pre className="mt-4 max-h-96 overflow-auto rounded-md border bg-background p-4 font-mono text-[11px] leading-relaxed whitespace-pre-wrap break-words text-foreground/90 sm:text-xs">
+                <p className="text-xs font-semibold tracking-wider">GEMINI RECEIVES</p>
+                <pre className="mt-4 overflow-auto rounded-md border bg-background p-4 font-mono text-[11px] leading-relaxed whitespace-pre-wrap break-words text-foreground/90 sm:text-xs">
                   {exampleAfter}
                 </pre>
               </div>
@@ -212,13 +213,13 @@ function ChatGptPromptGenerator() {
               },
               {
                 icon: Zap,
-                heading: "Markdown for ChatGPT, its native tongue",
-                body: "ChatGPT gets markdown headings. Claude gets XML. Each model receives the structure it respects.",
+                heading: "Dialects, not templates",
+                body: "Gemini gets sections. Claude gets XML. ChatGPT gets markdown. Each model receives the structure it respects.",
               },
               {
                 icon: ShieldCheck,
                 heading: "Open and auditable",
-                body: "Installed unpacked as plain JavaScript — open the folder and inspect every line before you load it.",
+                body: "Patkan is open source under AGPL-3.0. Every line is on GitHub, there for anyone to read.",
               },
             ].map(({ icon: Icon, heading, body }) => (
               <article key={heading}>
@@ -235,7 +236,7 @@ function ChatGptPromptGenerator() {
         {/* FAQ */}
         <section className={`${shell} py-16 sm:py-20 md:py-24`}>
           <p className="font-mono text-xs uppercase tracking-[0.18em] text-primary">Questions</p>
-          <h2 className="mt-3 text-3xl font-semibold tracking-tight sm:text-4xl">ChatGPT + Patkan, answered</h2>
+          <h2 className="mt-3 text-3xl font-semibold tracking-tight sm:text-4xl">Gemini + Patkan, answered</h2>
           <div className="mt-10 divide-y rounded-lg border">
             {faqs.map(({ q, a }) => (
               <details key={q} className="group p-5 sm:p-6">
@@ -253,7 +254,7 @@ function ChatGptPromptGenerator() {
         <section className="border-t bg-card py-16 sm:py-20">
           <div className={`${shell} flex flex-col items-start gap-6 sm:flex-row sm:items-center sm:justify-between`}>
             <div>
-              <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl">Start prompting ChatGPT patkan.</h2>
+              <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl">Start prompting Gemini patkan.</h2>
               <p className="mt-2 text-sm text-muted-foreground sm:text-base">
                 10 transforms a day in ghost mode. No sign-up to start.
               </p>
@@ -270,18 +271,18 @@ function ChatGptPromptGenerator() {
 
       <footer className="border-t">
         <div className={`${shell} flex flex-wrap items-center justify-end gap-3 py-8 text-xs text-muted-foreground`}>
+          <Link to="/chatgpt-prompt-generator" className="transition-colors hover:text-foreground">
+            ChatGPT prompt generator
+          </Link>
           <Link to="/claude-prompt-generator" className="transition-colors hover:text-foreground">
             Claude prompt generator
-          </Link>
-          <Link to="/gemini-prompt-generator" className="transition-colors hover:text-foreground">
-            Gemini prompt generator
           </Link>
           <Link to="/privacy" className="transition-colors hover:text-foreground">
             Privacy Policy
           </Link>
-            <Link to="/terms" className="transition-colors hover:text-foreground">
-              Terms of Use
-            </Link>
+          <Link to="/terms" className="transition-colors hover:text-foreground">
+            Terms of Use
+          </Link>
           <Link to="/" className="transition-colors hover:text-foreground">
             Back to patkan.in
           </Link>
