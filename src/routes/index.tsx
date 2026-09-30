@@ -8,7 +8,6 @@ import {
   Check,
   ChevronDown,
   EyeOff,
-  Globe2,
   Headphones,
   Loader2,
   LockKeyhole,
