@@ -314,17 +314,8 @@ const privacy = [
     heading: "Blind to the rest of the web",
     body: "Patkan cannot see your other tabs, bank logins, emails, or browsing history. The browser sandbox strictly confines it to the AI sites in its approved list — `ChatGPT`, `Claude`, `Gemini`, `Microsoft Copilot`, `Perplexity`, and more.",
   },
-  {
-    icon: Zap,
-    heading: "Zero memory. Zero retention.",
-    body: "Your rough input compiles in RAM and immediately replaces your text. No prompt logs, no chat databases, and zero model training on what you write.",
-  },
-  {
-    icon: Globe2,
-    heading: "100% open and auditable",
-    body: "No obfuscated binary blobs. Because you install Patkan unpacked, you can open the folder, inspect every line of plain JavaScript, and verify every network call in DevTools before you click load.",
-  },
 ] as const;
+
 
 
 function Landing() {
