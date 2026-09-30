@@ -10,6 +10,7 @@ Key facts:
 - 10 transforms a day.
 - Open source under AGPL-3.0: https://github.com/Gauravrsh/patkan
 - Install from the Chrome Web Store: https://chromewebstore.google.com/detail/patkan-%E2%80%94-instant-expert-p/jcgkfecfliophjfnkokjnifcmalfbnnn
+- Official LinkedIn page: https://www.linkedin.com/company/patkan-in/
 - Contact: contact@patkan.in
 
 ## Pages
