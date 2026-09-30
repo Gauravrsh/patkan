@@ -1,0 +1,25 @@
+# Patkan
+
+> Patkan is a browser extension that turns a rough thought into a clear, well-structured prompt right inside ChatGPT, Gemini, Claude and other AI chats. Type your thought, end it with //, and Patkan rewrites it before the AI sees it.
+
+Patkan is made for non-technical professionals — marketers, HR, sales, finance, insurance agents, students, founders and freelancers — who want better answers from AI without learning "prompt engineering". A clearer prompt helps reduce made-up details (hallucinations), overly long replies and answers that drift away from what was asked.
+
+Key facts:
+- Trigger: end any line with // inside an AI chat box.
+- Works inside the AI chat window; no copying and pasting between tabs.
+- 10 transforms a day.
+- Open source under AGPL-3.0: https://github.com/Gauravrsh/patkan
+- Install from the Chrome Web Store: https://chromewebstore.google.com/detail/patkan-%E2%80%94-instant-expert-p/jcgkfecfliophjfnkokjnifcmalfbnnn
+- Contact: contact@patkan.in
+
+## Pages
+- [Home](https://patkan.in/): What Patkan does, a live playground and install steps.
+- [ChatGPT prompt generator](https://patkan.in/chatgpt-prompt-generator): Write better ChatGPT prompts with //.
+- [Claude prompt generator](https://patkan.in/claude-prompt-generator): Write better Claude prompts with //.
+
+## Legal
+- [Privacy Policy](https://patkan.in/privacy)
+- [Terms of Use](https://patkan.in/terms)
+
+## Optional
+- [Full description for AI assistants](https://patkan.in/llms-full.txt)
