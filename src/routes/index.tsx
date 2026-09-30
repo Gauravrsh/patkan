@@ -911,7 +911,7 @@ function Landing() {
               <p className="text-base leading-relaxed text-muted-foreground sm:text-lg">
                 No background tracking. No keystroke logging. No reading your chat history. Patkan is hardcoded strictly
                 to <ApprovedUrlsTrigger /> and takes no action until you type{" "}
-                <code className="font-mono text-foreground">//</code>. What you type compiles in RAM and vanishes.
+                <code className="font-mono text-foreground">//</code>.
               </p>
               <Link
                 to="/privacy"
