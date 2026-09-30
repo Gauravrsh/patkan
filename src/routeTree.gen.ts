@@ -15,6 +15,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as ChatgptPromptGeneratorRouteImport } from './routes/chatgpt-prompt-generator'
 import { Route as ClaudePromptGeneratorRouteImport } from './routes/claude-prompt-generator'
 import { Route as ConnectRouteImport } from './routes/connect'
+import { Route as GeminiPromptGeneratorRouteImport } from './routes/gemini-prompt-generator'
 import { Route as Playgroundv2RouteImport } from './routes/playgroundv2'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
@@ -60,6 +61,11 @@ const ClaudePromptGeneratorRoute = ClaudePromptGeneratorRouteImport.update({
 const ConnectRoute = ConnectRouteImport.update({
   id: '/connect',
   path: '/connect',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GeminiPromptGeneratorRoute = GeminiPromptGeneratorRouteImport.update({
+  id: '/gemini-prompt-generator',
+  path: '/gemini-prompt-generator',
   getParentRoute: () => rootRouteImport,
 } as any)
 const Playgroundv2Route = Playgroundv2RouteImport.update({
@@ -156,6 +162,7 @@ export interface FileRoutesByFullPath {
   '/chatgpt-prompt-generator': typeof ChatgptPromptGeneratorRoute
   '/claude-prompt-generator': typeof ClaudePromptGeneratorRoute
   '/connect': typeof ConnectRoute
+  '/gemini-prompt-generator': typeof GeminiPromptGeneratorRoute
   '/playgroundv2': typeof Playgroundv2Route
   '/privacy': typeof PrivacyRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -180,6 +187,7 @@ export interface FileRoutesByTo {
   '/chatgpt-prompt-generator': typeof ChatgptPromptGeneratorRoute
   '/claude-prompt-generator': typeof ClaudePromptGeneratorRoute
   '/connect': typeof ConnectRoute
+  '/gemini-prompt-generator': typeof GeminiPromptGeneratorRoute
   '/playgroundv2': typeof Playgroundv2Route
   '/privacy': typeof PrivacyRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -205,6 +213,7 @@ export interface FileRoutesById {
   '/chatgpt-prompt-generator': typeof ChatgptPromptGeneratorRoute
   '/claude-prompt-generator': typeof ClaudePromptGeneratorRoute
   '/connect': typeof ConnectRoute
+  '/gemini-prompt-generator': typeof GeminiPromptGeneratorRoute
   '/playgroundv2': typeof Playgroundv2Route
   '/privacy': typeof PrivacyRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -231,6 +240,7 @@ export interface FileRouteTypes {
     | '/chatgpt-prompt-generator'
     | '/claude-prompt-generator'
     | '/connect'
+    | '/gemini-prompt-generator'
     | '/playgroundv2'
     | '/privacy'
     | '/sitemap.xml'
@@ -255,6 +265,7 @@ export interface FileRouteTypes {
     | '/chatgpt-prompt-generator'
     | '/claude-prompt-generator'
     | '/connect'
+    | '/gemini-prompt-generator'
     | '/playgroundv2'
     | '/privacy'
     | '/sitemap.xml'
@@ -279,6 +290,7 @@ export interface FileRouteTypes {
     | '/chatgpt-prompt-generator'
     | '/claude-prompt-generator'
     | '/connect'
+    | '/gemini-prompt-generator'
     | '/playgroundv2'
     | '/privacy'
     | '/sitemap.xml'
@@ -305,6 +317,7 @@ export interface RootRouteChildren {
   ChatgptPromptGeneratorRoute: typeof ChatgptPromptGeneratorRoute
   ClaudePromptGeneratorRoute: typeof ClaudePromptGeneratorRoute
   ConnectRoute: typeof ConnectRoute
+  GeminiPromptGeneratorRoute: typeof GeminiPromptGeneratorRoute
   Playgroundv2Route: typeof Playgroundv2Route
   PrivacyRoute: typeof PrivacyRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
@@ -359,6 +372,13 @@ declare module '@tanstack/react-router' {
       path: '/connect'
       fullPath: '/connect'
       preLoaderRoute: typeof ConnectRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/gemini-prompt-generator': {
+      id: '/gemini-prompt-generator'
+      path: '/gemini-prompt-generator'
+      fullPath: '/gemini-prompt-generator'
+      preLoaderRoute: typeof GeminiPromptGeneratorRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/playgroundv2': {
@@ -522,6 +542,7 @@ const rootRouteChildren: RootRouteChildren = {
   ChatgptPromptGeneratorRoute: ChatgptPromptGeneratorRoute,
   ClaudePromptGeneratorRoute: ClaudePromptGeneratorRoute,
   ConnectRoute: ConnectRoute,
+  GeminiPromptGeneratorRoute: GeminiPromptGeneratorRoute,
   Playgroundv2Route: Playgroundv2Route,
   PrivacyRoute: PrivacyRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
