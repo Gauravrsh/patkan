@@ -7,6 +7,8 @@ export const GITHUB_URL = "https://github.com/Gauravrsh/patkan";
 export const PATKAN_DEFINITION =
   "Patkan is a browser extension that turns a rough thought into a clear, well-structured prompt right inside ChatGPT, Gemini, Claude and other AI chats. Type your thought, end it with //, and Patkan rewrites it before the AI sees it.";
 
+export const LINKEDIN_URL = "https://www.linkedin.com/company/patkan-in/";
+
 export const organizationLd = {
   "@type": "Organization",
   "@id": `${SITE_URL}/#organization`,
@@ -14,7 +16,7 @@ export const organizationLd = {
   url: `${SITE_URL}/`,
   logo: `${SITE_URL}/favicon.png`,
   email: "contact@patkan.in",
-  sameAs: [CWS_URL, GITHUB_URL],
+  sameAs: [CWS_URL, LINKEDIN_URL, GITHUB_URL],
 };
 
 export const softwareLd = {

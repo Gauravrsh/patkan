@@ -31,6 +31,7 @@ After: a prompt with a clear role (a B2B copywriter), context (a busy startup fo
 - 10 transforms a day.
 - Open source under AGPL-3.0: https://github.com/Gauravrsh/patkan
 - Chrome Web Store: https://chromewebstore.google.com/detail/patkan-%E2%80%94-instant-expert-p/jcgkfecfliophjfnkokjnifcmalfbnnn
+- LinkedIn page: https://www.linkedin.com/company/patkan-in/
 - Website: https://patkan.in
 - Privacy Policy: https://patkan.in/privacy
 - Terms of Use: https://patkan.in/terms
