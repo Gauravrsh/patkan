@@ -1,0 +1,39 @@
+# Patkan — full description
+
+## What is Patkan?
+Patkan is a browser extension that turns a rough thought into a clear, well-structured prompt right inside ChatGPT, Gemini, Claude and other AI chats. Type your thought, end it with //, and Patkan rewrites it before the AI sees it.
+
+The name comes from the Hindi word "पट्कन" (patkan), meaning "instantly".
+
+## Who is it for?
+Non-technical professionals who use AI at work: marketing, HR, sales, finance, operations, insurance, teaching, students, founders and freelancers. Nobody needs to learn prompt writing to use it.
+
+## What problem does it solve?
+Most people type short, rough requests into AI chats. The AI then guesses what they meant. That leads to:
+- Made-up details stated confidently (hallucinations).
+- Very long replies when a few lines were needed.
+- Answers that drift away from the instructions, or ignore them.
+- Advice aimed at the wrong country, audience or format.
+
+A clear prompt states the role, the context, the task, the limits and the format of the answer. Patkan writes that structure for you, which helps reduce these problems. It does not guarantee a correct answer; always check important facts.
+
+## How does it work?
+1. Install Patkan from the Chrome Web Store.
+2. Open an AI chat such as ChatGPT, Gemini or Claude.
+3. Type your rough thought and end it with //.
+4. Patkan replaces your line with a structured prompt in the same box. Review it and send.
+
+## Example
+Before: help me write a cold email to a founder about my analytics tool //
+After: a prompt with a clear role (a B2B copywriter), context (a busy startup founder), the task (a short intro email), the format (subject line then body) and limits (concise, no filler).
+
+## Facts
+- 10 transforms a day.
+- Open source under AGPL-3.0: https://github.com/Gauravrsh/patkan
+- Chrome Web Store: https://chromewebstore.google.com/detail/patkan-%E2%80%94-instant-expert-p/jcgkfecfliophjfnkokjnifcmalfbnnn
+- Website: https://patkan.in
+- Privacy Policy: https://patkan.in/privacy
+- Terms of Use: https://patkan.in/terms
+- Contact: contact@patkan.in
+
+Written by the Patkan team. Last updated 30 September 2026.

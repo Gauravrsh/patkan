@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowDownToLine, ArrowRight, Check, MousePointer2, ShieldCheck, Zap } from "lucide-react";
 
+import { ldScript, organizationLd, pageLd, softwareLd } from "@/lib/seo";
 import patkanMark from "@/assets/patkan-mark.svg";
 
 export const Route = createFileRoute("/claude-prompt-generator")({
@@ -26,18 +27,16 @@ export const Route = createFileRoute("/claude-prompt-generator")({
     ],
     links: [{ rel: "canonical", href: "https://patkan.in/claude-prompt-generator" }],
     scripts: [
-      {
-        type: "application/ld+json",
-        children: JSON.stringify({
-          "@context": "https://schema.org",
-          "@type": "WebPage",
+      ldScript([
+        organizationLd,
+        softwareLd,
+        pageLd({
           name: "Claude Prompt Generator — Patkan",
-          url: "https://patkan.in/claude-prompt-generator",
-          description:
-            "Turn a rough thought into an expert Claude prompt without leaving claude.ai, using Patkan's Claude XML dialect.",
-          isPartOf: { "@type": "WebSite", name: "Patkan", url: "https://patkan.in/" },
+          path: "/claude-prompt-generator",
+          description: "Turn a rough thought into an expert Claude prompt without leaving the chat. End your line with // and Patkan rewrites it.",
+          dateModified: "2026-09-30",
         }),
-      },
+      ]),
     ],
   }),
   component: ClaudePromptGenerator,

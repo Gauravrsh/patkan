@@ -8,3 +8,4 @@
 > Commits you push to the connected branch sync back to Lovable and show up in
 > the editor, so keep the branch in a working state.
 <!-- LOVABLE:END -->
+- Structured data (JSON-LD) for pages comes from src/lib/seo.ts — one shared definition keeps Patkan described identically everywhere.
