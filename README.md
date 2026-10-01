@@ -1,12 +1,16 @@
 # Patkan
 
-Turn a rough thought into a surgically crafted prompt, instantly.
+Patkan is a browser extension that turns a rough thought into a clear, well-structured prompt right inside
+ChatGPT, Gemini, Claude and other AI chats. Type your thought, end it with `//`, and Patkan rewrites it
+before the AI sees it.
 
-Patkan is a web app plus a browser extension. Type a sloppy sentence, end it with `//`, and it is
-rewritten into a structured prompt — role, context, task, constraints — before it ever reaches your
-AI chat.
+It is made for non-technical professionals — marketers, HR, sales, finance, insurance agents, students,
+founders and freelancers — who want better answers from AI without learning "prompt engineering". A clearer
+prompt helps reduce made-up details (hallucinations), overly long replies and answers that drift away from
+what was asked.
 
 Live at **[patkan.in](https://patkan.in)**.
+
 
 ## Licence and what you may do
 

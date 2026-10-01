@@ -1,30 +1,39 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowRight } from "lucide-react";
 
+import { ldScript, organizationLd, pageLd, softwareLd } from "@/lib/seo";
 import patkanMark from "@/assets/patkan-mark.svg";
+
+const PRIVACY_DESC =
+  "What Patkan collects, why, and what happens to it. A plain-language privacy policy for patkan.in and the official Patkan extension.";
 
 export const Route = createFileRoute("/privacy")({
   head: () => ({
     meta: [
       { title: "Privacy Policy · Patkan" },
-      {
-        name: "description",
-        content:
-          "What Patkan collects, why, and what happens to it. A plain-language privacy policy for patkan.in and the official Patkan extension.",
-      },
+      { name: "description", content: PRIVACY_DESC },
       { property: "og:title", content: "Privacy Policy · Patkan" },
-      {
-        property: "og:description",
-        content:
-          "What Patkan collects, why, and what happens to it. A plain-language privacy policy for patkan.in and the official Patkan extension.",
-      },
+      { property: "og:description", content: PRIVACY_DESC },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],
     links: [{ rel: "canonical", href: "https://patkan.in/privacy" }],
+    scripts: [
+      ldScript([
+        organizationLd,
+        softwareLd,
+        pageLd({
+          name: "Privacy Policy · Patkan",
+          path: "/privacy",
+          description: PRIVACY_DESC,
+          dateModified: "2026-09-27",
+        }),
+      ]),
+    ],
   }),
   component: PrivacyPolicy,
 });
+
 
 const shell = "mx-auto w-full max-w-3xl px-5 sm:px-6 lg:px-8";
 
