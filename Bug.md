@@ -61,44 +61,6 @@ Entry template:
     Playwright asserted the badge visible at 393px, 834px and 1440px with
     document.documentElement.scrollWidth === window.innerWidth (no overflow) at all three.
   status: fixed
-
-- id: BUG-006
-  date: 2026-10-01
-  title: Short prompts (under 4 words) never fire Patkan
-  severity: high
-  surface: browser extension (all supported hosts)
-  repro: >
-    In any supported composer, type a short rough thought ending in "//",
-    e.g. "rsadasjd askdjb//" or "fix this//". Nothing happens — no pill, no
-    rewrite — and pressing Enter sends the raw text with the trailing "//"
-    to the AI, which replies as if it were a typo.
-  evidence: >
-    Live telemetry for 2026-10-01: trigger_detected fired only for inputs
-    of 4+ words; no transform_events row exists for the 2-word input seen
-    in the user's screenshot. extension/content.js shouldTrigger returned
-    false because the word count before "//" was below 4; maybeShowPill
-    additionally hid the pill below 5 words.
-  root_cause: >
-    extension/content.js shouldTrigger required words >= 4 and
-    maybeShowPill required words >= 5. The thresholds were meant to skip
-    accidental triggers, but they silently excluded exactly the input
-    Patkan exists for: a short, rough, half-formed thought. There was no
-    user-visible feedback explaining why nothing fired.
-  why_undetected: >
-    All trigger tests used sentences of 4+ words, so the threshold was
-    never exercised from below.
-  fix: >
-    shouldTrigger now fires on any non-trivial text (trimmed length >= 3
-    characters) instead of a 4-word minimum; maybeShowPill shows the pill
-    from 3 characters up. URL/path/escape guards (TRIGGER_AT_END lookbehind,
-    \// escape) are unchanged. Manifest bumped to 1.0.2; both extension
-    packages rebuilt.
-  verification: >
-    node --check passes; trigger suite green with new cases:
-    "fix this//" -> true, "rsadasjd askdjb//" -> true, "ab//" -> false,
-    "https://x//" -> false, "a//b//" -> false, "\//" -> false,
-    "write a launch email//" -> true.
-  status: fixed
 ```
 
 ```yaml
