@@ -60,13 +60,13 @@ import patkanMark from "@/assets/patkan-mark.svg";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Patkan — Prompt generator for ChatGPT, Gemini and Claude" },
+      { title: "Patkan - Prompt convertor for ChatGPT, Gemini, Claude and more AI assistants" },
       {
         name: "description",
         content:
           "Turn a rough thought into a clear, well-structured prompt without leaving your AI chat. End your line with // and Patkan rewrites it for ChatGPT, Gemini or Claude.",
       },
-      { property: "og:title", content: "Patkan — Prompt generator for ChatGPT, Gemini and Claude" },
+      { property: "og:title", content: "Patkan - Prompt convertor for ChatGPT, Gemini, Claude and more AI assistants" },
       {
         property: "og:description",
         content:
@@ -84,7 +84,7 @@ export const Route = createFileRoute("/")({
         organizationLd,
         softwareLd,
         { "@type": "WebSite", "@id": "https://patkan.in/#website", name: "Patkan", url: "https://patkan.in/", publisher: { "@id": "https://patkan.in/#organization" } },
-        pageLd({ name: "Patkan — Prompt generator for ChatGPT, Gemini and Claude", path: "/", description: PATKAN_DEFINITION, dateModified: "2026-09-30" }),
+        pageLd({ name: "Patkan - Prompt convertor for ChatGPT, Gemini, Claude and more AI assistants", path: "/", description: PATKAN_DEFINITION, dateModified: "2026-09-30" }),
       ]),
     ],
   }),
