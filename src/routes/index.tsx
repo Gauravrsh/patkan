@@ -973,7 +973,11 @@ function Landing() {
         <div className={`${shell} flex flex-wrap items-center justify-between gap-3 py-8 text-xs text-muted-foreground`}>
           <p>patkan.in</p>
           <nav className="flex flex-wrap items-center gap-4" aria-label="Footer">
+            <Link to="/about" className="transition-colors hover:text-foreground">
+              About
+            </Link>
             <Link to="/chatgpt-prompt-generator" className="transition-colors hover:text-foreground">
+
               ChatGPT prompt generator
             </Link>
             <Link to="/claude-prompt-generator" className="transition-colors hover:text-foreground">

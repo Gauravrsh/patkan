@@ -232,7 +232,11 @@ function PrivacyPolicy() {
         <div className={`${shell} flex flex-wrap items-center justify-between gap-3 py-8 text-xs text-muted-foreground`}>
           <p>patkan.in</p>
           <nav className="flex flex-wrap items-center gap-4" aria-label="Site">
+            <Link to="/about" className="transition-colors hover:text-foreground">
+              About
+            </Link>
             <Link to="/terms" className="transition-colors hover:text-foreground">
+
               Terms of Use
             </Link>
             <Link to="/chatgpt-prompt-generator" className="transition-colors hover:text-foreground">
