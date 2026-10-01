@@ -466,8 +466,8 @@
 
   function maybeShowPill() {
     if (!target) return;
-    const words = readText(target).trim().split(/\s+/).filter(Boolean).length;
-    showPill(words >= 5 && !busy);
+    const text = readText(target).trim();
+    showPill(text.length >= 3 && !busy);
   }
 
   /* Trigger guards. `//` at the end of a real sentence fires Patkan; `//`
@@ -483,8 +483,9 @@
     if (!TRIGGER_AT_END.test(text)) return false;
     const before = text.replace(/\/\/[ \t]*$/, "");
     if (/\\$/.test(before)) return false; // escaped: \// never fires
-    const words = before.trim().split(/\s+/).filter(Boolean).length;
-    return words >= 4;
+    // Any real text qualifies: a lone word or short fragment is exactly the
+    // "rough thought" Patkan exists for. Only truly empty input is refused.
+    return before.trim().length >= 3;
   }
 
   function stripTrigger(text) {
