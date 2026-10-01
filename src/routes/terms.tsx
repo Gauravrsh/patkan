@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowRight } from "lucide-react";
 
+import { ldScript, organizationLd, pageLd, softwareLd } from "@/lib/seo";
 import patkanMark from "@/assets/patkan-mark.svg";
 
 const DESC =
@@ -17,9 +18,17 @@ export const Route = createFileRoute("/terms")({
       { name: "twitter:card", content: "summary" },
     ],
     links: [{ rel: "canonical", href: "https://patkan.in/terms" }],
+    scripts: [
+      ldScript([
+        organizationLd,
+        softwareLd,
+        pageLd({ name: "Terms of Use · Patkan", path: "/terms", description: DESC, dateModified: "2026-09-27" }),
+      ]),
+    ],
   }),
   component: TermsOfUse,
 });
+
 
 const shell = "mx-auto w-full max-w-3xl px-5 sm:px-6 lg:px-8";
 
@@ -217,7 +226,9 @@ function TermsOfUse() {
         <div className={`${shell} flex flex-wrap items-center justify-between gap-3 py-8 text-xs text-muted-foreground`}>
           <p>patkan.in</p>
           <nav className="flex flex-wrap items-center gap-4" aria-label="Site">
+            <Link to="/about" className="transition-colors hover:text-foreground">About</Link>
             <Link to="/privacy" className="transition-colors hover:text-foreground">Privacy Policy</Link>
+
             <Link to="/chatgpt-prompt-generator" className="transition-colors hover:text-foreground">ChatGPT prompt generator</Link>
             <Link to="/claude-prompt-generator" className="transition-colors hover:text-foreground">Claude prompt generator</Link>
           </nav>
