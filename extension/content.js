@@ -483,6 +483,7 @@
     if (!TRIGGER_AT_END.test(text)) return false;
     const before = text.replace(/\/\/[ \t]*$/, "");
     if (/\\$/.test(before)) return false; // escaped: \// never fires
+    if (before.includes("//")) return false; // URLs, paths, a//b — never fire
     // Any real text qualifies: a lone word or short fragment is exactly the
     // "rough thought" Patkan exists for. Only truly empty input is refused.
     return before.trim().length >= 3;
