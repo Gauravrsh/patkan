@@ -271,6 +271,9 @@ function GeminiPromptGenerator() {
 
       <footer className="border-t">
         <div className={`${shell} flex flex-wrap items-center justify-end gap-3 py-8 text-xs text-muted-foreground`}>
+          <Link to="/about" className="transition-colors hover:text-foreground">
+            About
+          </Link>
           <Link to="/chatgpt-prompt-generator" className="transition-colors hover:text-foreground">
             ChatGPT prompt generator
           </Link>
