@@ -708,8 +708,7 @@ function Landing() {
               Patkan sits right inside <strong className="text-foreground">ChatGPT</strong>,{" "}
               <strong className="text-foreground">Claude</strong>, <strong className="text-foreground">Gemini</strong>,{" "}
               <strong className="text-foreground">Microsoft Copilot</strong>,{" "}
-              <strong className="text-foreground">Perplexity</strong>, and more. You never have to switch tabs or leave
-              your AI chat.
+              <strong className="text-foreground">Perplexity</strong>, and more. You never have to switch tabs or copy-paste from a different AI asistant.
             </p>
             <div className="mt-7 flex flex-col gap-3 sm:mt-8 sm:flex-row sm:flex-wrap">
               <button
