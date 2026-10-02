@@ -691,7 +691,7 @@ function Landing() {
           data-section="hero"
           className={`${shell} grid gap-10 pb-16 pt-10 sm:gap-12 sm:pb-20 sm:pt-14 lg:grid-cols-[1.05fr_.95fr] lg:items-center lg:gap-16 lg:pb-28 lg:pt-20`}
         >
-          <div className="order-2 lg:order-1">
+          <div className="order-1 lg:order-1">
             <div className="border-l-2 border-primary pl-4 sm:pl-6">
               <p className="text-balance text-xl font-medium leading-snug sm:text-2xl md:text-3xl">
                 “Good prompts work better.
@@ -733,7 +733,7 @@ function Landing() {
 
           </div>
 
-          <article className="order-1 overflow-hidden rounded-lg border bg-card shadow-sm lg:order-2">
+          <article className="order-2 overflow-hidden rounded-lg border bg-card shadow-sm lg:order-2">
             <div className="flex items-start justify-between gap-3 border-b p-5 sm:p-7 md:p-8">
               <div className="min-w-0">
                 <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
