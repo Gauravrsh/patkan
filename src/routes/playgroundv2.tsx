@@ -1,6 +1,6 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
-import { Check, ChevronDown, Loader2, Sparkles } from "lucide-react";
+import { ArrowDownToLine, Check, ChevronDown, Copy, Loader2, RotateCcw } from "lucide-react";
 import { toast } from "sonner";
 
 import {
@@ -20,7 +20,7 @@ import {
 } from "@/lib/patkan-core";
 import { streamTransform, type EngineId } from "@/lib/patkan-stream";
 import { useAuth } from "@/hooks/useAuth";
-import patkanMark from "@/assets/patkan-mark.svg";
+
 
 export const Route = createFileRoute("/playgroundv2")({
   head: () => ({
@@ -55,12 +55,6 @@ function deviceId() {
 
 type Phase = "idle" | "drafting" | "sharpening" | "ready";
 
-const PHASE_LABEL: Record<Phase, string> = {
-  idle: "Compiled prompt",
-  drafting: "Drafting…",
-  sharpening: "Sharpening this…",
-  ready: "Ready",
-};
 
 const shell = "mx-auto w-full max-w-6xl px-5 sm:px-6 lg:px-8";
 
@@ -208,58 +202,46 @@ const PROFESSIONS: PersonaOption[] = [
 type PersonaOption = readonly [string, string, string];
 const MARKETER_INDEX = PROFESSIONS.findIndex(([name]) => name === "Marketing");
 
+const CWS_URL =
+  "https://chromewebstore.google.com/detail/patkan-%E2%80%94-instant-expert-p/jcgkfecfliophjfnkokjnifcmalfbnnn";
+const GHOST_SET = new Set<string>(GHOST_TASKS);
+
 function PlaygroundV2Page() {
   const { session } = useAuth();
-
   const [input, setInput] = useState("");
-  const [targetIndex, setTargetIndex] = useState(0);
-  const [personaIndex, setPersonaIndex] = useState(MARKETER_INDEX);
   const [output, setOutput] = useState("");
   const [phase, setPhase] = useState<Phase>("idle");
-  const [engine, setEngine] = useState<EngineId>("local");
-  const [assumptions, setAssumptions] = useState<string[]>([]);
-  const [clarifiers, setClarifiers] = useState<{ label: string; refinement: string }[]>([]);
+  const [targetIndex, setTargetIndex] = useState(0);
+  const [personaIndex, setPersonaIndex] = useState(MARKETER_INDEX);
   const [busy, setBusy] = useState(false);
   const [copied, setCopied] = useState(false);
   const [usage, setUsage] = useState<{ used: number; limit: number } | null>(null);
-  const [customPersonas, setCustomPersonas] = useState<string[]>([]);
+  const [mobile, setMobile] = useState(false);
+  const [, setEngine] = useState<EngineId>("local");
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const inputStarted = useRef(false);
-  const outRef = useRef<HTMLPreElement>(null);
-
-  const personaList: PersonaOption[] = [
-    ...PROFESSIONS,
-    ...customPersonas.map((name) => [name, "auto", `Write as ${name}.`] as PersonaOption),
-  ];
 
   const target = targetAis[targetIndex]!;
-  const persona = personaList[personaIndex] ?? personaList[MARKETER_INDEX]!;
+  const persona = PROFESSIONS[personaIndex]!;
   const dialect = target[1] as Dialect;
-  const personaId = persona[1];
-  const customInstruction = persona[2] || null;
   const intensity: Intensity = "standard";
-
-  function addCustomPersona(name: string) {
-    const clean = name.trim().slice(0, 40);
-    if (!clean) return;
-    const existing = customPersonas.indexOf(clean);
-    if (existing >= 0) {
-      setPersonaIndex(PROFESSIONS.length + existing);
-      return;
-    }
-    setCustomPersonas([...customPersonas, clean]);
-    setPersonaIndex(PROFESSIONS.length + customPersonas.length);
-  }
+  const limit = usage?.limit ?? (session ? DAILY_SIGNED_IN_LIMIT : DAILY_FREE_LIMIT);
+  const exhausted = (usage?.used ?? 0) >= limit;
+  const ghost = useGhostTyping(!input && !output && !busy);
+  const ghostDone = GHOST_SET.has(ghost);
 
   useEffect(() => {
-    if (textareaRef.current) {
-      const el = textareaRef.current;
+    setMobile(window.matchMedia("(max-width: 767px)").matches);
+  }, []);
+
+  useEffect(() => {
+    const el = textareaRef.current;
+    if (el) {
       el.style.height = "auto";
-      el.style.height = `${Math.max(el.scrollHeight, 96)}px`;
+      el.style.height = `${Math.max(el.scrollHeight, 120)}px`;
     }
   }, [input]);
 
-  // The allowance shown on load must be the real one, not an optimistic 10.
   useEffect(() => {
     let cancelled = false;
     const token = session?.access_token;
@@ -277,24 +259,26 @@ function PlaygroundV2Page() {
     };
   }, [session?.access_token]);
 
-  async function transform(refinement?: string) {
-    if (!input.trim() || busy) return;
+  async function transform(text: string) {
+    if (busy) return;
+    if (exhausted) {
+      toast.error("Daily limit reached. Sign in to keep going.");
+      return;
+    }
     setBusy(true);
     setPhase("drafting");
-    setAssumptions([]);
-    setClarifiers([]);
-    setOutput(localScaffold(input, { persona: personaId, dialect, intensity }));
+    setOutput(localScaffold(text, { persona: persona[1], dialect, intensity }));
     try {
       const result = await streamTransform(
         {
-          text: input,
-          persona: personaId,
+          text,
+          persona: persona[1],
           dialect,
           intensity,
           deviceId: deviceId(),
           accessToken: session?.access_token,
-          refinement: refinement ?? null,
-          customInstruction,
+          refinement: null,
+          customInstruction: persona[2] || null,
           surface: "web",
         },
         (visible) => {
@@ -303,433 +287,180 @@ function PlaygroundV2Page() {
         },
       );
       setOutput(result.prompt);
-      trackEvent("playground_compiled", { meta: { engine: result.engine } });
       setEngine(result.engine);
-      setPhase("ready");
-      setAssumptions(result.assumptions);
-      setClarifiers(result.clarifiers);
+      trackEvent("playground_compiled", { meta: { engine: result.engine } });
       if (typeof result.used === "number" && typeof result.limit === "number") {
         setUsage({ used: result.used, limit: result.limit });
       }
     } catch (err) {
-      setPhase("ready");
-      setEngine("local");
       toast.error(err instanceof Error ? err.message : "Transform failed.");
     } finally {
+      setPhase("ready");
       setBusy(false);
     }
   }
 
-  /**
-   * Quality signal. A copy is the strongest "this was good" a visitor gives us;
-   * the thumbs-down is the only way a bad compile becomes visible at all.
-   */
-  function rate(accepted: boolean) {
-    void fetch("/api/public/feedback", {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({ deviceId: deviceId(), accepted }),
-      keepalive: true,
-    }).catch(() => {});
+  function onType(value: string) {
+    if (!inputStarted.current && value.trim()) {
+      inputStarted.current = true;
+      trackEvent("playground_input_started");
+    }
+    const trimmed = value.trimEnd();
+    if (trimmed.endsWith("//")) {
+      const thought = trimmed.slice(0, -2).trim();
+      if (thought.length >= 3) {
+        setInput(thought);
+        void transform(thought);
+        return;
+      }
+    }
+    setInput(value);
+  }
+
+  function reset() {
+    if (busy) return;
+    setInput("");
+    setOutput("");
+    setPhase("idle");
   }
 
   async function copy() {
     if (!output) return;
     trackEvent("playground_copied");
-    rate(true);
+    void fetch("/api/public/feedback", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ deviceId: deviceId(), accepted: true }),
+      keepalive: true,
+    }).catch(() => {});
     await navigator.clipboard.writeText(output);
     setCopied(true);
     setTimeout(() => setCopied(false), 1500);
   }
 
-  const limit = usage?.limit ?? (session ? DAILY_SIGNED_IN_LIMIT : DAILY_FREE_LIMIT);
-  const used = usage?.used ?? 0;
-  const remaining = Math.max(0, limit - used);
-  const exhausted = used >= limit;
+  function getExtension() {
+    trackEvent("download_clicked", { meta: { surface: "playgroundv2" } });
+    window.open(CWS_URL, "_blank", "noopener");
+  }
+
+  const pill =
+    "inline-flex shrink-0 items-center gap-2 rounded-full border bg-background px-4 py-2 text-sm font-medium transition-colors hover:bg-accent";
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <main>
-        {/* Playground */}
-        <section id="playground" data-section="playground" className="scroll-mt-16 border-y bg-card py-16 sm:py-20 md:py-28">
-          <div className={shell}>
-            <Playground
-              input={input}
-              setInput={(value: string) => {
-                if (!inputStarted.current && value.trim()) {
-                  inputStarted.current = true;
-                  trackEvent("playground_input_started");
-                }
-                setInput(value);
-              }}
-              targetIndex={targetIndex}
-              setTargetIndex={setTargetIndex}
-              personaIndex={personaIndex}
-              setPersonaIndex={setPersonaIndex}
-              output={output}
-              phase={phase}
-              engine={engine}
-              assumptions={assumptions}
-              clarifiers={clarifiers}
-              busy={busy}
-              copied={copied}
-              copy={copy}
-              rate={rate}
-              transform={transform}
-              personaList={personaList}
-              addCustomPersona={addCustomPersona}
-              remaining={remaining}
-              exhausted={exhausted}
-              session={!!session}
-              textareaRef={textareaRef}
-              outRef={outRef}
-            />
+      <main className={`${shell} py-14 sm:py-20`}>
+        <section data-section="hero" className="mx-auto max-w-3xl text-center">
+          <p className="font-mono text-xs uppercase tracking-[0.18em] text-primary">Your Personal Prompt Engineer</p>
+          <h1 className="mt-4 text-balance text-3xl font-semibold leading-tight tracking-tight sm:text-5xl">
+            Stop writing prompts. Just end your sentence with <span className="font-mono text-primary">//</span>
+          </h1>
+          <p className="mx-auto mt-5 max-w-2xl text-base leading-relaxed text-muted-foreground sm:text-lg">
+            Turn raw thoughts into structured prompts right inside ChatGPT, Claude, and Gemini — without switching tabs
+            or learning prompt engineering.
+          </p>
+        </section>
+
+        <section data-section="playground" className="mx-auto mt-10 max-w-3xl sm:mt-12">
+          <div className="flex flex-wrap gap-2">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button type="button" className={pill}>
+                  {target[0]} <ChevronDown className="size-4" aria-hidden />
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start" className="max-h-80 overflow-y-auto">
+                {targetAis.map(([name], i) => (
+                  <DropdownMenuItem key={name} onSelect={() => setTargetIndex(i)}>
+                    {name}
+                    {i === targetIndex && <Check className="ml-auto size-4" />}
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button type="button" className={pill}>
+                  {persona[0]} <ChevronDown className="size-4" aria-hidden />
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start" className="max-h-80 overflow-y-auto">
+                {PROFESSIONS.map(([name], i) => (
+                  <DropdownMenuItem key={name} onSelect={() => setPersonaIndex(i)}>
+                    {name}
+                    {i === personaIndex && <Check className="ml-auto size-4" />}
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+
+          <div className="mt-4 overflow-hidden rounded-lg border bg-card shadow-sm">
+            <div className="flex items-center justify-end gap-1 border-b px-3 py-2">
+              {busy && <Loader2 className="mr-auto size-4 animate-spin text-primary" aria-label="Working" />}
+              <button
+                type="button"
+                onClick={reset}
+                disabled={busy}
+                aria-label="Reset"
+                title="Reset"
+                className="rounded-md p-2 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground disabled:opacity-40"
+              >
+                <RotateCcw className="size-4" />
+              </button>
+              <button
+                type="button"
+                onClick={copy}
+                disabled={!output || busy}
+                aria-label="Copy prompt"
+                title="Copy prompt"
+                className="rounded-md p-2 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground disabled:opacity-40"
+              >
+                {copied ? <Check className="size-4 text-primary" /> : <Copy className="size-4" />}
+              </button>
+            </div>
+
+            <div className="relative p-5 sm:p-7">
+              {output ? (
+                <pre className="max-h-[28rem] min-h-[120px] overflow-y-auto whitespace-pre-wrap break-words font-sans text-sm leading-relaxed sm:text-base">
+                  {output}
+                </pre>
+              ) : (
+                <>
+                  {!input && (
+                    <p
+                      aria-hidden
+                      className="pointer-events-none absolute inset-x-5 top-5 text-base leading-relaxed text-muted-foreground sm:inset-x-7 sm:top-7 sm:text-lg"
+                    >
+                      {ghost}
+                      {ghostDone && <span className="ml-1 font-mono font-bold text-primary">//</span>}
+                    </p>
+                  )}
+                  <textarea
+                    ref={textareaRef}
+                    value={input}
+                    onChange={(e) => onType(e.target.value)}
+                    aria-label="Type your rough thought and end it with //"
+                    className="block min-h-[120px] w-full resize-none bg-transparent text-base leading-relaxed outline-none sm:text-lg"
+                  />
+                </>
+              )}
+            </div>
+          </div>
+
+          <div className="mt-8 flex flex-col items-center gap-3 text-center">
+            <button
+              type="button"
+              onClick={getExtension}
+              className="inline-flex h-11 items-center justify-center gap-2 rounded-md bg-primary px-6 text-sm font-medium text-primary-foreground shadow-sm transition-colors hover:bg-primary/90"
+            >
+              <ArrowDownToLine className="size-4" aria-hidden /> {mobile ? "Add to Desktop" : "Add to Chrome"}
+            </button>
+            <p className="text-xs text-muted-foreground sm:text-sm">
+              Google Verified • Works across 14 AI assistants • No sign-up to start
+            </p>
           </div>
         </section>
       </main>
     </div>
-  );
-}
-
-
-interface PlaygroundProps {
-  input: string;
-  setInput: (v: string) => void;
-  targetIndex: number;
-  setTargetIndex: (i: number) => void;
-  personaIndex: number;
-  setPersonaIndex: (i: number) => void;
-  personaList: PersonaOption[];
-  addCustomPersona: (name: string) => void;
-  output: string;
-  phase: Phase;
-  engine: EngineId;
-  assumptions: string[];
-  clarifiers: { label: string; refinement: string }[];
-  busy: boolean;
-  copied: boolean;
-  copy: () => void;
-  rate: (accepted: boolean) => void;
-  transform: (refinement?: string) => void;
-  remaining: number;
-  exhausted: boolean;
-  session: boolean;
-  textareaRef: React.RefObject<HTMLTextAreaElement | null>;
-  outRef: React.RefObject<HTMLPreElement | null>;
-}
-
-function Playground(props: PlaygroundProps) {
-  const {
-    input,
-    setInput,
-    targetIndex,
-    setTargetIndex,
-    personaIndex,
-    setPersonaIndex,
-    personaList,
-    addCustomPersona,
-    output,
-    phase,
-    assumptions,
-    clarifiers,
-    busy,
-    copied,
-    copy,
-    transform,
-    remaining,
-    exhausted,
-    session,
-    textareaRef,
-    outRef,
-  } = props;
-
-  const [customOpen, setCustomOpen] = useState(false);
-  const [customDraft, setCustomDraft] = useState("");
-  const target = targetAis[targetIndex]!;
-  const persona = personaList[personaIndex] ?? personaList[MARKETER_INDEX]!;
-  const settled = phase === "ready" || phase === "idle";
-  const ghost = useGhostTyping(!input && !busy && !exhausted);
-
-  return (
-    <div>
-      <div className="mx-auto mb-8 max-w-xl text-center sm:mb-10">
-        <p className="font-mono text-xs uppercase tracking-[0.18em] text-primary">Playground</p>
-      </div>
-      <div className="relative flex flex-col lg:grid lg:grid-cols-[5fr_6fr] lg:gap-px lg:overflow-hidden lg:rounded-lg lg:border lg:bg-border lg:shadow-sm">
-        {/* Input card */}
-        <div className="rounded-lg border bg-background p-5 shadow-sm sm:p-7 lg:rounded-none lg:border-0 lg:pr-16 lg:shadow-none">
-          <div className="flex items-center justify-between gap-3 text-xs">
-            <span className="font-semibold tracking-wider">YOUR THOUGHTS</span>
-            <span className="shrink-0 text-muted-foreground">
-              {session
-                ? exhausted
-                  ? "0 left today"
-                  : `${remaining} left today`
-                : exhausted
-                  ? "0 transforms left — sign in to keep going"
-                  : `${remaining} more transforms, before you need to sign-in`}
-            </span>
-          </div>
-
-          {exhausted ? (
-            <div className="mt-5 min-h-24 border-b border-dashed pb-6 sm:min-h-28">
-              <p className="text-sm text-muted-foreground">
-                Daily limit reached.{" "}
-                <Link to="/auth" className="text-primary underline underline-offset-4">
-                  Sign in
-                </Link>{" "}
-                to keep going.
-              </p>
-            </div>
-          ) : (
-            <div className="relative mt-5 min-h-24 border-b border-dashed pb-6 sm:min-h-28">
-              {!input && (
-                <p
-                  aria-hidden="true"
-                  className="pointer-events-none absolute inset-x-0 top-0 font-sans text-base text-muted-foreground sm:text-lg"
-                >
-                  {ghost || "I want to.."}
-                  <span className="ml-0.5 inline-block w-px animate-pulse border-l border-muted-foreground align-middle text-transparent">
-                    .
-                  </span>
-                </p>
-              )}
-              <textarea
-                ref={textareaRef}
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                rows={1}
-                className="relative w-full resize-none overflow-hidden border-0 bg-transparent p-0 font-sans text-base text-foreground focus:outline-none focus:ring-0 sm:text-lg"
-                disabled={busy}
-              />
-            </div>
-          )}
-
-          <div className="mt-6 flex flex-wrap items-start gap-x-12 gap-y-4">
-            <div>
-              <p className="font-mono text-[11px] tracking-widest text-muted-foreground">TARGET AI</p>
-              <div className="mt-2">
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <button
-                      type="button"
-                      className="inline-flex items-center gap-2 rounded-full border px-4 py-1.5 text-sm font-medium transition-colors hover:bg-muted"
-                    >
-                      {target[0]}
-                      <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" />
-                    </button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="start" className="max-h-72 overflow-y-auto">
-                    {targetAis.map(([name], index) => (
-                      <DropdownMenuItem key={name} onSelect={() => setTargetIndex(index)}>
-                        {name}
-                      </DropdownMenuItem>
-                    ))}
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </div>
-            </div>
-            <div>
-              <p className="font-mono text-[11px] tracking-widest text-muted-foreground">SELECT ROLE</p>
-              <div className="mt-2">
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <button
-                      type="button"
-                      className="inline-flex items-center gap-2 rounded-full border px-4 py-1.5 text-sm font-medium transition-colors hover:bg-muted"
-                    >
-                      {persona[0]}
-                      <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" />
-                    </button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="start" className="max-h-72 overflow-y-auto">
-                    {personaList.map(([name], index) => (
-                      <DropdownMenuItem key={name} onSelect={() => setPersonaIndex(index)}>
-                        {name}
-                      </DropdownMenuItem>
-                    ))}
-                    <DropdownMenuItem onSelect={() => setCustomOpen(true)}>Other</DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </div>
-            </div>
-          </div>
-
-          {customOpen && (
-            <form
-              className="mt-4 flex max-w-sm gap-2"
-              onSubmit={(e) => {
-                e.preventDefault();
-                addCustomPersona(customDraft);
-                setCustomDraft("");
-                setCustomOpen(false);
-              }}
-            >
-              <input
-                value={customDraft}
-                onChange={(e) => setCustomDraft(e.target.value)}
-                placeholder="Name your persona"
-                maxLength={40}
-                className="h-9 min-w-0 flex-1 rounded-md border bg-background px-3 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
-              />
-              <button
-                type="submit"
-                className="h-9 shrink-0 rounded-md bg-primary px-3 text-xs font-medium text-primary-foreground transition-colors hover:bg-primary/90"
-              >
-                Add
-              </button>
-            </form>
-          )}
-
-          {/* Mobile CTA */}
-          <button
-            onClick={() => transform()}
-            disabled={busy || !input.trim() || exhausted}
-            className="mt-7 flex h-12 w-full items-center justify-center gap-2 rounded-md bg-primary text-sm font-medium text-primary-foreground shadow-sm transition-colors hover:bg-primary/90 disabled:opacity-50 lg:hidden"
-          >
-            {busy ? <Loader2 className="size-4 animate-spin" aria-hidden /> : <Sparkles className="size-4" aria-hidden />}
-            {busy ? "Patkan it…" : "Patkan it"}
-          </button>
-        </div>
-
-        {/* Mobile connector */}
-        <div className="flex flex-col items-center py-1 lg:hidden" aria-hidden>
-          <span className="h-4 w-px bg-border" />
-          <img src={patkanMark} alt="" width={816} height={816} className="my-1 size-8 rounded-[0.55rem] shadow-sm" />
-          <span className="h-4 w-px bg-border" />
-        </div>
-
-        {/* Output card */}
-        <div className="flex flex-col rounded-lg border bg-muted/40 p-5 shadow-sm sm:p-7 lg:rounded-none lg:border-0 lg:pl-16 lg:shadow-none">
-          <div className="flex items-start justify-between gap-3">
-            <div className="min-w-0">
-              <p className="text-xs font-semibold tracking-wider">
-                {settled ? "UPGRADED PROMPT" : PHASE_LABEL[phase].toUpperCase()}
-              </p>
-              <p className="mt-1 truncate text-xs text-muted-foreground">
-                Ready to paste into {target[0]}
-              </p>
-            </div>
-            <button
-              onClick={copy}
-              disabled={!output || !settled}
-              className="inline-flex shrink-0 items-center gap-2 rounded-full bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground shadow-sm transition-colors hover:bg-primary/90 disabled:opacity-40"
-            >
-              {copied ? <Check className="size-4" aria-hidden /> : <CopyIcon className="size-4" aria-hidden />}
-              {copied ? "Copied" : "Copy Prompt"}
-            </button>
-          </div>
-          <div className="relative mt-4 overflow-hidden rounded-md border bg-background">
-            <pre
-              ref={outRef}
-              aria-busy={!settled}
-              className={`max-h-72 space-y-2.5 overflow-auto p-4 font-mono text-[11px] leading-relaxed whitespace-pre-wrap break-words sm:max-h-96 sm:p-5 sm:text-xs ${
-                settled ? "text-foreground/90 opacity-100" : "text-foreground/70 opacity-60"
-              }`}
-            >
-              {output ? (
-                <PromptOutput text={output} dialect={target[1] as Dialect} />
-              ) : (
-                <EmptySkeleton />
-              )}
-            </pre>
-            {output && (
-              <div
-                className="pointer-events-none absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-background to-transparent"
-                aria-hidden
-              />
-            )}
-          </div>
-
-          {assumptions.length > 0 && (
-            <div className="mt-5 border-l-2 border-primary/60 pl-4">
-              <p className="text-xs leading-relaxed text-muted-foreground">
-                <strong className="font-mono text-[11px] tracking-wide text-foreground">Assumed:</strong>{" "}
-                {assumptions.join(" · ")}
-              </p>
-            </div>
-          )}
-
-          {clarifiers.length > 0 && (
-            <div className="mt-4 flex flex-wrap gap-2 lg:mt-auto lg:pt-5">
-              {clarifiers.map((c) => (
-                <button
-                  key={c.label}
-                  type="button"
-                  disabled={busy || exhausted}
-                  onClick={() => transform(c.refinement)}
-                  className="rounded-full border border-dashed px-3 py-1.5 text-xs text-muted-foreground transition-colors hover:border-primary hover:text-foreground disabled:opacity-50"
-                >
-                  + {c.label}
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
-
-        {/* Desktop bridge */}
-        <button
-          onClick={() => transform()}
-          disabled={busy || !input.trim() || exhausted}
-          className="absolute top-1/2 left-[45.45%] hidden h-11 -translate-x-1/2 -translate-y-1/2 items-center gap-2 rounded-full bg-primary px-5 text-sm font-medium whitespace-nowrap text-primary-foreground shadow-lg ring-[6px] ring-background transition-colors hover:bg-primary/90 disabled:opacity-50 lg:inline-flex"
-        >
-          {busy ? <Loader2 className="size-4 animate-spin" aria-hidden /> : <Sparkles className="size-4" aria-hidden />}
-          {busy ? "Patkan it…" : "Patkan it"}
-        </button>
-      </div>
-    </div>
-  );
-}
-
-function EmptySkeleton() {
-  const rows: (number | string)[] = ["## Role", 70, 45, "## Context & Task", 85, 60, 40, "## Constraints", 55, 35];
-  return (
-    <span className="block select-none opacity-40" aria-hidden>
-      {rows.map((row, i) =>
-        typeof row === "string" ? (
-          <span key={i} className="mt-3 block first:mt-0 text-primary/70">
-            {row}
-          </span>
-        ) : (
-          <span key={i} className="mt-2 block h-2 rounded bg-muted-foreground/25" style={{ width: `${row}%` }} />
-        ),
-      )}
-    </span>
-  );
-}
-
-function PromptOutput({ text, dialect }: { text: string; dialect: Dialect }) {
-  return (
-    <>
-      {text.split("\n").map((line, i) => {
-        const isAccent = accentLine(line, dialect);
-        return (
-          <p key={i} className={isAccent ? "text-primary" : "text-foreground/90"}>
-            {line || "\u00A0"}
-          </p>
-        );
-      })}
-    </>
-  );
-}
-
-function accentLine(line: string, dialect: Dialect): boolean {
-  const trimmed = line.trim();
-  if (!trimmed) return false;
-  if (dialect === "xml") {
-    return /^<\/?[a-z_][a-z0-9_]*>$/i.test(trimmed);
-  }
-  if (dialect === "markdown") {
-    return /^#{2,6}\s+/.test(trimmed);
-  }
-  return /^[A-Z][A-Z\s]{2,}$/.test(trimmed);
-}
-
-function CopyIcon({ className }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" className={className} aria-hidden>
-      <rect x="9" y="9" width="12" height="12" rx="2" />
-      <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
-    </svg>
   );
 }
