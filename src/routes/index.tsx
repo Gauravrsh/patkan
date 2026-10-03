@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
-import { ArrowDownToLine, ArrowRight, Check, ChevronDown, Copy, EyeOff, Headphones, Loader2, RotateCcw, Share2 } from "lucide-react";
+import { ArrowDownToLine, ArrowRight, Check, ChevronDown, Copy, EyeOff, Headphones, Loader2, RotateCcw, Share2, UserRound } from "lucide-react";
 
 import {
   DropdownMenu,
@@ -364,7 +364,7 @@ function Landing() {
                   <DropdownMenuItem onSelect={() => void signOutEverywhere()}>Sign out</DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
-            ) : <Link to="/auth" className="hidden hover:text-foreground sm:inline">Sign in</Link>}
+            ) : <Link to="/auth" aria-label="Sign in" title="Sign in" className="inline-flex size-9 items-center justify-center rounded-md hover:text-foreground sm:w-auto sm:px-2"><UserRound className="size-4 sm:hidden" /><span className="hidden sm:inline">Sign in</span></Link>}
             <Button variant="ghost" size="icon" aria-label="Share Patkan" title="Share Patkan" onClick={() => void sharePatkan()}><Share2 className="size-4" /></Button>
             <Button onClick={getExtension} size="sm" className="hidden sm:inline-flex">Add to Chrome</Button>
           </div>
