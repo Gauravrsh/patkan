@@ -9,3 +9,4 @@
 > the editor, so keep the branch in a working state.
 <!-- LOVABLE:END -->
 - Structured data (JSON-LD) for pages comes from src/lib/seo.ts — one shared definition keeps Patkan described identically everywhere.
+- Keep superseded homepage source in a private .lovable/archive snapshot, never a public route, so the founder can reference it without exposing outdated copy to visitors or crawlers.
