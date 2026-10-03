@@ -175,16 +175,16 @@ function useGhost() {
   return { text, slashes };
 }
 
-function Picker({ items, value, onChange }: { items: readonly (string | readonly [string, ...string[]])[]; value: number; onChange: (i: number) => void }) {
+function Picker({ items, value, onChange, onOther }: { items: readonly (string | readonly [string, ...string[]])[]; value: number; onChange: (i: number) => void; onOther?: () => void }) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <button
+        <Button
           type="button"
-          className="inline-flex shrink-0 items-center gap-1.5 rounded-full border bg-background px-3 py-1.5 text-xs font-medium transition-colors hover:bg-accent sm:text-sm"
+          variant="outline" className="h-auto shrink-0 rounded-full px-3 py-1.5 text-xs sm:text-sm"
         >
           {typeof items[value] === "string" ? items[value] : items[value]?.[0]} <ChevronDown className="size-3.5" aria-hidden />
-        </button>
+        </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="start" className="max-h-80 overflow-y-auto">
         {items.map((item, i) => (
@@ -193,6 +193,7 @@ function Picker({ items, value, onChange }: { items: readonly (string | readonly
             {i === value && <Check className="ml-auto size-4" />}
           </DropdownMenuItem>
         ))}
+        {onOther && <DropdownMenuItem onSelect={onOther}>Other</DropdownMenuItem>}
       </DropdownMenuContent>
     </DropdownMenu>
   );
@@ -219,6 +220,7 @@ function Landing() {
   const [customDraft, setCustomDraft] = useState("");
   const [phase, setPhase] = useState<"idle" | "drafting" | "sharpening" | "ready">("idle");
   const runId = useRef(0);
+  const running = useRef(false);
   const inputStarted = useRef(false);
   const ghost = useGhost();
   const personaList: PersonaOption[] = [
@@ -253,6 +255,7 @@ function Landing() {
 
   function reset() {
     runId.current += 1;
+    running.current = false;
     setInput("");
     setOutput("");
     setBusy(false);
@@ -262,11 +265,12 @@ function Landing() {
 
   async function transform(raw: string) {
     const text = raw.trim().slice(0, -2).trim();
-    if (!text || busy || exhausted) return;
+    if (!text || running.current || exhausted) return;
+    running.current = true;
     const run = ++runId.current;
     const role = selectedPersona ?? PROFESSIONS[MARKETER_INDEX];
     const target = selectedAi ?? AIS[0];
-    if (!role || !target) return;
+    if (!role || !target) { running.current = false; return; }
     setInput(text);
     setBusy(true);
     setPhase("drafting");
@@ -295,7 +299,7 @@ function Landing() {
       setPhase("idle");
       toast.error(err instanceof Error ? err.message : "Transform failed.");
     } finally {
-      if (run === runId.current) setBusy(false);
+      if (run === runId.current) { setBusy(false); running.current = false; }
     }
   }
 
@@ -386,7 +390,7 @@ function Landing() {
             <div className="flex items-center gap-2 border-b px-3 py-2">
               <div className="flex min-w-0 flex-wrap gap-2">
                 <Picker items={AIS} value={ai} onChange={setAi} />
-                <Picker items={personaList} value={persona} onChange={setPersona} />
+                <Picker items={personaList} value={persona} onChange={setPersona} onOther={() => setCustomOpen(true)} />
               </div>
               <div className="ml-auto flex shrink-0 gap-1 text-muted-foreground">
                 <Button type="button" variant="ghost" size="icon" onClick={reset} aria-label="Reset" title="Reset">
@@ -397,6 +401,22 @@ function Landing() {
                 </Button>
               </div>
             </div>
+            {customOpen && (
+              <form className="flex gap-2 border-b p-3" onSubmit={(e) => {
+                e.preventDefault();
+                const name = customDraft.trim().slice(0, 40);
+                if (name) {
+                  const existing = customPersonas.indexOf(name);
+                  if (existing < 0) setCustomPersonas([...customPersonas, name]);
+                  setPersona(PROFESSIONS.length + (existing >= 0 ? existing : customPersonas.length));
+                }
+                setCustomOpen(false);
+                setCustomDraft("");
+              }}>
+                <input value={customDraft} onChange={(e) => setCustomDraft(e.target.value)} maxLength={40} aria-label="Name your role" className="h-9 min-w-0 flex-1 rounded-md border bg-background px-3 text-sm" />
+                <Button type="submit" size="sm">Add</Button>
+              </form>
+            )}
             <div className="relative p-5 sm:p-7">
               {phase === "idle" ? (
                 <>
