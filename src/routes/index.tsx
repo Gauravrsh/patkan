@@ -11,7 +11,7 @@ import {
 import patkanMark from "@/assets/patkan-mark.svg";
 
 // UI-review mock of the new landing page. Static only: no transforms, no API calls.
-export const Route = createFileRoute("/playgroundv2")({
+export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
       { title: "Landing page preview — Patkan" },
