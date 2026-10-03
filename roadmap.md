@@ -1,0 +1,3 @@
+- [x] Save the outgoing dictionary-card homepage as a private source snapshot.
+- [x] Replace the homepage with the approved V2 layout and restore every visible control's behavior.
+- [x] Verify real transformation, usage, links, and mobile/desktop presentation.
