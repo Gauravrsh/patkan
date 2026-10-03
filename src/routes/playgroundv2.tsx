@@ -147,7 +147,7 @@ function LandingPreview() {
         {/* 1. Hero + 2. Playground + 3. CTA */}
         <section className={`${shell} py-12 sm:py-20`}>
           <div className="mx-auto max-w-3xl text-center">
-            <p className={eyebrow}>Your Personal Prompt Engineer</p>
+            <p className="text-xl font-semibold text-primary sm:text-2xl">Your Personal Prompt Engineer</p>
             <h1 className="mt-3 text-balance text-3xl font-semibold leading-[1.15] tracking-tight sm:text-[2.6rem]">
               Stop writing prompts. Just end your sentence with <span className="font-mono text-primary">//</span>
             </h1>
@@ -157,7 +157,8 @@ function LandingPreview() {
             </p>
           </div>
 
-          <div className="mx-auto mt-10 max-w-3xl overflow-hidden rounded-lg border bg-card shadow-sm">
+          <p className="mt-10 text-sm font-medium text-primary">Try Patkan in action. Just type anything and end it with //</p>
+          <div className="mx-auto mt-3 max-w-3xl overflow-hidden rounded-lg border bg-card shadow-sm">
             <div className="flex items-center gap-2 border-b px-3 py-2">
               <div className="flex min-w-0 flex-wrap gap-2">
                 <Picker items={AIS} value={ai} onChange={setAi} />
@@ -218,7 +219,7 @@ function LandingPreview() {
         {/* 5. Professions ticker */}
         <section className="overflow-hidden py-14 sm:py-20">
           <div className={`${shell} text-center`}>
-            <p className={eyebrow}>Built for 30 professions</p>
+            <p className={eyebrow}>Built for all professionals - not just software engineers</p>
             <h2 className={h2}>Whatever you do, Patkan speaks your language.</h2>
           </div>
           <div className="mt-8 flex w-max animate-[pv2-marquee_40s_linear_infinite] gap-3">
@@ -233,12 +234,12 @@ function LandingPreview() {
         <section className="border-y bg-card py-14 sm:py-20">
           <div className={shell}>
             <p className={eyebrow}>How it works</p>
-            <h2 className={h2}>Three steps. No new tab.</h2>
+            <h2 className={h2}>How to turn any sentence into a prompt inside your AI</h2>
             <div className="mt-10 grid gap-px overflow-hidden rounded-lg border bg-border md:grid-cols-3">
               {[
-                ["01", "Add Patkan to Chrome", "Two clicks from the Chrome Web Store. No sign-up to start."],
-                ["02", "Type what you want", "Open ChatGPT, Claude or Gemini and write a rough sentence in plain words."],
-                ["03", "End it with //", "Your sentence turns into a structured prompt, right in the same box."],
+                ["01", "Add to Desktop Browser", "Install the free Patkan prompt generator extension for Chrome, Edge, Firefox, Brave, Arc, and Opera. It takes just 2 click, no sign-up."],
+                ["02", "Open your AI in browser", "Open ChatGPT, Claude, Gemini, Microsoft Copilot, Perplexity, or any supported AI assistant. Patkan sits inside the AI you already use - no new tab. no copy pasting prompts."],
+                ["03", "Type anything and end with //", "Write your task in plain words and end it with //. Patkan turns the sentence into a structured expert prompt instantly - no tab switching, no copy-paste."],
               ].map(([n, t, b]) => (
                 <article key={n} className="bg-background p-6 sm:p-8">
                   <span className="font-mono text-xs tracking-widest text-muted-foreground">{n}</span>
