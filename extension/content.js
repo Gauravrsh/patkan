@@ -24,7 +24,14 @@
       id: "gemini",
       dialect: "sectioned",
       match: /(^|\.)gemini\.google\.com$/,
-      selectors: ["div.ql-editor[contenteditable='true']", "rich-textarea div[contenteditable='true']"],
+      selectors: [
+        "rich-textarea div.ql-editor[contenteditable='true']",
+        "div.ql-editor[contenteditable='true']",
+        "rich-textarea [contenteditable='true']:not(.ql-clipboard)",
+        "[aria-label*='prompt for Gemini' i][contenteditable='true']",
+        "[role='textbox'][contenteditable='true']",
+        "textarea",
+      ],
     },
     {
       id: "aistudio",

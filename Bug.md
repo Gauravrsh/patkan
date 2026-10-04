@@ -178,5 +178,43 @@ Entry template:
     "write a launch email//" -> true.
   status: fixed
 
+- id: BUG-007
+  date: 2026-10-04
+  title: "//" does not fire Patkan in Gemini for installed users
+  severity: high
+  surface: browser extension (Gemini; store installs)
+  reported: "I just tried using patkan, in gemini. the // doesnt seem to be working."
+  repro: >
+    Install Patkan from the Chrome Web Store, open gemini.google.com, type a
+    short thought of 1-3 words ending in "//" (e.g. "fix this//"). Nothing fires.
+  evidence: >
+    Chrome Web Store listing serves version 1.0.0 (checked 2026-10-04). Playwright
+    on live gemini.google.com/app with the 1.0.0 content.js: "short prompt test//"
+    -> no trigger; "this is five words now//" -> trigger + transform. With the
+    repo build the same short input fires. extension_events has zero rows on
+    2026-10-04, consistent with nothing firing on the user's install.
+  root_cause: >
+    1) Distribution: the BUG-006 fix (3-character threshold, extension/content.js
+    shouldTrigger ~line 489) shipped only in repo build 1.0.2; the store still
+    serves 1.0.0, whose shouldTrigger requires words >= 4, so short Gemini
+    prompts never fire. 2) Fragility: extension/content.js lines 24-28 gave
+    Gemini only two Quill selectors and no fallbacks, unlike other hosts, and
+    "rich-textarea div[contenteditable='true']" also matches Gemini's hidden
+    .ql-clipboard helper. Any Gemini markup change would silently disable Patkan.
+    3) Tabs open before install/update receive no content script until refreshed.
+  fix: >
+    Gemini selectors widened (editor inside rich-textarea, aria-label "prompt for
+    Gemini", role=textbox, textarea) and the .ql-clipboard helper excluded.
+    Manifest bumped to 1.0.3; both extension packages rebuilt. Store upload of
+    1.0.3 is required for users to receive the fix.
+  verification: >
+    node --check passes. Playwright on live gemini.google.com/app with the 1.0.3
+    content.js: "fix this//" -> transform, "marketing ideas//" -> transform,
+    "need a marketing plan for new insurance product//" -> transform, "ab//" ->
+    no trigger (as designed). Real-user fix is confirmed only once the store
+    listing shows 1.0.3 and extension_events records a gemini trigger_detected.
+  status: fixed
+
+
 ```
 
