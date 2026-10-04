@@ -22,6 +22,7 @@ import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
+import { Route as AuthenticatedDictionaryCardRouteImport } from './routes/_authenticated/dictionary-card'
 import { Route as AuthenticatedLibraryRouteImport } from './routes/_authenticated/library'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
 import { Route as AuthenticatedAdminCarouselRouteImport } from './routes/_authenticated/admin.carousel'
@@ -99,6 +100,12 @@ const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
   path: '/admin',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedDictionaryCardRoute =
+  AuthenticatedDictionaryCardRouteImport.update({
+    id: '/dictionary-card',
+    path: '/dictionary-card',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedLibraryRoute = AuthenticatedLibraryRouteImport.update({
   id: '/library',
   path: '/library',
@@ -175,6 +182,7 @@ export interface FileRoutesByFullPath {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
   '/admin': typeof AuthenticatedAdminRouteWithChildren
+  '/dictionary-card': typeof AuthenticatedDictionaryCardRoute
   '/library': typeof AuthenticatedLibraryRoute
   '/admin/carousel': typeof AuthenticatedAdminCarouselRoute
   '/admin/docs': typeof AuthenticatedAdminDocsRoute
@@ -200,6 +208,7 @@ export interface FileRoutesByTo {
   '/privacy': typeof PrivacyRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
+  '/dictionary-card': typeof AuthenticatedDictionaryCardRoute
   '/library': typeof AuthenticatedLibraryRoute
   '/admin/carousel': typeof AuthenticatedAdminCarouselRoute
   '/admin/docs': typeof AuthenticatedAdminDocsRoute
@@ -228,6 +237,7 @@ export interface FileRoutesById {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
+  '/_authenticated/dictionary-card': typeof AuthenticatedDictionaryCardRoute
   '/_authenticated/library': typeof AuthenticatedLibraryRoute
   '/_authenticated/admin/carousel': typeof AuthenticatedAdminCarouselRoute
   '/_authenticated/admin/docs': typeof AuthenticatedAdminDocsRoute
@@ -256,6 +266,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/terms'
     | '/admin'
+    | '/dictionary-card'
     | '/library'
     | '/admin/carousel'
     | '/admin/docs'
@@ -281,6 +292,7 @@ export interface FileRouteTypes {
     | '/privacy'
     | '/sitemap.xml'
     | '/terms'
+    | '/dictionary-card'
     | '/library'
     | '/admin/carousel'
     | '/admin/docs'
@@ -308,6 +320,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/terms'
     | '/_authenticated/admin'
+    | '/_authenticated/dictionary-card'
     | '/_authenticated/library'
     | '/_authenticated/admin/carousel'
     | '/_authenticated/admin/docs'
@@ -436,6 +449,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/dictionary-card': {
+      id: '/_authenticated/dictionary-card'
+      path: '/dictionary-card'
+      fullPath: '/dictionary-card'
+      preLoaderRoute: typeof AuthenticatedDictionaryCardRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/library': {
       id: '/_authenticated/library'
       path: '/library'
@@ -544,11 +564,13 @@ const AuthenticatedAdminRouteWithChildren =
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminRoute: typeof AuthenticatedAdminRouteWithChildren
+  AuthenticatedDictionaryCardRoute: typeof AuthenticatedDictionaryCardRoute
   AuthenticatedLibraryRoute: typeof AuthenticatedLibraryRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminRoute: AuthenticatedAdminRouteWithChildren,
+  AuthenticatedDictionaryCardRoute: AuthenticatedDictionaryCardRoute,
   AuthenticatedLibraryRoute: AuthenticatedLibraryRoute,
 }
 
