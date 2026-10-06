@@ -218,3 +218,13 @@ Entry template:
 
 ```
 
+
+## BUG-008 — A link anywhere in the prompt blocked `//`
+Date: 2026-10-06
+Severity: Medium
+Surface: Browser extension (all supported AI sites)
+Symptom: "summarize this article https://example.com/post //" did nothing.
+Root cause: extension/content.js shouldTrigger refused any text containing "//" anywhere, and every https:// link contains "//".
+Fix: only the word attached to the trailing `//` is checked, so "https://x.com//" and "a//b//" still don't fire, but an earlier link no longer blocks Patkan. Version 1.0.4; Chrome and Firefox packages rebuilt.
+Verification: 21-case test run against the shipped function (links, single "/", https://, \//, a//b//, multi-line, 3-character minimum): all pass. Both zips contain the new code and version 1.0.4.
+Status: fixed (reaches users after the 1.0.4 upload to Chrome Web Store)
