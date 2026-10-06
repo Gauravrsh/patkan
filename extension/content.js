@@ -490,7 +490,10 @@
     if (!TRIGGER_AT_END.test(text)) return false;
     const before = text.replace(/\/\/[ \t]*$/, "");
     if (/\\$/.test(before)) return false; // escaped: \// never fires
-    if (before.includes("//")) return false; // URLs, paths, a//b — never fire
+    // Only the word glued to the trigger is checked: "https://x.com//" or
+    // "a//b//" must not fire, but a link earlier in the prompt must not block it.
+    const lastToken = (before.match(/\S*$/) || [""])[0];
+    if (lastToken.includes("//")) return false;
     // Any real text qualifies: a lone word or short fragment is exactly the
     // "rough thought" Patkan exists for. Only truly empty input is refused.
     return before.trim().length >= 3;
