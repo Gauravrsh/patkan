@@ -1,4 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
+import { Loader2, RefreshCw } from "lucide-react";
+
+import { Button } from "@/components/ui/button";
+import { getEventStats, type EventStats } from "@/lib/events.functions";
 
 export const Route = createFileRoute("/_authenticated/admin/events")({
   head: () => ({
@@ -232,15 +238,119 @@ function Table({ title, rows }: { title: string; rows: Row[] }) {
   );
 }
 
+const when = (iso: string) =>
+  new Date(iso).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short", timeZone: "Asia/Kolkata" });
+
+function LiveCounts() {
+  const fetchStats = useServerFn(getEventStats);
+  const { data, isLoading, isFetching, error, refetch } = useQuery<EventStats>({
+    queryKey: ["admin-event-stats"],
+    queryFn: () => fetchStats(),
+    retry: false,
+    staleTime: 0,
+  });
+
+  if (isLoading) {
+    return (
+      <div className="mt-8 flex justify-center">
+        <Loader2 className="size-5 animate-spin text-muted-foreground" />
+      </div>
+    );
+  }
+  if (error || !data) {
+    return <p className="mt-8 text-sm text-muted-foreground">Couldn&apos;t load event counts.</p>;
+  }
+
+  return (
+    <>
+      <div className="mt-6 flex flex-wrap items-center justify-between gap-3">
+        <p className="text-xs text-muted-foreground">Counted at {when(data.generatedAt)} IST</p>
+        <Button size="sm" variant="outline" onClick={() => void refetch()} disabled={isFetching}>
+          {isFetching ? <Loader2 className="size-4 animate-spin" /> : <RefreshCw className="size-4" />}
+          Refresh
+        </Button>
+      </div>
+
+      <section className="mt-4">
+        <h2 className="text-xs uppercase tracking-wide text-muted-foreground">Counts</h2>
+        <div className="mt-2 overflow-x-auto rounded-lg border border-border bg-card">
+          <table className="w-full min-w-[36rem] text-sm">
+            <thead className="text-left text-xs text-muted-foreground">
+              <tr className="border-b border-border">
+                <th className="px-4 py-2 font-normal">Signal</th>
+                <th className="px-4 py-2 font-normal">Source</th>
+                <th className="px-4 py-2 text-right font-normal">24h</th>
+                <th className="px-4 py-2 text-right font-normal">7d</th>
+                <th className="px-4 py-2 text-right font-normal">30d</th>
+                <th className="px-4 py-2 text-right font-normal">All time</th>
+              </tr>
+            </thead>
+            <tbody>
+              {[
+                ...data.counts,
+                { event: "transform (server)", source: "server", ...data.transforms },
+              ].map((c) => (
+                <tr key={`${c.source}-${c.event}`} className="border-b border-border last:border-b-0">
+                  <td className="px-4 py-2 font-mono text-xs">{c.event}</td>
+                  <td className="px-4 py-2 text-muted-foreground">{c.source}</td>
+                  <td className="px-4 py-2 text-right tabular-nums">{c.d1}</td>
+                  <td className="px-4 py-2 text-right tabular-nums">{c.d7}</td>
+                  <td className="px-4 py-2 text-right tabular-nums">{c.d30}</td>
+                  <td className="px-4 py-2 text-right tabular-nums">{c.all}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section className="mt-8">
+        <h2 className="text-xs uppercase tracking-wide text-muted-foreground">Latest 50 signals</h2>
+        <div className="mt-2 overflow-x-auto rounded-lg border border-border bg-card">
+          <table className="w-full min-w-[40rem] text-sm">
+            <thead className="text-left text-xs text-muted-foreground">
+              <tr className="border-b border-border">
+                <th className="px-4 py-2 font-normal">When (IST)</th>
+                <th className="px-4 py-2 font-normal">Signal</th>
+                <th className="px-4 py-2 font-normal">Source</th>
+                <th className="px-4 py-2 font-normal">Where</th>
+                <th className="px-4 py-2 font-normal">Section</th>
+                <th className="px-4 py-2 font-normal">Device</th>
+              </tr>
+            </thead>
+            <tbody>
+              {data.recent.map((r, i) => (
+                <tr key={`${r.at}-${i}`} className="border-b border-border last:border-b-0">
+                  <td className="px-4 py-2 whitespace-nowrap text-muted-foreground">{when(r.at)}</td>
+                  <td className="px-4 py-2 font-mono text-xs">{r.event}</td>
+                  <td className="px-4 py-2 text-muted-foreground">{r.source}</td>
+                  <td className="px-4 py-2 text-muted-foreground">{r.where ?? "—"}</td>
+                  <td className="px-4 py-2 text-muted-foreground">{r.section ?? "—"}</td>
+                  <td className="px-4 py-2 text-muted-foreground">{r.device ?? "—"}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </>
+  );
+}
+
 function EventsPage() {
   return (
     <main className="mx-auto min-h-screen w-full max-w-5xl px-6 py-10">
-      <h1 className="text-2xl font-semibold tracking-tight">Event taxonomy</h1>
+      <h1 className="text-2xl font-semibold tracking-tight">Events</h1>
       <p className="mt-1 max-w-2xl text-sm text-muted-foreground">
-        Every signal Patkan records, exactly once each, with no overlap. Nothing anyone types — on the
-        site or inside an AI chat — is ever stored. <strong className="text-foreground">Oxygen</strong> means
-        the product is dead within a minute if it breaks;{" "}
-        <strong className="text-foreground">water</strong> means nothing breaks today but growth stops.
+        Fresh counts every time this page opens. Nothing anyone types — on the site or inside an AI
+        chat — is ever stored.
+      </p>
+      <LiveCounts />
+      <h2 className="mt-12 text-lg font-semibold tracking-tight">What each signal means</h2>
+      <p className="mt-1 max-w-2xl text-sm text-muted-foreground">
+        <strong className="text-foreground">Oxygen</strong> means the product is dead within a minute if
+        it breaks; <strong className="text-foreground">water</strong> means nothing breaks today but
+        growth stops.
       </p>
       <Table title="Website" rows={website} />
       <Table title="Extension" rows={extension} />
