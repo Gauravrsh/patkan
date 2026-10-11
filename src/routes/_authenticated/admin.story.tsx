@@ -32,11 +32,12 @@ const pts = (n: number | null) =>
 const secs = (n: number | null) => (n === null ? "—" : `${Math.round(n / 1000)} s`);
 
 const SECTION_LABEL: Record<string, string> = {
-  hero: "Hero",
-  playground: "Playground",
-  pillars: "How it works",
-  install: "Install guide",
-  privacy: "Privacy",
+  hero: "Hero + playground",
+  install: "How it works",
+  support: "Help",
+  playground: "Playground (old page)",
+  pillars: "Pillars (old page)",
+  privacy: "Privacy (old page)",
 };
 
 function verdict(row: StoryStats["sections"][number]) {
