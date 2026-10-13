@@ -14,7 +14,7 @@ export const Route = createFileRoute("/api/public/whatsapp/webhook")({
         const mode = url.searchParams.get("hub.mode");
         const token = url.searchParams.get("hub.verify_token");
         const challenge = url.searchParams.get("hub.challenge") ?? "";
-        const expected = process.env.WHATSAPP_VERIFY_TOKEN || "patkan_wa_verify_7f9c2d1b8e4a";
+        const expected = process.env["WHATSAPP_VERIFY_TOKEN"] || "patkan_wa_verify_7f9c2d1b8e4a";
         if (mode === "subscribe" && token === expected && /^[\w-]{1,200}$/.test(challenge)) {
           return new Response(challenge, { status: 200, headers: { "content-type": "text/plain" } });
         }
