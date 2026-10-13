@@ -35,6 +35,7 @@ import { Route as ApiPublicTemplatesRouteImport } from './routes/api/public/temp
 import { Route as ApiPublicTransformRouteImport } from './routes/api/public/transform'
 import { Route as ApiPublicUsageRouteImport } from './routes/api/public/usage'
 import { Route as ApiPublicCronHealthRouteImport } from './routes/api/public/cron/health'
+import { Route as ApiPublicWhatsappWebhookRouteImport } from './routes/api/public/whatsapp/webhook'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -168,6 +169,12 @@ const ApiPublicCronHealthRoute = ApiPublicCronHealthRouteImport.update({
   path: '/api/public/cron/health',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicWhatsappWebhookRoute =
+  ApiPublicWhatsappWebhookRouteImport.update({
+    id: '/api/public/whatsapp/webhook',
+    path: '/api/public/whatsapp/webhook',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -195,6 +202,7 @@ export interface FileRoutesByFullPath {
   '/api/public/usage': typeof ApiPublicUsageRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
   '/api/public/cron/health': typeof ApiPublicCronHealthRoute
+  '/api/public/whatsapp/webhook': typeof ApiPublicWhatsappWebhookRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -221,6 +229,7 @@ export interface FileRoutesByTo {
   '/api/public/usage': typeof ApiPublicUsageRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/api/public/cron/health': typeof ApiPublicCronHealthRoute
+  '/api/public/whatsapp/webhook': typeof ApiPublicWhatsappWebhookRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -250,6 +259,7 @@ export interface FileRoutesById {
   '/api/public/usage': typeof ApiPublicUsageRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/api/public/cron/health': typeof ApiPublicCronHealthRoute
+  '/api/public/whatsapp/webhook': typeof ApiPublicWhatsappWebhookRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -279,6 +289,7 @@ export interface FileRouteTypes {
     | '/api/public/usage'
     | '/admin/'
     | '/api/public/cron/health'
+    | '/api/public/whatsapp/webhook'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -305,6 +316,7 @@ export interface FileRouteTypes {
     | '/api/public/usage'
     | '/admin'
     | '/api/public/cron/health'
+    | '/api/public/whatsapp/webhook'
   id:
     | '__root__'
     | '/'
@@ -333,6 +345,7 @@ export interface FileRouteTypes {
     | '/api/public/usage'
     | '/_authenticated/admin/'
     | '/api/public/cron/health'
+    | '/api/public/whatsapp/webhook'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -354,6 +367,7 @@ export interface RootRouteChildren {
   ApiPublicTransformRoute: typeof ApiPublicTransformRoute
   ApiPublicUsageRoute: typeof ApiPublicUsageRoute
   ApiPublicCronHealthRoute: typeof ApiPublicCronHealthRoute
+  ApiPublicWhatsappWebhookRoute: typeof ApiPublicWhatsappWebhookRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -540,6 +554,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicCronHealthRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/whatsapp/webhook': {
+      id: '/api/public/whatsapp/webhook'
+      path: '/api/public/whatsapp/webhook'
+      fullPath: '/api/public/whatsapp/webhook'
+      preLoaderRoute: typeof ApiPublicWhatsappWebhookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -596,6 +617,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicTransformRoute: ApiPublicTransformRoute,
   ApiPublicUsageRoute: ApiPublicUsageRoute,
   ApiPublicCronHealthRoute: ApiPublicCronHealthRoute,
+  ApiPublicWhatsappWebhookRoute: ApiPublicWhatsappWebhookRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
