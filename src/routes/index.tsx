@@ -366,7 +366,11 @@ function Landing() {
               </DropdownMenu>
             ) : <Link to="/auth" aria-label="Sign in" title="Sign in" className="inline-flex size-9 items-center justify-center rounded-md hover:text-foreground sm:w-auto sm:px-2"><UserRound className="size-4 sm:hidden" /><span className="hidden sm:inline">Sign in</span></Link>}
             <Button variant="ghost" size="icon" aria-label="Share Patkan" title="Share Patkan" onClick={() => void sharePatkan()}><Share2 className="size-4" /></Button>
-            <Button onClick={getExtension} size="sm" className="hidden sm:inline-flex">Add to Chrome</Button>
+            <Button onClick={getExtension} size="sm" className="inline-flex shrink-0 gap-1.5 px-3 sm:px-4">
+              <span className="hidden sm:inline">Add to Desktop</span>
+              <span className="sm:hidden">Add</span>
+              <ArrowDownToLine className="size-4" aria-hidden />
+            </Button>
           </div>
         </div>
       </header>
