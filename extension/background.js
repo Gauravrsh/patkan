@@ -259,7 +259,10 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     return true;
   }
   if (msg?.type === "PATKAN_SET_SESSION") {
-    chrome.storage.local.set({ session: msg.payload }).then(() => sendResponse({ ok: true }));
+    const { profileSaved, ...session } = msg.payload || {};
+    const update = { session };
+    if (profileSaved === true) update.profileSaved = true;
+    chrome.storage.local.set(update).then(() => sendResponse({ ok: true }));
     return true;
   }
   if (msg?.type === "PATKAN_OPEN_PROFILE") {

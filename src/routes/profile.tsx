@@ -73,7 +73,7 @@ function ProfilePage() {
     setBusy(false);
     if (err) return setError(err.message);
     // Connect hands the session to the extension so transforms use this profile.
-    window.location.assign("/connect");
+    window.location.assign("/connect?profile=saved");
   }
 
   return (
