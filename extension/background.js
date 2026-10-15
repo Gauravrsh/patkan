@@ -47,7 +47,7 @@ async function getSettings() {
   ]);
   return {
     apiBase: stored.apiBase || DEFAULT_API_BASE,
-    persona: stored.persona || "product-manager",
+    persona: stored.persona || "auto",
     zeroDataMode: Boolean(stored.zeroDataMode),
     session: stored.session || null,
     disabledHosts: stored.disabledHosts || [],
