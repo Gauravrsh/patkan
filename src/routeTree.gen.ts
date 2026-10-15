@@ -19,6 +19,7 @@ import { Route as ConnectRouteImport } from './routes/connect'
 import { Route as GeminiPromptGeneratorRouteImport } from './routes/gemini-prompt-generator'
 import { Route as Playgroundv2RouteImport } from './routes/playgroundv2'
 import { Route as PrivacyRouteImport } from './routes/privacy'
+import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
@@ -84,6 +85,11 @@ const Playgroundv2Route = Playgroundv2RouteImport.update({
 const PrivacyRoute = PrivacyRouteImport.update({
   id: '/privacy',
   path: '/privacy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProfileRoute = ProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
@@ -186,6 +192,7 @@ export interface FileRoutesByFullPath {
   '/gemini-prompt-generator': typeof GeminiPromptGeneratorRoute
   '/playgroundv2': typeof Playgroundv2Route
   '/privacy': typeof PrivacyRoute
+  '/profile': typeof ProfileRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
   '/admin': typeof AuthenticatedAdminRouteWithChildren
@@ -214,6 +221,7 @@ export interface FileRoutesByTo {
   '/gemini-prompt-generator': typeof GeminiPromptGeneratorRoute
   '/playgroundv2': typeof Playgroundv2Route
   '/privacy': typeof PrivacyRoute
+  '/profile': typeof ProfileRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
   '/dictionary-card': typeof AuthenticatedDictionaryCardRoute
@@ -243,6 +251,7 @@ export interface FileRoutesById {
   '/gemini-prompt-generator': typeof GeminiPromptGeneratorRoute
   '/playgroundv2': typeof Playgroundv2Route
   '/privacy': typeof PrivacyRoute
+  '/profile': typeof ProfileRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
@@ -273,6 +282,7 @@ export interface FileRouteTypes {
     | '/gemini-prompt-generator'
     | '/playgroundv2'
     | '/privacy'
+    | '/profile'
     | '/sitemap.xml'
     | '/terms'
     | '/admin'
@@ -301,6 +311,7 @@ export interface FileRouteTypes {
     | '/gemini-prompt-generator'
     | '/playgroundv2'
     | '/privacy'
+    | '/profile'
     | '/sitemap.xml'
     | '/terms'
     | '/dictionary-card'
@@ -329,6 +340,7 @@ export interface FileRouteTypes {
     | '/gemini-prompt-generator'
     | '/playgroundv2'
     | '/privacy'
+    | '/profile'
     | '/sitemap.xml'
     | '/terms'
     | '/_authenticated/admin'
@@ -359,6 +371,7 @@ export interface RootRouteChildren {
   GeminiPromptGeneratorRoute: typeof GeminiPromptGeneratorRoute
   Playgroundv2Route: typeof Playgroundv2Route
   PrivacyRoute: typeof PrivacyRoute
+  ProfileRoute: typeof ProfileRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TermsRoute: typeof TermsRoute
   ApiPublicEventsRoute: typeof ApiPublicEventsRoute
@@ -440,6 +453,13 @@ declare module '@tanstack/react-router' {
       path: '/privacy'
       fullPath: '/privacy'
       preLoaderRoute: typeof PrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/profile': {
+      id: '/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof ProfileRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/sitemap.xml': {
@@ -609,6 +629,7 @@ const rootRouteChildren: RootRouteChildren = {
   GeminiPromptGeneratorRoute: GeminiPromptGeneratorRoute,
   Playgroundv2Route: Playgroundv2Route,
   PrivacyRoute: PrivacyRoute,
+  ProfileRoute: ProfileRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   TermsRoute: TermsRoute,
   ApiPublicEventsRoute: ApiPublicEventsRoute,

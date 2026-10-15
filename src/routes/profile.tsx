@@ -51,7 +51,7 @@ function ProfilePage() {
     return (
       <Shell>
         <Button asChild className="w-full">
-          <Link to="/auth" search={{ next: "/profile" } as never}>Set up profile</Link>
+          <a href="/auth?next=/profile">Set up profile</a>
         </Button>
       </Shell>
     );
