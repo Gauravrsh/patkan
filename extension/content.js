@@ -116,7 +116,15 @@
   let lastOriginal = null;
   let busy = false;
   let sendAnyway = false;
-  let restingLabel = "Type // to Patkan";
+  let restingLabel = "End with // to turn into prompt";
+  let siteOff = false;
+  let runId = 0;
+  let lastResult = null;
+  let hintShown = false;
+  chrome.storage.local.get("disabledHosts").then((s) => {
+    siteOff = (s.disabledHosts || []).includes(location.hostname);
+    applySiteState();
+  }).catch(() => {});
 
   /* ---------- text read / write ---------- */
 
@@ -154,6 +162,34 @@
 
   /* ---------- shadow UI ---------- */
 
+  function hostIsDark() {
+    let el = target || document.body;
+    while (el && el.nodeType === 1) {
+      const c = getComputedStyle(el).backgroundColor;
+      const m = c.match(/\d+(\.\d+)?/g);
+      if (m && (m.length < 4 || +m[3] > 0.5)) {
+        const [r, g, b] = m.map(Number);
+        return 0.2126 * r + 0.7152 * g + 0.0722 * b < 128;
+      }
+      el = el.parentElement;
+    }
+    return matchMedia("(prefers-color-scheme: dark)").matches;
+  }
+
+  function applyTheme() {
+    if (pillHost) pillHost.classList.toggle("dark", hostIsDark());
+    if (shadow) shadow.host.dataset.theme = hostIsDark() ? "dark" : "light";
+  }
+
+  function applySiteState() {
+    if (!pill) return;
+    pill.classList.toggle("off", siteOff);
+    tipText.textContent = siteOff ? "Patkan is off on this site" : "End with // to turn into prompt";
+    tipBtn.textContent = siteOff ? "Turn on here" : "Turn off here";
+  }
+
+  let tip = null, tipText = null, tipBtn = null, hideTipTimer = null;
+
   function ensureUI() {
     if (pillHost) return;
     pillHost = document.createElement("div");
@@ -161,51 +197,72 @@
     shadow = pillHost.attachShadow({ mode: "open" });
     const style = document.createElement("style");
     style.textContent = `
-      :host { all: initial; }
-      .pill, .chip {
-        position: fixed;
-        font: 500 12px/1 ui-sans-serif, system-ui, -apple-system, sans-serif;
-        border-radius: 999px;
-        border: 1px solid rgba(120,90,60,.28);
-        background: #fffaf3;
-        color: #3a2c1e;
-        box-shadow: 0 2px 10px rgba(60,40,20,.12);
-        cursor: pointer;
-        user-select: none;
-        display: none;
-        align-items: center;
-        gap: 6px;
-        padding: 6px 10px;
-        transition: opacity .15s ease, transform .15s ease;
+      :host { all: initial; --bg:#fffaf3; --fg:#1c1917; --bd:rgba(28,25,23,.18); --hv:#f2e7d8; }
+      :host([data-theme="dark"]) { --bg:#262321; --fg:#f5efe6; --bd:rgba(255,255,255,.16); --hv:#36312d; }
+      .badge {
+        position: fixed; width: 22px; height: 22px; box-sizing: border-box;
+        border-radius: 6px; background: #1c1917; border: 1px solid rgba(255,255,255,.14);
+        color: #ff6b00; font: 700 11px/20px ui-monospace, SFMono-Regular, Menlo, monospace;
+        letter-spacing: -1px; text-align: center; cursor: pointer; user-select: none;
+        display: none; box-shadow: 0 1px 4px rgba(0,0,0,.18); opacity: .92;
       }
-      .pill.show, .chip.show { display: inline-flex; }
-      .pill:hover { background: #fff3e3; }
-      .spin { animation: sp .7s linear infinite; display:inline-block; }
+      .badge.show { display: block; }
+      .badge:hover { opacity: 1; }
+      .badge.off { color: #8a817a; opacity: .55; }
+      .tip, .pill, .chip {
+        position: fixed; font: 500 12px/1.2 ui-sans-serif, system-ui, -apple-system, sans-serif;
+        background: var(--bg); color: var(--fg); border: 1px solid var(--bd);
+        border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,.14);
+        display: none; align-items: center; gap: 8px; padding: 6px 10px; user-select: none;
+      }
+      .tip.show, .pill.show, .chip.show { display: inline-flex; }
+      button { all: unset; cursor: pointer; padding: 3px 8px; border-radius: 6px;
+        font: 600 11px/1 ui-sans-serif, system-ui, sans-serif; color: var(--fg); }
+      button:hover { background: var(--hv); }
+      .tip button { color: #ff6b00; }
+      .spin { animation: sp .7s linear infinite; display:inline-block; color:#ff6b00; }
       @keyframes sp { to { transform: rotate(360deg); } }
-      .chip { gap: 4px; padding: 4px 6px; background: #fff; }
-      .chip button {
-        all: unset;
-        cursor: pointer;
-        padding: 3px 8px;
-        border-radius: 999px;
-        font: 500 11px/1 ui-sans-serif, system-ui, -apple-system, sans-serif;
-        color: #3a2c1e;
-      }
-      .chip button:hover { background: #f2e7d8; }
+      .chip { padding: 3px 4px; }
     `;
     pill = document.createElement("div");
-    pill.className = "pill";
-    const icoEl = document.createElement("span");
-    icoEl.className = "ico";
-    icoEl.textContent = "✦";
-    const lblEl = document.createElement("span");
-    lblEl.className = "lbl";
-    lblEl.textContent = "Type // to Patkan";
-    pill.append(icoEl, lblEl);
+    pill.className = "badge";
+    pill.textContent = "//";
+    pill.setAttribute("role", "button");
+    pill.setAttribute("aria-label", "End with // to turn into prompt");
     pill.addEventListener("mousedown", (e) => {
       e.preventDefault();
-      run();
+      if (!siteOff) run();
     });
+    pill.addEventListener("mouseenter", () => showTip(true));
+    pill.addEventListener("mouseleave", () => scheduleHideTip());
+
+    tip = document.createElement("div");
+    tip.className = "tip";
+    tipText = document.createElement("span");
+    tipBtn = document.createElement("button");
+    tipBtn.addEventListener("mousedown", (e) => {
+      e.preventDefault();
+      toggleSite();
+    });
+    tip.append(tipText, tipBtn);
+    tip.addEventListener("mouseenter", () => clearTimeout(hideTipTimer));
+    tip.addEventListener("mouseleave", () => scheduleHideTip());
+
+    // In-flight status with an always-available exit.
+    busyEl = document.createElement("div");
+    busyEl.className = "pill";
+    const spin = document.createElement("span");
+    spin.className = "spin";
+    spin.textContent = "◠";
+    const busyLbl = document.createElement("span");
+    busyLbl.textContent = "Transforming…";
+    const cancelBtn = document.createElement("button");
+    cancelBtn.textContent = "Cancel";
+    cancelBtn.addEventListener("mousedown", (e) => {
+      e.preventDefault();
+      cancel();
+    });
+    busyEl.append(spin, busyLbl, cancelBtn);
 
     chip = document.createElement("div");
     chip.className = "chip";
@@ -215,73 +272,88 @@
       e.preventDefault();
       undo();
     });
-    const panelBtn = document.createElement("button");
-    panelBtn.textContent = "Open panel";
-    panelBtn.addEventListener("mousedown", (e) => {
-      e.preventDefault();
-      chrome.runtime.sendMessage({ type: "PATKAN_OPEN_PANEL" });
-    });
-    chip.append(undoBtn, panelBtn);
+    chip.append(undoBtn);
 
-    shadow.append(style, pill, chip);
+    shadow.append(style, pill, tip, busyEl, chip);
     document.documentElement.appendChild(pillHost);
+    applySiteState();
+  }
+  let busyEl = null;
+
+  function showTip(show) {
+    ensureUI();
+    clearTimeout(hideTipTimer);
+    tip.classList.toggle("show", show);
+    if (show) place(target);
+  }
+  function scheduleHideTip(ms = 250) {
+    clearTimeout(hideTipTimer);
+    hideTipTimer = setTimeout(() => tip && tip.classList.remove("show"), ms);
+  }
+
+  async function toggleSite() {
+    const s = await chrome.storage.local.get("disabledHosts");
+    const list = new Set(s.disabledHosts || []);
+    siteOff = !siteOff;
+    if (siteOff) list.add(location.hostname);
+    else list.delete(location.hostname);
+    await chrome.storage.local.set({ disabledHosts: [...list] });
+    track(siteOff ? "site_disabled" : "site_enabled", { reason: location.hostname.slice(0, 60) });
+    applySiteState();
   }
 
   function place(el) {
-    if (!el) return;
+    if (!el || !pill) return;
     const r = el.getBoundingClientRect();
-    pill.style.left = Math.max(8, r.right - pill.offsetWidth - 12) + "px";
-    pill.style.top = Math.max(8, r.bottom - pill.offsetHeight - 10) + "px";
-    chip.style.left = Math.max(8, r.right - chip.offsetWidth - 12) + "px";
-    chip.style.top = Math.max(8, r.top - chip.offsetHeight - 8) + "px";
+    // Badge sits just outside the composer's top-right corner so it never covers text.
+    const bx = Math.min(window.innerWidth - 30, r.right - 11);
+    const by = Math.max(4, r.top - 11);
+    pill.style.left = bx + "px";
+    pill.style.top = by + "px";
+    tip.style.left = Math.max(8, bx + 22 - tip.offsetWidth) + "px";
+    tip.style.top = Math.max(4, by - tip.offsetHeight - 6) + "px";
+    for (const x of [busyEl, chip]) {
+      x.style.left = Math.max(8, bx - x.offsetWidth - 6) + "px";
+      x.style.top = Math.max(4, by - 4) + "px";
+    }
   }
 
-  function showPill(show, label) {
+  function showPill(show) {
     ensureUI();
+    applyTheme();
     pill.classList.toggle("show", show);
-    if (label) pill.querySelector(".lbl").textContent = label;
-    if (show) place(target);
+    if (show) {
+      place(target);
+      if (!hintShown && !siteOff) {
+        hintShown = true;
+        showTip(true);
+        scheduleHideTip(3000);
+      }
+    } else tip.classList.remove("show");
   }
 
   function showChip(show) {
     ensureUI();
+    applyTheme();
     chip.classList.toggle("show", show);
     if (show) place(target);
   }
 
-  /* Beat labels. The user must never wonder whether Patkan is done. */
-  function setPhase(phase, engine) {
+  function setPhase(phase) {
     ensureUI();
     busy = phase === "drafting" || phase === "sharpening";
-    const spinning = busy;
-    const ico = pill.querySelector(".ico");
-    if (spinning) {
-      const s = document.createElement("span");
-      s.className = "spin";
-      s.textContent = "◠";
-      ico.replaceChildren(s);
-    } else {
-      ico.replaceChildren(document.createTextNode("✦"));
-    }
-    let label = restingLabel;
-    if (phase === "drafting") label = "Drafting…";
-    else if (phase === "sharpening") label = "Sharpening — one moment";
-    else if (phase === "ready") {
-      label =
-        engine === "primary"
-          ? "Ready"
-          : !engine || engine === "local"
-            ? "Ready — offline draft"
-            : "Ready — backup engine";
-    }
-    pill.querySelector(".lbl").textContent = label;
-    pill.classList.toggle("show", busy || phase === "ready" || pill.classList.contains("show"));
+    applyTheme();
+    busyEl.classList.toggle("show", busy);
+    if (busy) place(target);
     if (target) target.style.opacity = busy ? "0.55" : "";
-    if (phase === "ready") {
-      setTimeout(() => {
-        if (!busy) pill.querySelector(".lbl").textContent = restingLabel;
-      }, 1000);
-    }
+  }
+
+  function cancel() {
+    if (!busy) return;
+    runId++;
+    setPhase("idle");
+    if (target && lastOriginal != null) writeText(target, lastOriginal);
+    track("transform_cancelled");
   }
 
   function toast(text) {
@@ -325,7 +397,7 @@
   function undo() {
     if (target && lastOriginal != null) {
       writeText(target, lastOriginal);
-      lastOriginal = null;
+      lastResult = null;
       showChip(false);
       reportFeedback(false);
       track("transform_rejected");
@@ -358,13 +430,14 @@
   }
 
   async function run(cleanText) {
-    if (busy || !target) return;
+    if (busy || !target || siteOff) return;
     track("trigger_detected");
     const raw = typeof cleanText === "string" ? cleanText : readText(target).replace(/\/\/\s*$/, "").trim();
     if (raw.length < 3) return;
 
     lastOriginal = typeof cleanText === "string" ? cleanText : readText(target);
     sendAnyway = false;
+    const myRun = ++runId;
     setPhase("drafting");
     showChip(false);
 
@@ -376,6 +449,7 @@
       type: "PATKAN_SCAFFOLD",
       payload: { text: raw, persona: settings?.persona, dialect: host.dialect, intensity: settings?.intensity },
     });
+    if (myRun !== runId) return;
     if (scaffold?.text) writeText(target, scaffold.text);
     setPhase("sharpening");
 
@@ -391,6 +465,7 @@
       },
     });
 
+    if (myRun !== runId) return; // cancelled: the user's words are already back
     if (!res || !res.ok) {
       setPhase("ready", "local");
       // Nothing is lost: the user's own words go straight back.
@@ -412,7 +487,7 @@
     const wrote = writeText(target, res.prompt);
     setPhase("ready", res.engine || "primary");
     if (typeof res.used === "number" && typeof res.limit === "number") {
-      restingLabel = `Type // to Patkan · ${Math.max(0, res.limit - res.used)} left today`;
+      restingLabel = `End with // to turn into prompt · ${Math.max(0, res.limit - res.used)} left today`;
     }
     if (!wrote) {
       try {
@@ -425,6 +500,7 @@
     }
 
     pendingFeedback = true;
+    lastResult = res.prompt;
     const prev = target.style.backgroundColor;
     target.style.transition = "background-color .4s ease";
     target.style.backgroundColor = "rgba(255,180,80,.16)";
@@ -432,8 +508,8 @@
       target.style.backgroundColor = prev;
     }, 600);
     if (res.assumptions?.length) toast("Assumed: " + res.assumptions.join(" · "));
+    // Undo stays until the user sends or starts a new transform — no timer.
     showChip(true);
-    setTimeout(() => showChip(false), 8000);
   }
 
 
@@ -465,7 +541,7 @@
     "focusout",
     () => {
       setTimeout(() => {
-        if (!busy && document.activeElement !== target) showPill(false);
+        if (!busy && document.activeElement !== target && !tip?.matches(":hover")) showPill(false);
       }, 200);
     },
     true,
@@ -474,7 +550,7 @@
   function maybeShowPill() {
     if (!target) return;
     const text = readText(target).trim();
-    showPill(text.length >= 3 && !busy);
+    showPill(text.length >= 3 || siteOff || !!chip?.classList.contains("show"));
   }
 
   /* Trigger guards. `//` at the end of a real sentence fires Patkan; `//`
@@ -514,7 +590,7 @@
 
       const text = readText(el);
 
-      if (shouldTrigger(text)) {
+      if (!siteOff && shouldTrigger(text)) {
         if (idleTimer) clearTimeout(idleTimer);
         const clean = stripTrigger(text);
         writeText(el, clean);
@@ -547,6 +623,11 @@
   document.addEventListener(
     "keydown",
     (e) => {
+      if (e.key === "Escape" && busy) {
+        e.preventDefault();
+        cancel();
+        return;
+      }
       if (e.key === "Enter" && !e.shiftKey && pendingCleanText) {
         const el = findComposer(e.target);
         if (el === target) {
@@ -572,7 +653,12 @@
       if (!busy && e.key === "Enter" && !e.shiftKey && pendingFeedback) {
         const el = findComposer(e.target);
         // Sent with the rewrite in place = the rewrite was accepted.
-        if (el === target) reportFeedback(true);
+        if (el === target) {
+          reportFeedback(true);
+          lastOriginal = null;
+          lastResult = null;
+          showChip(false);
+        }
       }
 
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "z" && lastOriginal != null) {
@@ -594,7 +680,7 @@
     .sendMessage({ type: "PATKAN_FETCH_USAGE" })
     .then((usage) => {
       if (usage && typeof usage.remaining === "number") {
-        restingLabel = `Type // to Patkan · ${usage.remaining} left today`;
+        restingLabel = `End with // to turn into prompt · ${usage.remaining} left today`;
       }
     })
     .catch(() => {});

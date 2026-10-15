@@ -1,3 +1,3 @@
-- [x] Save the outgoing dictionary-card homepage as a private source snapshot.
-- [x] Replace the homepage with the approved V2 layout and restore every visible control's behavior.
-- [x] Verify real transformation, usage, links, and mobile/desktop presentation.
+- [x] P0: squircle // badge, "End with // to turn into prompt" tip, Transforming… · Cancel, lasting Undo, auto persona default, host theme, per-site Turn off/on + events
+- [ ] P1 items (next)
+- [ ] Package 1.0.5 ZIPs and upload to CWS after P1 (tonight)

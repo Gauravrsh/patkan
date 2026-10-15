@@ -35,6 +35,9 @@ const EXTENSION_EVENTS = [
   "quota_limit_reached",
   "account_connect_viewed",
   "account_connect_success",
+  "site_disabled",
+  "site_enabled",
+  "transform_cancelled",
 ] as const;
 
 const short = z.string().trim().min(1).max(60);
