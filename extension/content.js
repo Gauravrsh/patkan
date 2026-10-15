@@ -223,7 +223,7 @@
     pill.setAttribute("aria-label", "End with // to turn into prompt");
     pill.addEventListener("mousedown", (e) => {
       e.preventDefault();
-      if (!false) run();
+      run();
     });
     pill.addEventListener("mouseenter", () => showTip(true));
     pill.addEventListener("mouseleave", () => scheduleHideTip());
@@ -303,7 +303,7 @@
     pill.classList.toggle("show", show);
     if (show) {
       place(target);
-      if (!hintShown && !false) {
+      if (!hintShown) {
         hintShown = true;
         showTip(true);
         scheduleHideTip(3000);
@@ -409,7 +409,7 @@
   }
 
   async function run(cleanText) {
-    if (busy || !target || false) return;
+    if (busy || !target) return;
     track("trigger_detected");
     const raw = typeof cleanText === "string" ? cleanText : readText(target).replace(/\/\/\s*$/, "").trim();
     if (raw.length < 3) return;
@@ -572,7 +572,7 @@
   function maybeShowPill() {
     if (!target) return;
     const text = readText(target).trim();
-    showPill(text.length >= 3 || false || !!chip?.classList.contains("show"));
+    showPill(text.length >= 3 || !!chip?.classList.contains("show"));
   }
 
   /* Trigger guards. `//` at the end of a real sentence fires Patkan; `//`
@@ -612,7 +612,7 @@
 
       const text = readText(el);
 
-      if (!false && shouldTrigger(text)) {
+      if (shouldTrigger(text)) {
         if (idleTimer) clearTimeout(idleTimer);
         const clean = stripTrigger(text);
         writeText(el, clean);
