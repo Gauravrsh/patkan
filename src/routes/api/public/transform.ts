@@ -18,6 +18,7 @@ import {
   type EngineMessage,
 } from "@/lib/patkan-engines.server";
 import { recordEvent, type Outcome } from "@/lib/patkan-telemetry.server";
+import { profileInstruction } from "@/lib/profile-tasks";
 import {
   blockedResponse,
   classifyClient,
