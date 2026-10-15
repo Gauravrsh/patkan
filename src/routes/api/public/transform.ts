@@ -139,6 +139,17 @@ export const Route = createFileRoute("/api/public/transform")({
         const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
         const day = today();
 
+        // Signed-in users' saved role and tasks give the engine work context.
+        if (userId) {
+          const { data: prof } = await supabaseAdmin
+            .from("profiles")
+            .select("work_role, work_role_other, daily_tasks")
+            .eq("id", userId)
+            .maybeSingle();
+          const ctx = prof ? profileInstruction(prof) : null;
+          if (ctx) payload.customInstruction = payload.customInstruction ? `${ctx}\n${payload.customInstruction}` : ctx;
+        }
+
         const persona = getPersona(payload.persona);
         const dialect = getDialect(payload.dialect).id;
         const intensity: Intensity = payload.intensity ?? "standard";
