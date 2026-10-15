@@ -6,6 +6,11 @@ const chrome = globalThis.browser ?? globalThis.chrome;
 // Chromium (Chrome/Edge/Opera) has sidePanel; Firefox has sidebarAction instead.
 const hasSidePanel = Boolean(chrome.sidePanel?.open);
 
+// Install time drives the profile nudge (never before day 2).
+chrome.storage.local.get("installedAt").then((s) => {
+  if (!s.installedAt) chrome.storage.local.set({ installedAt: Date.now() });
+});
+
 chrome.runtime.onInstalled.addListener(() => {
   trackEvent("extension_initialized");
   Promise.resolve(chrome.sidePanel?.setPanelBehavior?.({ openPanelOnActionClick: true })).catch(() => {});
@@ -255,6 +260,12 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
   }
   if (msg?.type === "PATKAN_SET_SESSION") {
     chrome.storage.local.set({ session: msg.payload }).then(() => sendResponse({ ok: true }));
+    return true;
+  }
+  if (msg?.type === "PATKAN_OPEN_PROFILE") {
+    getSettings()
+      .then((st) => chrome.tabs.create({ url: st.apiBase.replace(/\/$/, "") + "/profile" }))
+      .then(() => sendResponse({ ok: true }));
     return true;
   }
   if (msg?.type === "PATKAN_OPEN_PANEL") {

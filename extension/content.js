@@ -117,14 +117,9 @@
   let busy = false;
   let sendAnyway = false;
   let restingLabel = "End with // to turn into prompt";
-  let siteOff = false;
   let runId = 0;
   let lastResult = null;
   let hintShown = false;
-  chrome.storage.local.get("disabledHosts").then((s) => {
-    siteOff = (s.disabledHosts || []).includes(location.hostname);
-    applySiteState();
-  }).catch(() => {});
 
   /* ---------- text read / write ---------- */
 
@@ -182,10 +177,7 @@
   }
 
   function applySiteState() {
-    if (!pill) return;
-    pill.classList.toggle("off", siteOff);
-    tipText.textContent = siteOff ? "Patkan is off on this site" : "End with // to turn into prompt";
-    tipBtn.textContent = siteOff ? "Turn on here" : "Turn off here";
+    if (tipText) tipText.textContent = restingLabel;
   }
 
   let tip = null, tipText = null, tipBtn = null, hideTipTimer = null;
@@ -231,7 +223,7 @@
     pill.setAttribute("aria-label", "End with // to turn into prompt");
     pill.addEventListener("mousedown", (e) => {
       e.preventDefault();
-      if (!siteOff) run();
+      run();
     });
     pill.addEventListener("mouseenter", () => showTip(true));
     pill.addEventListener("mouseleave", () => scheduleHideTip());
@@ -239,12 +231,7 @@
     tip = document.createElement("div");
     tip.className = "tip";
     tipText = document.createElement("span");
-    tipBtn = document.createElement("button");
-    tipBtn.addEventListener("mousedown", (e) => {
-      e.preventDefault();
-      toggleSite();
-    });
-    tip.append(tipText, tipBtn);
+    tip.append(tipText);
     tip.addEventListener("mouseenter", () => clearTimeout(hideTipTimer));
     tip.addEventListener("mouseleave", () => scheduleHideTip());
 
@@ -284,22 +271,14 @@
     ensureUI();
     clearTimeout(hideTipTimer);
     tip.classList.toggle("show", show);
-    if (show) place(target);
+    if (show) {
+      applySiteState();
+      place(target);
+    }
   }
   function scheduleHideTip(ms = 250) {
     clearTimeout(hideTipTimer);
     hideTipTimer = setTimeout(() => tip && tip.classList.remove("show"), ms);
-  }
-
-  async function toggleSite() {
-    const s = await chrome.storage.local.get("disabledHosts");
-    const list = new Set(s.disabledHosts || []);
-    siteOff = !siteOff;
-    if (siteOff) list.add(location.hostname);
-    else list.delete(location.hostname);
-    await chrome.storage.local.set({ disabledHosts: [...list] });
-    track(siteOff ? "site_disabled" : "site_enabled", { reason: location.hostname.slice(0, 60) });
-    applySiteState();
   }
 
   function place(el) {
@@ -324,7 +303,7 @@
     pill.classList.toggle("show", show);
     if (show) {
       place(target);
-      if (!hintShown && !siteOff) {
+      if (!hintShown) {
         hintShown = true;
         showTip(true);
         scheduleHideTip(3000);
@@ -405,7 +384,7 @@
   }
 
   /** The wall is a doorway, not a dead end: one tap opens sign-in. */
-  function showLimitCta(message) {
+  function showLimitCta(message, canSignIn) {
     track("quota_limit_reached");
     ensureUI();
     const existing = shadow.querySelector(".limitCta");
@@ -416,7 +395,7 @@
     el.textContent = message;
     el.addEventListener("mousedown", (ev) => {
       ev.preventDefault();
-      chrome.runtime.sendMessage({ type: "PATKAN_OPEN_SIGNIN" });
+      if (canSignIn) chrome.runtime.sendMessage({ type: "PATKAN_OPEN_SIGNIN" });
       el.remove();
     });
     shadow.appendChild(el);
@@ -430,7 +409,7 @@
   }
 
   async function run(cleanText) {
-    if (busy || !target || siteOff) return;
+    if (busy || !target) return;
     track("trigger_detected");
     const raw = typeof cleanText === "string" ? cleanText : readText(target).replace(/\/\/\s*$/, "").trim();
     if (raw.length < 3) return;
@@ -471,12 +450,7 @@
       // Nothing is lost: the user's own words go straight back.
       if (lastOriginal != null) writeText(target, lastOriginal);
       if (res?.limitReached) {
-        restingLabel = "Daily limit reached — sign in";
-        showLimitCta(
-          res.requiresSignIn
-            ? "Daily limit reached — tap to sign in and keep going"
-            : "Daily limit reached — resets at midnight UTC",
-        );
+        showLimitCta("You've used today's 10 transforms. Resets at 5:30 AM IST.", Boolean(res.requiresSignIn));
         setPhase("idle");
         return;
       }
@@ -510,6 +484,54 @@
     if (res.assumptions?.length) toast("Assumed: " + res.assumptions.join(" · "));
     // Undo stays until the user sends or starts a new transform — no timer.
     showChip(true);
+    maybeNudge();
+  }
+
+  /* Profile nudge: installed at least a day ago and more than 3 transforms today. */
+  const istDay = () => new Date(Date.now() + 5.5 * 3600e3).toISOString().slice(0, 10);
+  async function maybeNudge() {
+    try {
+      const day = istDay();
+      const s = await chrome.storage.local.get(["installedAt", "dayCount", "nudgeDismissedDay", "profileSaved"]);
+      const dc = s.dayCount && s.dayCount.day === day ? s.dayCount.n + 1 : 1;
+      await chrome.storage.local.set({ dayCount: { day, n: dc } });
+      if (s.profileSaved || s.nudgeDismissedDay === day) return;
+      if (!s.installedAt || Date.now() - s.installedAt < 864e5 || dc <= 3) return;
+      showNudge(day);
+    } catch {}
+  }
+  function showNudge(day) {
+    ensureUI();
+    if (shadow.querySelector(".nudge")) return;
+    const el = document.createElement("div");
+    el.className = "pill show nudge";
+    const txt = document.createElement("span");
+    txt.textContent = "Tailor Patkan to your daily work";
+    const go = document.createElement("button");
+    go.textContent = "Set up profile";
+    go.style.color = "#ff6b00";
+    go.addEventListener("mousedown", (e) => {
+      e.preventDefault();
+      track("profile_nudge_clicked");
+      chrome.runtime.sendMessage({ type: "PATKAN_OPEN_PROFILE" });
+      el.remove();
+    });
+    const x = document.createElement("button");
+    x.textContent = "✕";
+    x.setAttribute("aria-label", "Dismiss");
+    x.addEventListener("mousedown", (e) => {
+      e.preventDefault();
+      chrome.storage.local.set({ nudgeDismissedDay: day });
+      track("profile_nudge_dismissed");
+      el.remove();
+    });
+    el.append(txt, go, x);
+    const r = pill.getBoundingClientRect();
+    el.style.left = "0px";
+    shadow.appendChild(el);
+    el.style.left = Math.max(8, r.left - el.offsetWidth - 6) + "px";
+    el.style.top = Math.max(4, r.top - 40) + "px";
+    track("profile_nudge_shown");
   }
 
 
@@ -550,7 +572,7 @@
   function maybeShowPill() {
     if (!target) return;
     const text = readText(target).trim();
-    showPill(text.length >= 3 || siteOff || !!chip?.classList.contains("show"));
+    showPill(text.length >= 3 || !!chip?.classList.contains("show"));
   }
 
   /* Trigger guards. `//` at the end of a real sentence fires Patkan; `//`
@@ -590,7 +612,7 @@
 
       const text = readText(el);
 
-      if (!siteOff && shouldTrigger(text)) {
+      if (shouldTrigger(text)) {
         if (idleTimer) clearTimeout(idleTimer);
         const clean = stripTrigger(text);
         writeText(el, clean);

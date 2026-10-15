@@ -36,6 +36,9 @@ const EXTENSION_EVENTS = [
   "account_connect_viewed",
   "account_connect_success",
   "site_disabled",
+  "profile_nudge_shown",
+  "profile_nudge_clicked",
+  "profile_nudge_dismissed",
   "site_enabled",
   "transform_cancelled",
 ] as const;

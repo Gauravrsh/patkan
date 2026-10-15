@@ -95,29 +95,38 @@ export type Database = {
       profiles: {
         Row: {
           created_at: string
+          daily_tasks: string[]
           display_name: string | null
           email: string | null
           id: string
           tier: string
           updated_at: string
+          work_role: string | null
+          work_role_other: string | null
           zero_data_mode: boolean
         }
         Insert: {
           created_at?: string
+          daily_tasks?: string[]
           display_name?: string | null
           email?: string | null
           id: string
           tier?: string
           updated_at?: string
+          work_role?: string | null
+          work_role_other?: string | null
           zero_data_mode?: boolean
         }
         Update: {
           created_at?: string
+          daily_tasks?: string[]
           display_name?: string | null
           email?: string | null
           id?: string
           tier?: string
           updated_at?: string
+          work_role?: string | null
+          work_role_other?: string | null
           zero_data_mode?: boolean
         }
         Relationships: []
