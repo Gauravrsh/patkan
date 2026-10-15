@@ -377,6 +377,8 @@
     if (target && lastOriginal != null) {
       writeText(target, lastOriginal);
       lastResult = null;
+      // One undo per transform; later Ctrl+Z must fall through to the host's native undo.
+      lastOriginal = null;
       showChip(false);
       reportFeedback(false);
       track("transform_rejected");
@@ -513,6 +515,7 @@
     go.addEventListener("mousedown", (e) => {
       e.preventDefault();
       track("profile_nudge_clicked");
+      chrome.storage.local.set({ nudgeDismissedDay: day });
       chrome.runtime.sendMessage({ type: "PATKAN_OPEN_PROFILE" });
       el.remove();
     });

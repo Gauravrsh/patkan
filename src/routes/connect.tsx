@@ -38,6 +38,10 @@ function ConnectPage() {
           refresh_token: session.refresh_token,
           expires_at: session.expires_at,
           email: session.user.email,
+          // Tells the extension to stop the profile reminder.
+          ...(new URLSearchParams(window.location.search).get("profile") === "saved"
+            ? { profileSaved: true }
+            : {}),
         },
       },
       window.location.origin,
