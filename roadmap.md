@@ -4,4 +4,4 @@
 - [ ] P0: owner approval of "Turn off here" / "Turn on here" / "Patkan is off on this site"
 - [ ] P1 items (after P0 closes) — blocked on owner-approved copy
 - [ ] Profile section (web + extension, synced by sign-in): role + curated daily-task checklist + Other; gentle non-blocking nudge after 3rd transform of the day; profile feeds transform context — blocked on owner-approved copy/wireframe
-- [ ] Package 1.0.5 ZIPs and upload to CWS after P1 (tonight)
+- [ ] Build and inspect the current v1.0.5 extension packages, now explicitly requested by owner; CWS upload remains manual.

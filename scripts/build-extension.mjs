@@ -11,11 +11,12 @@
 import { execFileSync } from "node:child_process";
 import { cpSync, mkdirSync, rmSync, readFileSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
+import { tmpdir } from "node:os";
 
 const root = resolve(import.meta.dirname, "..");
 const src = resolve(root, "extension");
 const out = resolve(root, "public");
-const tmp = resolve(root, ".tmp-extension");
+const tmp = resolve(tmpdir(), "patkan-extension-package");
 
 const base = JSON.parse(readFileSync(resolve(src, "manifest.json"), "utf8"));
 
