@@ -17,6 +17,7 @@ import { Route as ChatgptPromptGeneratorRouteImport } from './routes/chatgpt-pro
 import { Route as ClaudePromptGeneratorRouteImport } from './routes/claude-prompt-generator'
 import { Route as ConnectRouteImport } from './routes/connect'
 import { Route as GeminiPromptGeneratorRouteImport } from './routes/gemini-prompt-generator'
+import { Route as LinkedinCoverRouteImport } from './routes/linkedin-cover'
 import { Route as Playgroundv2RouteImport } from './routes/playgroundv2'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as ProfileRouteImport } from './routes/profile'
@@ -75,6 +76,11 @@ const ConnectRoute = ConnectRouteImport.update({
 const GeminiPromptGeneratorRoute = GeminiPromptGeneratorRouteImport.update({
   id: '/gemini-prompt-generator',
   path: '/gemini-prompt-generator',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LinkedinCoverRoute = LinkedinCoverRouteImport.update({
+  id: '/linkedin-cover',
+  path: '/linkedin-cover',
   getParentRoute: () => rootRouteImport,
 } as any)
 const Playgroundv2Route = Playgroundv2RouteImport.update({
@@ -190,6 +196,7 @@ export interface FileRoutesByFullPath {
   '/claude-prompt-generator': typeof ClaudePromptGeneratorRoute
   '/connect': typeof ConnectRoute
   '/gemini-prompt-generator': typeof GeminiPromptGeneratorRoute
+  '/linkedin-cover': typeof LinkedinCoverRoute
   '/playgroundv2': typeof Playgroundv2Route
   '/privacy': typeof PrivacyRoute
   '/profile': typeof ProfileRoute
@@ -219,6 +226,7 @@ export interface FileRoutesByTo {
   '/claude-prompt-generator': typeof ClaudePromptGeneratorRoute
   '/connect': typeof ConnectRoute
   '/gemini-prompt-generator': typeof GeminiPromptGeneratorRoute
+  '/linkedin-cover': typeof LinkedinCoverRoute
   '/playgroundv2': typeof Playgroundv2Route
   '/privacy': typeof PrivacyRoute
   '/profile': typeof ProfileRoute
@@ -249,6 +257,7 @@ export interface FileRoutesById {
   '/claude-prompt-generator': typeof ClaudePromptGeneratorRoute
   '/connect': typeof ConnectRoute
   '/gemini-prompt-generator': typeof GeminiPromptGeneratorRoute
+  '/linkedin-cover': typeof LinkedinCoverRoute
   '/playgroundv2': typeof Playgroundv2Route
   '/privacy': typeof PrivacyRoute
   '/profile': typeof ProfileRoute
@@ -280,6 +289,7 @@ export interface FileRouteTypes {
     | '/claude-prompt-generator'
     | '/connect'
     | '/gemini-prompt-generator'
+    | '/linkedin-cover'
     | '/playgroundv2'
     | '/privacy'
     | '/profile'
@@ -309,6 +319,7 @@ export interface FileRouteTypes {
     | '/claude-prompt-generator'
     | '/connect'
     | '/gemini-prompt-generator'
+    | '/linkedin-cover'
     | '/playgroundv2'
     | '/privacy'
     | '/profile'
@@ -338,6 +349,7 @@ export interface FileRouteTypes {
     | '/claude-prompt-generator'
     | '/connect'
     | '/gemini-prompt-generator'
+    | '/linkedin-cover'
     | '/playgroundv2'
     | '/privacy'
     | '/profile'
@@ -369,6 +381,7 @@ export interface RootRouteChildren {
   ClaudePromptGeneratorRoute: typeof ClaudePromptGeneratorRoute
   ConnectRoute: typeof ConnectRoute
   GeminiPromptGeneratorRoute: typeof GeminiPromptGeneratorRoute
+  LinkedinCoverRoute: typeof LinkedinCoverRoute
   Playgroundv2Route: typeof Playgroundv2Route
   PrivacyRoute: typeof PrivacyRoute
   ProfileRoute: typeof ProfileRoute
@@ -439,6 +452,13 @@ declare module '@tanstack/react-router' {
       path: '/gemini-prompt-generator'
       fullPath: '/gemini-prompt-generator'
       preLoaderRoute: typeof GeminiPromptGeneratorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/linkedin-cover': {
+      id: '/linkedin-cover'
+      path: '/linkedin-cover'
+      fullPath: '/linkedin-cover'
+      preLoaderRoute: typeof LinkedinCoverRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/playgroundv2': {
@@ -627,6 +647,7 @@ const rootRouteChildren: RootRouteChildren = {
   ClaudePromptGeneratorRoute: ClaudePromptGeneratorRoute,
   ConnectRoute: ConnectRoute,
   GeminiPromptGeneratorRoute: GeminiPromptGeneratorRoute,
+  LinkedinCoverRoute: LinkedinCoverRoute,
   Playgroundv2Route: Playgroundv2Route,
   PrivacyRoute: PrivacyRoute,
   ProfileRoute: ProfileRoute,
