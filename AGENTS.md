@@ -10,3 +10,4 @@
 <!-- LOVABLE:END -->
 - Structured data (JSON-LD) for pages comes from src/lib/seo.ts — one shared definition keeps Patkan described identically everywhere.
 - Keep superseded homepage source in a private .lovable/archive snapshot, never a public route, so the founder can reference it without exposing outdated copy to visitors or crawlers.
+- Stage extension archives in the system temporary directory and serve completed ZIPs from public/ so packaging does not leave staging files in the project.
