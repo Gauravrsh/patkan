@@ -377,22 +377,22 @@ function Landing() {
 
       <main>
         {/* 1. Hero + 2. Playground + 3. CTA */}
-        <section id="playground" data-section="hero" className={`${shell} scroll-mt-20 py-12 sm:py-20`}>
+        <section id="playground" data-section="hero" className={`${shell} scroll-mt-20 pt-5 pb-10 sm:py-16`}>
           <div className="mx-auto max-w-3xl text-center">
-            <h1 className="text-balance text-3xl font-semibold leading-[1.15] tracking-tight sm:text-[2.6rem]">
-              <span className="mb-3 block text-xl font-semibold uppercase tracking-wide text-primary sm:text-2xl">
+            <h1 className="text-balance text-[1.4rem] font-semibold leading-snug tracking-tight sm:text-4xl sm:leading-[1.15]">
+              <span className="mb-2 block text-xs font-semibold uppercase tracking-[0.14em] text-primary sm:mb-3 sm:text-sm">
                 AI Prompt Generator &amp; Enhancer
               </span>
               Stop writing prompts. Just end your sentence with <span className="font-mono text-primary">//</span>{" "}
               inside ChatGPT, Claude, Gemini, or any AI assistant.
             </h1>
-            <p className="mx-auto mt-4 max-w-2xl text-base leading-relaxed text-muted-foreground sm:text-lg">
+            <p className="mx-auto mt-2 max-w-2xl text-sm leading-relaxed text-muted-foreground sm:mt-4 sm:text-lg">
               Turn rough thoughts into structured prompts right where you type — without switching tabs or learning
               prompt engineering.
             </p>
           </div>
 
-          <p className="mt-10 text-sm font-medium text-primary">Try Patkan in action. Just type anything and end it with //</p>
+          <p className="mt-5 text-center text-xs font-medium text-primary sm:mt-10 sm:text-sm">Try Patkan in action. Just type anything and end it with //</p>
           <div className="mx-auto mt-3 max-w-3xl overflow-hidden rounded-lg border bg-card shadow-sm">
             <div className="flex items-center gap-2 border-b px-3 py-2">
               <div className="flex min-w-0 flex-wrap gap-2">
@@ -424,11 +424,11 @@ function Landing() {
                 <Button type="submit" size="sm">Add</Button>
               </form>
             )}
-            <div className="relative p-5 sm:p-7">
+            <div className="relative p-4 sm:p-7">
               {phase === "idle" ? (
                 <>
                   {!input && (
-                    <p aria-hidden className="pointer-events-none absolute inset-x-5 top-5 text-base leading-relaxed text-muted-foreground sm:inset-x-7 sm:top-7 sm:text-lg">
+                    <p aria-hidden className="pointer-events-none absolute inset-x-4 top-4 text-base leading-relaxed text-muted-foreground sm:inset-x-7 sm:top-7 sm:text-lg">
                       {ghost.text}
                       {ghost.slashes > 0 && <span className="ml-1 font-mono font-bold text-primary">{"/".repeat(ghost.slashes)}</span>}
                     </p>
@@ -439,7 +439,7 @@ function Landing() {
                     maxLength={MAX_INPUT_CHARS + 2}
                     disabled={exhausted}
                     aria-label="Type your rough thought and end it with //"
-                    className="block min-h-[120px] w-full resize-y bg-transparent text-base leading-relaxed outline-none sm:text-lg"
+                    className="block min-h-[96px] w-full resize-y bg-transparent text-base leading-relaxed outline-none sm:min-h-[120px] sm:text-lg"
                   />
                 </>
               ) : (
@@ -451,7 +451,7 @@ function Landing() {
             </div>
           </div>
 
-          <div className="mt-8 flex flex-col items-center gap-3 text-center">
+          <div className="mt-6 flex flex-col items-center gap-3 text-center sm:mt-8">
             <Button onClick={getExtension} className="h-11 px-6">
               <ArrowDownToLine className="size-4" aria-hidden />
               <span className="sm:hidden">Add to Desktop</span>
