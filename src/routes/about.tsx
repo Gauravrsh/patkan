@@ -61,7 +61,7 @@ const sections: { heading: string; body: string[] }[] = [
   {
     heading: "Open source, zero surveillance",
     body: [
-      "Trust is critical when it comes to your browser. The core code behind Patkan is free and open-source under the GNU AGPL-3.0 license on GitHub. Anyone can inspect the code, review the extension manifests, or run their own local copy.",
+      "Trust is critical when it comes to your browser. The core code behind Patkan is open source under the GNU AGPL-3.0 license on GitHub. Anyone can inspect the code, review the extension manifests, or run their own local copy.",
       "Patkan is built with zero advertising trackers and no user profiling. Your prompts (raw thoughts) are processed solely to return a structured prompt, and an anonymous cache ensures that repeat transforms happen instantly. The extension is completely deaf until you type // and blind to every website not explicitly listed in its permissions.",
     ],
   },
@@ -141,7 +141,7 @@ function AboutPage() {
             </div>
             <div className="mt-5 space-y-4 pl-0 sm:pl-9">
               <p className="max-w-2xl text-sm leading-7 text-muted-foreground sm:text-base sm:leading-8">
-                Patkan is currently completely free to use. To protect server capacity and prevent automated abuse,
+                To protect server capacity and prevent automated abuse,
                 simple fair-use limits apply:
               </p>
               <ul className="max-w-2xl list-disc space-y-2 pl-5 text-sm leading-7 text-muted-foreground sm:text-base sm:leading-8">

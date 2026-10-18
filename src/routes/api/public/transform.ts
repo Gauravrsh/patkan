@@ -326,7 +326,7 @@ export const Route = createFileRoute("/api/public/transform")({
             {
               error: userId
                 ? `You've used all ${limit} transforms for today. The counter resets at midnight UTC.`
-                : `You've used all ${limit} free transforms for today. Sign in for ${dailyLimitFor(true)} a day, or wait for the reset.`,
+                : `You've used all ${limit} transforms for today. Sign in for ${dailyLimitFor(true)} a day, or wait for the reset.`,
               limitReached: true,
               requiresSignIn: !userId,
               used: nextCount,

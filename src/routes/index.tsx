@@ -505,7 +505,7 @@ function Landing() {
             <h2 className={h2}>How to turn any sentence into a prompt inside your AI</h2>
             <div className="mt-10 grid gap-px overflow-hidden rounded-lg border bg-border md:grid-cols-3">
               {[
-                ["01", "Add to Desktop Browser", "Install the free Patkan prompt generator extension for Chrome, Edge, Firefox, Brave, Arc, and Opera. It takes just 2 click, no sign-up."],
+                ["01", "Add to Desktop Browser", "Install the Patkan prompt generator extension for Chrome, Edge, Firefox, Brave, Arc, and Opera. No sign-up required."],
                 ["02", "Open your AI in browser", "Open ChatGPT, Claude, Gemini, Microsoft Copilot, Perplexity, or any supported AI assistant. Patkan sits inside the AI you already use - no new tab. no copy pasting prompts."],
                 ["03", "Type anything and end with //", "Write your task in plain words and end it with //. Patkan turns the sentence into a structured expert prompt instantly - no tab switching, no copy-paste."],
               ].map(([n, t, b]) => (
