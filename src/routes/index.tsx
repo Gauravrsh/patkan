@@ -379,13 +379,16 @@ function Landing() {
         {/* 1. Hero + 2. Playground + 3. CTA */}
         <section id="playground" data-section="hero" className={`${shell} scroll-mt-20 py-12 sm:py-20`}>
           <div className="mx-auto max-w-3xl text-center">
-            <p className="text-xl font-semibold text-primary sm:text-2xl">Your Personal Prompt Engineer</p>
-            <h1 className="mt-3 text-balance text-3xl font-semibold leading-[1.15] tracking-tight sm:text-[2.6rem]">
-              Stop writing prompts. Just end your sentence with <span className="font-mono text-primary">//</span>
+            <h1 className="text-balance text-3xl font-semibold leading-[1.15] tracking-tight sm:text-[2.6rem]">
+              <span className="mb-3 block text-xl font-semibold uppercase tracking-wide text-primary sm:text-2xl">
+                AI Prompt Generator &amp; Enhancer
+              </span>
+              Stop writing prompts. Just end your sentence with <span className="font-mono text-primary">//</span>{" "}
+              inside ChatGPT, Claude, Gemini, or any AI assistant.
             </h1>
             <p className="mx-auto mt-4 max-w-2xl text-base leading-relaxed text-muted-foreground sm:text-lg">
-              Turn raw thoughts into structured prompts right inside ChatGPT, Claude, and Gemini — without switching
-              tabs or learning prompt engineering.
+              Turn rough thoughts into structured prompts right where you type — without switching tabs or learning
+              prompt engineering.
             </p>
           </div>
 
