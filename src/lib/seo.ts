@@ -54,3 +54,14 @@ export function pageLd(opts: { name: string; path: string; description: string; 
     isPartOf: { "@type": "WebSite", name: "Patkan", url: `${SITE_URL}/` },
   };
 }
+
+/** FAQPage schema. Must mirror the visible FAQ text on the page word for word. */
+export function faqLd(faqs: readonly (readonly [string, string] | { readonly q: string; readonly a: string })[]) {
+  return {
+    "@type": "FAQPage",
+    mainEntity: faqs.map((item) => {
+      const [q, a] = "q" in item ? [item.q, item.a] : item;
+      return { "@type": "Question", name: q, acceptedAnswer: { "@type": "Answer", text: a } };
+    }),
+  };
+}

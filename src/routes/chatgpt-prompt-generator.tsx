@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowDownToLine, ArrowRight, Check, MousePointer2, ShieldCheck, Zap } from "lucide-react";
 
-import { ldScript, organizationLd, pageLd, softwareLd } from "@/lib/seo";
+import { faqLd, ldScript, organizationLd, pageLd, softwareLd } from "@/lib/seo";
 import patkanMark from "@/assets/patkan-mark.svg";
 
 export const Route = createFileRoute("/chatgpt-prompt-generator")({
@@ -36,6 +36,7 @@ export const Route = createFileRoute("/chatgpt-prompt-generator")({
           description: "Turn a rough thought into an expert ChatGPT prompt without leaving the chat. End your line with // and Patkan rewrites it.",
           dateModified: "2026-09-30",
         }),
+        faqLd(faqs),
       ]),
     ],
   }),
