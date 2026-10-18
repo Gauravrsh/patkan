@@ -24,17 +24,17 @@ import patkanMark from "@/assets/patkan-mark.svg";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Patkan - Prompt convertor for ChatGPT, Gemini, Claude and more AI assistants" },
+      { title: "Patkan - AI Prompt Enhancer & Prompt Generator" },
       {
         name: "description",
         content:
-          "Turn a rough thought into a clear, well-structured prompt without leaving your AI chat. End your line with // and Patkan rewrites it for ChatGPT, Gemini or Claude.",
+          "Turn rough sentences into structured prompts right inside ChatGPT, Claude & Gemini. End any thought with // to trigger instant prompt enhancement.",
       },
-      { property: "og:title", content: "Patkan - Prompt convertor for ChatGPT, Gemini, Claude and more AI assistants" },
+      { property: "og:title", content: "Patkan - AI Prompt Enhancer & Prompt Generator" },
       {
         property: "og:description",
         content:
-          "Turn a rough thought into a clear, well-structured prompt without leaving your AI chat. End your line with // and Patkan rewrites it.",
+          "Turn rough sentences into structured prompts inside ChatGPT, Claude & Gemini. End any thought with // to trigger instant prompt enhancement.",
       },
       { property: "og:type", content: "website" },
       { property: "og:url", content: "https://patkan.in/" },
@@ -48,7 +48,7 @@ export const Route = createFileRoute("/")({
         organizationLd,
         softwareLd,
         { "@type": "WebSite", "@id": "https://patkan.in/#website", name: "Patkan", url: "https://patkan.in/", publisher: { "@id": "https://patkan.in/#organization" } },
-        pageLd({ name: "Patkan - Prompt convertor for ChatGPT, Gemini, Claude and more AI assistants", path: "/", description: PATKAN_DEFINITION, dateModified: "2026-10-03" }),
+        pageLd({ name: "Patkan - AI Prompt Enhancer & Prompt Generator", path: "/", description: PATKAN_DEFINITION, dateModified: "2026-10-18" }),
       ]),
     ],
   }),

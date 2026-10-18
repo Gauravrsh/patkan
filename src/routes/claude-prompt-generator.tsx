@@ -211,7 +211,7 @@ function ClaudePromptGenerator() {
               {
                 icon: ShieldCheck,
                 heading: "Open and auditable",
-                body: "Installed unpacked as plain JavaScript — open the folder and inspect every line before you load it.",
+                body: "Patkan is open source under AGPL-3.0. Every line is on GitHub, there for anyone to read.",
               },
             ].map(({ icon: Icon, heading, body }) => (
               <article key={heading}>
