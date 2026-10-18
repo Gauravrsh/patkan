@@ -1,7 +1,14 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
-import { ArrowDownToLine, ArrowRight, Check, ChevronDown, Copy, EyeOff, Headphones, Loader2, RotateCcw, Share2, UserRound } from "lucide-react";
+import { ArrowDownToLine, ArrowRight, Check, ChevronDown, Code2, Copy, EyeOff, Loader2, RotateCcw, Share2, Slash, UserRound } from "lucide-react";
+
+const FAQS: [string, string][] = [
+  ["What is Patkan?", "Patkan is an AI prompt generator and enhancer that turns rough sentences into structured, expert prompts right inside your AI chat box. Instead of learning prompt engineering syntax, you type your task in plain words and end it with //. Patkan rewrites it instantly before the AI model processes it."],
+  ["Which AI assistants does Patkan work with?", "Patkan works directly inside desktop web interfaces for ChatGPT, Claude, Google Gemini, Microsoft Copilot, Perplexity, Google AI Studio, and other major AI platforms. It functions directly inside your active chat window without requiring you to switch tabs or copy-paste between tools."],
+  ["How does Patkan protect your privacy?", "Patkan activates only when you type // at the end of a sentence. It does not monitor background keystrokes, does not read other browser tabs or browsing history, and never accesses personal accounts. Inputs are processed solely to structure your prompt and are not used to build advertising profiles."],
+  ["Do I need to learn prompt engineering to use Patkan?", "No. Effective prompt engineering requires specifying roles, task constraints, edge cases, and output formats. As an instant prompt generator, Patkan builds this context automatically. You write naturally, and Patkan supplies the framing required for accurate, hallucination-free AI responses."],
+];
 
 import {
   DropdownMenu,
@@ -514,11 +521,12 @@ function Landing() {
         {/* 7. Privacy */}
         <section className={`${shell} py-14 sm:py-20`}>
           <p className={eyebrow}>Privacy &amp; Security</p>
-          <h2 className={h2}>Inside your AI tab. Nowhere else.</h2>
-          <div className="mt-10 grid gap-px overflow-hidden rounded-lg border bg-border md:grid-cols-2">
+          <h2 className={h2}>Activates only when you ask for it. Isolated to everything else.</h2>
+          <div className="mt-10 grid gap-px overflow-hidden rounded-lg border bg-border md:grid-cols-3">
             {[
-              [Headphones, "Deaf until //", "No keyloggers. No background daemons listening to keystrokes. Patkan takes no action until you type // at the end of a sentence."],
-              [EyeOff, "Blind to the rest of the web", "Patkan cannot see your other tabs, bank logins, emails, or browsing history. It is confined to the AI sites in its approved list."],
+              [Slash, "Explicit // Trigger", "Patkan does not monitor typing or record background keystrokes. It evaluates text only when you intentionally type // at the end of a thought inside an approved AI chat box."],
+              [EyeOff, "Strict Domain Isolation", "The extension operates exclusively within supported AI web interfaces. It has no access to your other browser tabs, browsing history, form fills, or personal credentials."],
+              [Code2, "Open Source AGPL-3.0 License", "Every line of Patkan's code is public on GitHub under the GNU Affero General Public License v3. Anyone can inspect, verify, and independently audit how Patkan handles data, security boundaries, and privacy claims."],
             ].map(([Icon, t, b]) => {
               const I = Icon as typeof EyeOff;
               return (
@@ -535,6 +543,23 @@ function Landing() {
           <Link to="/privacy" className="mt-6 inline-flex items-center gap-1.5 text-sm font-medium text-primary">
             Read the full privacy policy <ArrowRight className="size-4" aria-hidden />
           </Link>
+        </section>
+
+        {/* 7b. FAQ — native details so every answer is in the server HTML */}
+        <section id="faq" className={`${shell} scroll-mt-20 pb-14 sm:pb-20`}>
+          <p className={eyebrow}>Common questions</p>
+          <h2 className={h2}>Frequently asked questions about Patkan</h2>
+          <div className="mt-8 divide-y rounded-lg border bg-card">
+            {FAQS.map(([q, a]) => (
+              <details key={q} className="group px-5 py-4 sm:px-6">
+                <summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-base font-semibold tracking-tight [&::-webkit-details-marker]:hidden">
+                  <h3>{q}</h3>
+                  <ChevronDown className="size-4 shrink-0 text-muted-foreground transition-transform group-open:rotate-180" aria-hidden />
+                </summary>
+                <p className="mt-3 text-sm leading-7 text-muted-foreground">{a}</p>
+              </details>
+            ))}
+          </div>
         </section>
 
         {/* 8. Support */}
