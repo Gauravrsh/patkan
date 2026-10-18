@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowDownToLine, ArrowRight, MousePointer2, ShieldCheck, Zap } from "lucide-react";
 
-import { ldScript, organizationLd, pageLd, softwareLd } from "@/lib/seo";
+import { faqLd, ldScript, organizationLd, pageLd, softwareLd } from "@/lib/seo";
 import patkanMark from "@/assets/patkan-mark.svg";
 
 const DESCRIPTION =
@@ -32,6 +32,7 @@ export const Route = createFileRoute("/gemini-prompt-generator")({
             "Turn a rough thought into an expert Gemini prompt without leaving the chat. End your line with // and Patkan rewrites it.",
           dateModified: "2026-09-30",
         }),
+        faqLd(faqs),
       ]),
     ],
   }),

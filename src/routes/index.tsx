@@ -25,7 +25,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { trackEvent } from "@/lib/telemetry";
 import { DAILY_FREE_LIMIT, DAILY_SIGNED_IN_LIMIT, MAX_INPUT_CHARS, localScaffold, type Dialect } from "@/lib/patkan-core";
 import { streamTransform } from "@/lib/patkan-stream";
-import { ldScript, organizationLd, pageLd, PATKAN_DEFINITION, softwareLd } from "@/lib/seo";
+import { faqLd, ldScript, organizationLd, pageLd, PATKAN_DEFINITION, softwareLd } from "@/lib/seo";
 import patkanMark from "@/assets/patkan-mark.svg";
 
 export const Route = createFileRoute("/")({
@@ -56,6 +56,7 @@ export const Route = createFileRoute("/")({
         softwareLd,
         { "@type": "WebSite", "@id": "https://patkan.in/#website", name: "Patkan", url: "https://patkan.in/", publisher: { "@id": "https://patkan.in/#organization" } },
         pageLd({ name: "Patkan - AI Prompt Enhancer & Prompt Generator", path: "/", description: PATKAN_DEFINITION, dateModified: "2026-10-18" }),
+        faqLd(FAQS),
       ]),
     ],
   }),
