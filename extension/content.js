@@ -604,6 +604,40 @@
     return text.replace(/\/\/[ \t]*$/, "");
   }
 
+  /* Remove only the trailing trigger characters. Rewriting the whole box
+     makes Quill (Gemini) turn each newline into an extra paragraph. */
+  function deleteTrailing(el, count) {
+    try {
+      if (el.tagName === "TEXTAREA") {
+        const end = el.value.length;
+        el.setSelectionRange(end - count, end);
+        el.setRangeText("", end - count, end, "end");
+        el.dispatchEvent(new Event("input", { bubbles: true }));
+        return;
+      }
+      el.focus();
+      const sel = window.getSelection();
+      const range = document.createRange();
+      range.selectNodeContents(el);
+      range.collapse(false);
+      sel.removeAllRanges();
+      sel.addRange(range);
+      for (let i = 0; i < count; i++) document.execCommand("delete", false);
+    } catch {}
+  }
+
+  const norm = (t) => (t || "").replace(/\s+/g, " ").trim();
+
+  /* Gemini opens a menu on "/" that grabs the keyboard; close it. */
+  function closeHostSlashMenu(el) {
+    if (!/gemini\.google\.com$/.test(location.hostname)) return;
+    const menu = document.querySelector(".at-mentions-menu-redesign-panel, .cdk-overlay-pane");
+    if (!menu) return;
+    const opts = { key: "Escape", code: "Escape", keyCode: 27, bubbles: true, cancelable: true };
+    el.dispatchEvent(new KeyboardEvent("keydown", opts));
+    el.dispatchEvent(new KeyboardEvent("keyup", opts));
+  }
+
 
   document.addEventListener(
     "input",
@@ -618,14 +652,16 @@
       if (shouldTrigger(text)) {
         if (idleTimer) clearTimeout(idleTimer);
         const clean = stripTrigger(text);
-        writeText(el, clean);
+        closeHostSlashMenu(el);
+        deleteTrailing(el, text.length - clean.length);
+        if (norm(readText(el)) !== norm(clean)) writeText(el, clean);
+        closeHostSlashMenu(el);
         lastOriginal = clean;
         pendingCleanText = clean;
         idleTimer = setTimeout(() => {
           idleTimer = null;
           if (target === el && pendingCleanText) {
-            const current = readText(el).trimEnd();
-            if (current === pendingCleanText.trimEnd()) run(pendingCleanText);
+            if (norm(readText(el)) === norm(pendingCleanText)) run(pendingCleanText);
             pendingCleanText = null;
           }
         }, IDLE_MS);
@@ -633,8 +669,7 @@
       }
 
       if (pendingCleanText) {
-        const current = text.trimEnd();
-        if (current !== pendingCleanText.trimEnd()) {
+        if (norm(text) !== norm(pendingCleanText)) {
           pendingCleanText = null;
           if (idleTimer) clearTimeout(idleTimer);
           idleTimer = null;
