@@ -186,6 +186,13 @@ function PrivacyPolicy() {
             What we collect. What it does. Nothing more.
           </h1>
           <p className="mt-6 max-w-2xl text-base leading-relaxed text-muted-foreground sm:text-lg">
+            Version 1.0 · Effective 27 September 2026 · Last updated 27 September 2026. Also read our{" "}
+            <Link to="/terms" className="font-medium text-foreground underline-offset-4 hover:underline">
+              Terms of Use
+            </Link>
+            .
+          </p>
+          <p className="mt-4 max-w-2xl text-base leading-relaxed text-muted-foreground sm:text-lg">
             This policy describes exactly what patkan.in and the official Patkan extension collect, why, and what
             happens to it. Patkan is open source, so every line here can be checked against the code.
           </p>
