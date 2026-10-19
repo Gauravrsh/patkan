@@ -228,3 +228,52 @@ Root cause: extension/content.js shouldTrigger refused any text containing "//" 
 Fix: only the word attached to the trailing `//` is checked, so "https://x.com//" and "a//b//" still don't fire, but an earlier link no longer blocks Patkan. Version 1.0.4; Chrome and Firefox packages rebuilt.
 Verification: 21-case test run against the shipped function (links, single "/", https://, \//, a//b//, multi-line, 3-character minimum): all pass. Both zips contain the new code and version 1.0.4.
 Status: fixed (reaches users after the 1.0.4 upload to Chrome Web Store)
+
+```yaml
+- id: BUG-009
+  date: 2026-10-18
+  title: Gemini freezes on the first "/" of "//"
+  severity: high
+  surface: browser extension (gemini.google.com)
+  reported: "When I click //, after the first / it hangs."
+  repro: In Gemini's composer, type a prompt ending in "//". After the first "/" the box stalls.
+  evidence: >
+    Gemini opens its own menu on "/" (.at-mentions-menu-redesign-panel inside
+    .cdk-overlay-pane, "/ is now @...") which takes the keyboard. Telemetry on
+    2026-10-18 for device 1e83fef7 (v1.0.5): one cancel after 4.4s at 13:31 UTC.
+  root_cause: >
+    extension/content.js input handler assumed the composer is a plain text box;
+    it never dismissed the host's own "/" menu, so Gemini kept focus.
+  fix: >
+    extension/content.js closeHostSlashMenu(el): on gemini.google.com, when "//"
+    fires, send Escape to close the overlay before and after removing "//".
+    Version 1.0.6; packages rebuilt.
+  verification: >
+    node --check passes; 1.0.6 zip contains closeHostSlashMenu. Not yet tested on
+    live Gemini — confirm by a gemini trigger_detected followed by an ok
+    transform_events row from a 1.0.6 install with no transform_cancelled.
+  status: fixed (pending live confirmation and CWS upload of 1.0.6)
+
+- id: BUG-010
+  date: 2026-10-18
+  title: Multi-line prompts in Gemini add blank lines and never transform
+  severity: critical
+  surface: browser extension (Gemini; Quill editors)
+  reported: "It just ends up doing a para change, like what pressing enter does, instead of transforming."
+  repro: In Gemini, type two or more lines, end with "//". Blank lines appear and nothing transforms; Enter adds more blank lines.
+  root_cause: >
+    extension/content.js input handler called writeText(el, clean), rewriting the
+    whole box. Quill turns each newline into extra paragraphs (2 breaks became 5),
+    so the check `readText(el).trimEnd() === pendingCleanText.trimEnd()` failed,
+    pendingCleanText was cleared and run() never fired.
+  why_undetected: Trigger tests used single-line text and plain textareas only.
+  fix: >
+    deleteTrailing(el, n) now removes only the trailing "//"; writeText is a
+    fallback only if text differs. Comparisons use norm() (collapsed whitespace)
+    instead of exact match. Version 1.0.6; packages rebuilt.
+  verification: >
+    node --check passes; 1.0.6 zip contains deleteTrailing and norm. Not yet tested
+    on live Gemini — confirm by a multi-line "//" on Gemini producing an ok
+    transform_events row from a 1.0.6 install.
+  status: fixed (pending live confirmation and CWS upload of 1.0.6)
+```
