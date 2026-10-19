@@ -11,8 +11,11 @@ chrome.storage.local.get("installedAt").then((s) => {
   if (!s.installedAt) chrome.storage.local.set({ installedAt: Date.now() });
 });
 
-chrome.runtime.onInstalled.addListener(() => {
+chrome.runtime.onInstalled.addListener((details) => {
   trackEvent("extension_initialized");
+  if (details?.reason === "install") {
+    Promise.resolve(chrome.tabs.create({ url: "https://patkan.in/welcome" })).catch(() => {});
+  }
   Promise.resolve(chrome.sidePanel?.setPanelBehavior?.({ openPanelOnActionClick: true })).catch(() => {});
 });
 
