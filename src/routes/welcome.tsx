@@ -28,7 +28,7 @@ const LAUNCH = [
 ] as const;
 
 function open(label: string, url: string) {
-  trackEvent("welcome_launch_clicked", { meta: { target: label } });
+  trackEvent("nav_clicked", { meta: { page: "welcome", target: label } });
   // Browsers block web pages from linking to chrome://newtab, so "Other" opens a fresh empty tab.
   if (url.startsWith("chrome://")) window.open("", "_blank");
   else window.open(url, "_blank", "noopener,noreferrer");
