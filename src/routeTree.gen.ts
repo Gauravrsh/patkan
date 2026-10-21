@@ -16,8 +16,11 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as ChatgptPromptGeneratorRouteImport } from './routes/chatgpt-prompt-generator'
 import { Route as ClaudePromptGeneratorRouteImport } from './routes/claude-prompt-generator'
 import { Route as ConnectRouteImport } from './routes/connect'
+import { Route as CopilotPromptGeneratorRouteImport } from './routes/copilot-prompt-generator'
+import { Route as DeepseekPromptGeneratorRouteImport } from './routes/deepseek-prompt-generator'
 import { Route as GeminiPromptGeneratorRouteImport } from './routes/gemini-prompt-generator'
 import { Route as LinkedinCoverRouteImport } from './routes/linkedin-cover'
+import { Route as PerplexityPromptGeneratorRouteImport } from './routes/perplexity-prompt-generator'
 import { Route as Playgroundv2RouteImport } from './routes/playgroundv2'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as ProfileRouteImport } from './routes/profile'
@@ -75,6 +78,16 @@ const ConnectRoute = ConnectRouteImport.update({
   path: '/connect',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CopilotPromptGeneratorRoute = CopilotPromptGeneratorRouteImport.update({
+  id: '/copilot-prompt-generator',
+  path: '/copilot-prompt-generator',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DeepseekPromptGeneratorRoute = DeepseekPromptGeneratorRouteImport.update({
+  id: '/deepseek-prompt-generator',
+  path: '/deepseek-prompt-generator',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const GeminiPromptGeneratorRoute = GeminiPromptGeneratorRouteImport.update({
   id: '/gemini-prompt-generator',
   path: '/gemini-prompt-generator',
@@ -85,6 +98,12 @@ const LinkedinCoverRoute = LinkedinCoverRouteImport.update({
   path: '/linkedin-cover',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PerplexityPromptGeneratorRoute =
+  PerplexityPromptGeneratorRouteImport.update({
+    id: '/perplexity-prompt-generator',
+    path: '/perplexity-prompt-generator',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const Playgroundv2Route = Playgroundv2RouteImport.update({
   id: '/playgroundv2',
   path: '/playgroundv2',
@@ -208,8 +227,11 @@ export interface FileRoutesByFullPath {
   '/chatgpt-prompt-generator': typeof ChatgptPromptGeneratorRoute
   '/claude-prompt-generator': typeof ClaudePromptGeneratorRoute
   '/connect': typeof ConnectRoute
+  '/copilot-prompt-generator': typeof CopilotPromptGeneratorRoute
+  '/deepseek-prompt-generator': typeof DeepseekPromptGeneratorRoute
   '/gemini-prompt-generator': typeof GeminiPromptGeneratorRoute
   '/linkedin-cover': typeof LinkedinCoverRoute
+  '/perplexity-prompt-generator': typeof PerplexityPromptGeneratorRoute
   '/playgroundv2': typeof Playgroundv2Route
   '/privacy': typeof PrivacyRoute
   '/profile': typeof ProfileRoute
@@ -240,8 +262,11 @@ export interface FileRoutesByTo {
   '/chatgpt-prompt-generator': typeof ChatgptPromptGeneratorRoute
   '/claude-prompt-generator': typeof ClaudePromptGeneratorRoute
   '/connect': typeof ConnectRoute
+  '/copilot-prompt-generator': typeof CopilotPromptGeneratorRoute
+  '/deepseek-prompt-generator': typeof DeepseekPromptGeneratorRoute
   '/gemini-prompt-generator': typeof GeminiPromptGeneratorRoute
   '/linkedin-cover': typeof LinkedinCoverRoute
+  '/perplexity-prompt-generator': typeof PerplexityPromptGeneratorRoute
   '/playgroundv2': typeof Playgroundv2Route
   '/privacy': typeof PrivacyRoute
   '/profile': typeof ProfileRoute
@@ -273,8 +298,11 @@ export interface FileRoutesById {
   '/chatgpt-prompt-generator': typeof ChatgptPromptGeneratorRoute
   '/claude-prompt-generator': typeof ClaudePromptGeneratorRoute
   '/connect': typeof ConnectRoute
+  '/copilot-prompt-generator': typeof CopilotPromptGeneratorRoute
+  '/deepseek-prompt-generator': typeof DeepseekPromptGeneratorRoute
   '/gemini-prompt-generator': typeof GeminiPromptGeneratorRoute
   '/linkedin-cover': typeof LinkedinCoverRoute
+  '/perplexity-prompt-generator': typeof PerplexityPromptGeneratorRoute
   '/playgroundv2': typeof Playgroundv2Route
   '/privacy': typeof PrivacyRoute
   '/profile': typeof ProfileRoute
@@ -307,8 +335,11 @@ export interface FileRouteTypes {
     | '/chatgpt-prompt-generator'
     | '/claude-prompt-generator'
     | '/connect'
+    | '/copilot-prompt-generator'
+    | '/deepseek-prompt-generator'
     | '/gemini-prompt-generator'
     | '/linkedin-cover'
+    | '/perplexity-prompt-generator'
     | '/playgroundv2'
     | '/privacy'
     | '/profile'
@@ -339,8 +370,11 @@ export interface FileRouteTypes {
     | '/chatgpt-prompt-generator'
     | '/claude-prompt-generator'
     | '/connect'
+    | '/copilot-prompt-generator'
+    | '/deepseek-prompt-generator'
     | '/gemini-prompt-generator'
     | '/linkedin-cover'
+    | '/perplexity-prompt-generator'
     | '/playgroundv2'
     | '/privacy'
     | '/profile'
@@ -371,8 +405,11 @@ export interface FileRouteTypes {
     | '/chatgpt-prompt-generator'
     | '/claude-prompt-generator'
     | '/connect'
+    | '/copilot-prompt-generator'
+    | '/deepseek-prompt-generator'
     | '/gemini-prompt-generator'
     | '/linkedin-cover'
+    | '/perplexity-prompt-generator'
     | '/playgroundv2'
     | '/privacy'
     | '/profile'
@@ -405,8 +442,11 @@ export interface RootRouteChildren {
   ChatgptPromptGeneratorRoute: typeof ChatgptPromptGeneratorRoute
   ClaudePromptGeneratorRoute: typeof ClaudePromptGeneratorRoute
   ConnectRoute: typeof ConnectRoute
+  CopilotPromptGeneratorRoute: typeof CopilotPromptGeneratorRoute
+  DeepseekPromptGeneratorRoute: typeof DeepseekPromptGeneratorRoute
   GeminiPromptGeneratorRoute: typeof GeminiPromptGeneratorRoute
   LinkedinCoverRoute: typeof LinkedinCoverRoute
+  PerplexityPromptGeneratorRoute: typeof PerplexityPromptGeneratorRoute
   Playgroundv2Route: typeof Playgroundv2Route
   PrivacyRoute: typeof PrivacyRoute
   ProfileRoute: typeof ProfileRoute
@@ -474,6 +514,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ConnectRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/copilot-prompt-generator': {
+      id: '/copilot-prompt-generator'
+      path: '/copilot-prompt-generator'
+      fullPath: '/copilot-prompt-generator'
+      preLoaderRoute: typeof CopilotPromptGeneratorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/deepseek-prompt-generator': {
+      id: '/deepseek-prompt-generator'
+      path: '/deepseek-prompt-generator'
+      fullPath: '/deepseek-prompt-generator'
+      preLoaderRoute: typeof DeepseekPromptGeneratorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/gemini-prompt-generator': {
       id: '/gemini-prompt-generator'
       path: '/gemini-prompt-generator'
@@ -486,6 +540,13 @@ declare module '@tanstack/react-router' {
       path: '/linkedin-cover'
       fullPath: '/linkedin-cover'
       preLoaderRoute: typeof LinkedinCoverRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/perplexity-prompt-generator': {
+      id: '/perplexity-prompt-generator'
+      path: '/perplexity-prompt-generator'
+      fullPath: '/perplexity-prompt-generator'
+      preLoaderRoute: typeof PerplexityPromptGeneratorRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/playgroundv2': {
@@ -687,8 +748,11 @@ const rootRouteChildren: RootRouteChildren = {
   ChatgptPromptGeneratorRoute: ChatgptPromptGeneratorRoute,
   ClaudePromptGeneratorRoute: ClaudePromptGeneratorRoute,
   ConnectRoute: ConnectRoute,
+  CopilotPromptGeneratorRoute: CopilotPromptGeneratorRoute,
+  DeepseekPromptGeneratorRoute: DeepseekPromptGeneratorRoute,
   GeminiPromptGeneratorRoute: GeminiPromptGeneratorRoute,
   LinkedinCoverRoute: LinkedinCoverRoute,
+  PerplexityPromptGeneratorRoute: PerplexityPromptGeneratorRoute,
   Playgroundv2Route: Playgroundv2Route,
   PrivacyRoute: PrivacyRoute,
   ProfileRoute: ProfileRoute,
