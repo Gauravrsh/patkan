@@ -24,6 +24,7 @@ import { Route as PerplexityPromptGeneratorRouteImport } from './routes/perplexi
 import { Route as Playgroundv2RouteImport } from './routes/playgroundv2'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as ProfileRouteImport } from './routes/profile'
+import { Route as PromptGeneratorRouteImport } from './routes/prompt-generator'
 import { Route as PromptperfectAlternativeRouteImport } from './routes/promptperfect-alternative'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as TermsRouteImport } from './routes/terms'
@@ -117,6 +118,11 @@ const PrivacyRoute = PrivacyRouteImport.update({
 const ProfileRoute = ProfileRouteImport.update({
   id: '/profile',
   path: '/profile',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PromptGeneratorRoute = PromptGeneratorRouteImport.update({
+  id: '/prompt-generator',
+  path: '/prompt-generator',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PromptperfectAlternativeRoute =
@@ -235,6 +241,7 @@ export interface FileRoutesByFullPath {
   '/playgroundv2': typeof Playgroundv2Route
   '/privacy': typeof PrivacyRoute
   '/profile': typeof ProfileRoute
+  '/prompt-generator': typeof PromptGeneratorRoute
   '/promptperfect-alternative': typeof PromptperfectAlternativeRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
@@ -270,6 +277,7 @@ export interface FileRoutesByTo {
   '/playgroundv2': typeof Playgroundv2Route
   '/privacy': typeof PrivacyRoute
   '/profile': typeof ProfileRoute
+  '/prompt-generator': typeof PromptGeneratorRoute
   '/promptperfect-alternative': typeof PromptperfectAlternativeRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
@@ -306,6 +314,7 @@ export interface FileRoutesById {
   '/playgroundv2': typeof Playgroundv2Route
   '/privacy': typeof PrivacyRoute
   '/profile': typeof ProfileRoute
+  '/prompt-generator': typeof PromptGeneratorRoute
   '/promptperfect-alternative': typeof PromptperfectAlternativeRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
@@ -343,6 +352,7 @@ export interface FileRouteTypes {
     | '/playgroundv2'
     | '/privacy'
     | '/profile'
+    | '/prompt-generator'
     | '/promptperfect-alternative'
     | '/sitemap.xml'
     | '/terms'
@@ -378,6 +388,7 @@ export interface FileRouteTypes {
     | '/playgroundv2'
     | '/privacy'
     | '/profile'
+    | '/prompt-generator'
     | '/promptperfect-alternative'
     | '/sitemap.xml'
     | '/terms'
@@ -413,6 +424,7 @@ export interface FileRouteTypes {
     | '/playgroundv2'
     | '/privacy'
     | '/profile'
+    | '/prompt-generator'
     | '/promptperfect-alternative'
     | '/sitemap.xml'
     | '/terms'
@@ -450,6 +462,7 @@ export interface RootRouteChildren {
   Playgroundv2Route: typeof Playgroundv2Route
   PrivacyRoute: typeof PrivacyRoute
   ProfileRoute: typeof ProfileRoute
+  PromptGeneratorRoute: typeof PromptGeneratorRoute
   PromptperfectAlternativeRoute: typeof PromptperfectAlternativeRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TermsRoute: typeof TermsRoute
@@ -568,6 +581,13 @@ declare module '@tanstack/react-router' {
       path: '/profile'
       fullPath: '/profile'
       preLoaderRoute: typeof ProfileRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/prompt-generator': {
+      id: '/prompt-generator'
+      path: '/prompt-generator'
+      fullPath: '/prompt-generator'
+      preLoaderRoute: typeof PromptGeneratorRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/promptperfect-alternative': {
@@ -756,6 +776,7 @@ const rootRouteChildren: RootRouteChildren = {
   Playgroundv2Route: Playgroundv2Route,
   PrivacyRoute: PrivacyRoute,
   ProfileRoute: ProfileRoute,
+  PromptGeneratorRoute: PromptGeneratorRoute,
   PromptperfectAlternativeRoute: PromptperfectAlternativeRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   TermsRoute: TermsRoute,
