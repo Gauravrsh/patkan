@@ -48,15 +48,24 @@ export const Route = createFileRoute("/api/public/usage")({
         const limit = dailyLimitFor(Boolean(userId));
         const day = new Date().toISOString().slice(0, 10);
 
-        const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-        const { data } = await supabaseAdmin
-          .from("usage_counters")
-          .select("count")
-          .eq("subject_key", subjectKey)
-          .eq("day", day)
-          .maybeSingle();
-
-        const used = data?.count ?? 0;
+        let used: number;
+        try {
+          const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+          const { data, error } = await supabaseAdmin
+            .from("usage_counters")
+            .select("count")
+            .eq("subject_key", subjectKey)
+            .eq("day", day)
+            .maybeSingle();
+          if (error) throw error;
+          used = data?.count ?? 0;
+        } catch {
+          // This is an advisory read, not quota enforcement. Never report a
+          // fabricated zero count when configuration or the database is unavailable.
+          return new Response(JSON.stringify({ available: false }), {
+            headers: { "content-type": "application/json", "cache-control": "no-store", ...CORS_HEADERS },
+          });
+        }
         return new Response(
           JSON.stringify({
             used,
