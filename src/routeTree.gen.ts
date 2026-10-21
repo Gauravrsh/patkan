@@ -21,6 +21,7 @@ import { Route as LinkedinCoverRouteImport } from './routes/linkedin-cover'
 import { Route as Playgroundv2RouteImport } from './routes/playgroundv2'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as ProfileRouteImport } from './routes/profile'
+import { Route as PromptperfectAlternativeRouteImport } from './routes/promptperfect-alternative'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as WelcomeRouteImport } from './routes/welcome'
@@ -99,6 +100,12 @@ const ProfileRoute = ProfileRouteImport.update({
   path: '/profile',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PromptperfectAlternativeRoute =
+  PromptperfectAlternativeRouteImport.update({
+    id: '/promptperfect-alternative',
+    path: '/promptperfect-alternative',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
   path: '/sitemap.xml',
@@ -206,6 +213,7 @@ export interface FileRoutesByFullPath {
   '/playgroundv2': typeof Playgroundv2Route
   '/privacy': typeof PrivacyRoute
   '/profile': typeof ProfileRoute
+  '/promptperfect-alternative': typeof PromptperfectAlternativeRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
   '/welcome': typeof WelcomeRoute
@@ -237,6 +245,7 @@ export interface FileRoutesByTo {
   '/playgroundv2': typeof Playgroundv2Route
   '/privacy': typeof PrivacyRoute
   '/profile': typeof ProfileRoute
+  '/promptperfect-alternative': typeof PromptperfectAlternativeRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
   '/welcome': typeof WelcomeRoute
@@ -269,6 +278,7 @@ export interface FileRoutesById {
   '/playgroundv2': typeof Playgroundv2Route
   '/privacy': typeof PrivacyRoute
   '/profile': typeof ProfileRoute
+  '/promptperfect-alternative': typeof PromptperfectAlternativeRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
   '/welcome': typeof WelcomeRoute
@@ -302,6 +312,7 @@ export interface FileRouteTypes {
     | '/playgroundv2'
     | '/privacy'
     | '/profile'
+    | '/promptperfect-alternative'
     | '/sitemap.xml'
     | '/terms'
     | '/welcome'
@@ -333,6 +344,7 @@ export interface FileRouteTypes {
     | '/playgroundv2'
     | '/privacy'
     | '/profile'
+    | '/promptperfect-alternative'
     | '/sitemap.xml'
     | '/terms'
     | '/welcome'
@@ -364,6 +376,7 @@ export interface FileRouteTypes {
     | '/playgroundv2'
     | '/privacy'
     | '/profile'
+    | '/promptperfect-alternative'
     | '/sitemap.xml'
     | '/terms'
     | '/welcome'
@@ -397,6 +410,7 @@ export interface RootRouteChildren {
   Playgroundv2Route: typeof Playgroundv2Route
   PrivacyRoute: typeof PrivacyRoute
   ProfileRoute: typeof ProfileRoute
+  PromptperfectAlternativeRoute: typeof PromptperfectAlternativeRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TermsRoute: typeof TermsRoute
   WelcomeRoute: typeof WelcomeRoute
@@ -493,6 +507,13 @@ declare module '@tanstack/react-router' {
       path: '/profile'
       fullPath: '/profile'
       preLoaderRoute: typeof ProfileRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/promptperfect-alternative': {
+      id: '/promptperfect-alternative'
+      path: '/promptperfect-alternative'
+      fullPath: '/promptperfect-alternative'
+      preLoaderRoute: typeof PromptperfectAlternativeRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/sitemap.xml': {
@@ -671,6 +692,7 @@ const rootRouteChildren: RootRouteChildren = {
   Playgroundv2Route: Playgroundv2Route,
   PrivacyRoute: PrivacyRoute,
   ProfileRoute: ProfileRoute,
+  PromptperfectAlternativeRoute: PromptperfectAlternativeRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   TermsRoute: TermsRoute,
   WelcomeRoute: WelcomeRoute,
