@@ -21,6 +21,9 @@ export const Route = createFileRoute("/sitemap.xml")({
           { path: "/claude-prompt-generator", changefreq: "monthly", priority: "0.8", lastmod: "2026-09-30" },
           { path: "/gemini-prompt-generator", changefreq: "monthly", priority: "0.8", lastmod: "2026-09-30" },
           { path: "/promptperfect-alternative", changefreq: "monthly", priority: "0.8", lastmod: "2026-10-21" },
+          { path: "/copilot-prompt-generator", changefreq: "monthly", priority: "0.8", lastmod: "2026-10-21" },
+          { path: "/perplexity-prompt-generator", changefreq: "monthly", priority: "0.8", lastmod: "2026-10-21" },
+          { path: "/deepseek-prompt-generator", changefreq: "monthly", priority: "0.8", lastmod: "2026-10-21" },
           { path: "/privacy", changefreq: "yearly", priority: "0.3", lastmod: "2026-09-27" },
           { path: "/terms", changefreq: "yearly", priority: "0.3", lastmod: "2026-09-27" },
         ];
