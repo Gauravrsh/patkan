@@ -20,6 +20,7 @@ export const Route = createFileRoute("/sitemap.xml")({
           { path: "/chatgpt-prompt-generator", changefreq: "monthly", priority: "0.8", lastmod: "2026-09-30" },
           { path: "/claude-prompt-generator", changefreq: "monthly", priority: "0.8", lastmod: "2026-09-30" },
           { path: "/gemini-prompt-generator", changefreq: "monthly", priority: "0.8", lastmod: "2026-09-30" },
+          { path: "/promptperfect-alternative", changefreq: "monthly", priority: "0.8", lastmod: "2026-10-21" },
           { path: "/privacy", changefreq: "yearly", priority: "0.3", lastmod: "2026-09-27" },
           { path: "/terms", changefreq: "yearly", priority: "0.3", lastmod: "2026-09-27" },
         ];
