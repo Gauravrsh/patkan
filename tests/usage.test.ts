@@ -16,7 +16,7 @@ mock.module("@/integrations/supabase/client.server", () => ({
   },
 }));
 
-const { Route } = await import("./usage");
+const { Route } = await import("../src/routes/api/public/usage");
 const handler = (Route as unknown as { server: { handlers: { GET: (args: { request: Request }) => Promise<Response> } } }).server.handlers.GET;
 const request = () => new Request("http://localhost:8080/api/public/usage?deviceId=0cbe3c7d-609c-4761-a9c1-56f47963fde0", { headers: { origin: "http://localhost:8080" } });
 
