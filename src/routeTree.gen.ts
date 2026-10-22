@@ -20,6 +20,7 @@ import { Route as CopilotPromptGeneratorRouteImport } from './routes/copilot-pro
 import { Route as DeepseekPromptGeneratorRouteImport } from './routes/deepseek-prompt-generator'
 import { Route as GeminiPromptGeneratorRouteImport } from './routes/gemini-prompt-generator'
 import { Route as LinkedinCoverRouteImport } from './routes/linkedin-cover'
+import { Route as NoghaanRouteImport } from './routes/noghaan'
 import { Route as PerplexityPromptGeneratorRouteImport } from './routes/perplexity-prompt-generator'
 import { Route as Playgroundv2RouteImport } from './routes/playgroundv2'
 import { Route as PrivacyRouteImport } from './routes/privacy'
@@ -97,6 +98,11 @@ const GeminiPromptGeneratorRoute = GeminiPromptGeneratorRouteImport.update({
 const LinkedinCoverRoute = LinkedinCoverRouteImport.update({
   id: '/linkedin-cover',
   path: '/linkedin-cover',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const NoghaanRoute = NoghaanRouteImport.update({
+  id: '/noghaan',
+  path: '/noghaan',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PerplexityPromptGeneratorRoute =
@@ -237,6 +243,7 @@ export interface FileRoutesByFullPath {
   '/deepseek-prompt-generator': typeof DeepseekPromptGeneratorRoute
   '/gemini-prompt-generator': typeof GeminiPromptGeneratorRoute
   '/linkedin-cover': typeof LinkedinCoverRoute
+  '/noghaan': typeof NoghaanRoute
   '/perplexity-prompt-generator': typeof PerplexityPromptGeneratorRoute
   '/playgroundv2': typeof Playgroundv2Route
   '/privacy': typeof PrivacyRoute
@@ -273,6 +280,7 @@ export interface FileRoutesByTo {
   '/deepseek-prompt-generator': typeof DeepseekPromptGeneratorRoute
   '/gemini-prompt-generator': typeof GeminiPromptGeneratorRoute
   '/linkedin-cover': typeof LinkedinCoverRoute
+  '/noghaan': typeof NoghaanRoute
   '/perplexity-prompt-generator': typeof PerplexityPromptGeneratorRoute
   '/playgroundv2': typeof Playgroundv2Route
   '/privacy': typeof PrivacyRoute
@@ -310,6 +318,7 @@ export interface FileRoutesById {
   '/deepseek-prompt-generator': typeof DeepseekPromptGeneratorRoute
   '/gemini-prompt-generator': typeof GeminiPromptGeneratorRoute
   '/linkedin-cover': typeof LinkedinCoverRoute
+  '/noghaan': typeof NoghaanRoute
   '/perplexity-prompt-generator': typeof PerplexityPromptGeneratorRoute
   '/playgroundv2': typeof Playgroundv2Route
   '/privacy': typeof PrivacyRoute
@@ -348,6 +357,7 @@ export interface FileRouteTypes {
     | '/deepseek-prompt-generator'
     | '/gemini-prompt-generator'
     | '/linkedin-cover'
+    | '/noghaan'
     | '/perplexity-prompt-generator'
     | '/playgroundv2'
     | '/privacy'
@@ -384,6 +394,7 @@ export interface FileRouteTypes {
     | '/deepseek-prompt-generator'
     | '/gemini-prompt-generator'
     | '/linkedin-cover'
+    | '/noghaan'
     | '/perplexity-prompt-generator'
     | '/playgroundv2'
     | '/privacy'
@@ -420,6 +431,7 @@ export interface FileRouteTypes {
     | '/deepseek-prompt-generator'
     | '/gemini-prompt-generator'
     | '/linkedin-cover'
+    | '/noghaan'
     | '/perplexity-prompt-generator'
     | '/playgroundv2'
     | '/privacy'
@@ -458,6 +470,7 @@ export interface RootRouteChildren {
   DeepseekPromptGeneratorRoute: typeof DeepseekPromptGeneratorRoute
   GeminiPromptGeneratorRoute: typeof GeminiPromptGeneratorRoute
   LinkedinCoverRoute: typeof LinkedinCoverRoute
+  NoghaanRoute: typeof NoghaanRoute
   PerplexityPromptGeneratorRoute: typeof PerplexityPromptGeneratorRoute
   Playgroundv2Route: typeof Playgroundv2Route
   PrivacyRoute: typeof PrivacyRoute
@@ -553,6 +566,13 @@ declare module '@tanstack/react-router' {
       path: '/linkedin-cover'
       fullPath: '/linkedin-cover'
       preLoaderRoute: typeof LinkedinCoverRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/noghaan': {
+      id: '/noghaan'
+      path: '/noghaan'
+      fullPath: '/noghaan'
+      preLoaderRoute: typeof NoghaanRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/perplexity-prompt-generator': {
@@ -772,6 +792,7 @@ const rootRouteChildren: RootRouteChildren = {
   DeepseekPromptGeneratorRoute: DeepseekPromptGeneratorRoute,
   GeminiPromptGeneratorRoute: GeminiPromptGeneratorRoute,
   LinkedinCoverRoute: LinkedinCoverRoute,
+  NoghaanRoute: NoghaanRoute,
   PerplexityPromptGeneratorRoute: PerplexityPromptGeneratorRoute,
   Playgroundv2Route: Playgroundv2Route,
   PrivacyRoute: PrivacyRoute,

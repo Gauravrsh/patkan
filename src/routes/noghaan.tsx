@@ -7,7 +7,7 @@ import skillText from "../../.agents/skills/noghaan/SKILL.md?raw";
 
 const TITLE = "NoGhaan: an AI skill to stop AI from making things up";
 const DESC =
-  "NoGhaan is a copy-paste AI skill that tells ChatGPT, Claude, Gemini, or another AI to separate verified facts from guesses, state assumptions, say \u201cI don\u2019t know\u201d when evidence is missing, and cut long filler.";
+  "NoGhaan is a copy-paste AI skill that tells ChatGPT, Claude, Gemini, or another AI to separate verified facts from guesses, state assumptions, say “I don’t know” when evidence is missing, and cut long filler.";
 const URL = "https://patkan.in/noghaan";
 
 export const Route = createFileRoute("/noghaan")({
@@ -89,9 +89,9 @@ function NoGhaanPage() {
           </p>
           <h1 className="font-serif text-4xl leading-[1.05] sm:text-6xl">Stop AI from making things up.</h1>
           <p className="text-lg leading-relaxed">{DESC.replace("cut long filler.", "cut long filler from its answer.")}</p>
-          <p className="text-muted-foreground">Use it when you need a factual answer\u2014not a confident-sounding one.</p>
+          <p className="text-muted-foreground">Use it when you need a factual answer—not a confident-sounding one.</p>
           <a href="#skill" className="inline-block text-sm font-medium text-primary underline-offset-4 hover:underline">
-            Read the skill \u2193
+            Read the skill ↓
           </a>
         </section>
 
@@ -146,14 +146,14 @@ function NoGhaanPage() {
           <div className="grid gap-4 sm:grid-cols-2">
             <figure className="rounded-xl border p-4">
               <figcaption className="mb-2 text-xs font-medium uppercase tracking-wider text-muted-foreground">Without NoGhaan</figcaption>
-              <blockquote className="text-sm">\u201cYes, this is the best option. It will reduce costs and improve results significantly.\u201d</blockquote>
+              <blockquote className="text-sm">“Yes, this is the best option. It will reduce costs and improve results significantly.”</blockquote>
             </figure>
             <figure className="rounded-xl border border-primary/40 p-4">
               <figcaption className="mb-2 text-xs font-medium uppercase tracking-wider text-primary">With NoGhaan</figcaption>
               <blockquote className="space-y-2 font-mono text-xs leading-relaxed">
                 <p>UNVERIFIED: I do not have your current costs, alternatives, or outcome data.</p>
                 <p>DATA GAP: I can compare the options once you provide price, expected usage, and the result you want to improve.</p>
-                <p>INFERENCE: Without those inputs, calling one option \u201cbest\u201d would be a guess.</p>
+                <p>INFERENCE: Without those inputs, calling one option “best” would be a guess.</p>
               </blockquote>
             </figure>
           </div>
@@ -162,7 +162,7 @@ function NoGhaanPage() {
         <section id="skill" className="scroll-mt-20 space-y-5">
           <H2>Copy the complete NoGhaan skill</H2>
           <p className="text-muted-foreground">
-            Paste this skill into an AI chat before your question, or add it to an AI tool\u2019s instructions.
+            Paste this skill into an AI chat before your question, or add it to an AI tool’s instructions.
           </p>
           <pre className="max-h-[32rem] overflow-auto whitespace-pre-wrap rounded-xl border bg-muted p-4 font-mono text-xs leading-relaxed">
             {skillText}
@@ -199,7 +199,7 @@ function NoGhaanPage() {
             NoGhaan helps you inspect an AI answer. Patkan helps you structure what you ask before the answer is generated.
           </p>
           <Link to="/" className="inline-block font-medium text-primary underline-offset-4 hover:underline">
-            Try Patkan \u2192
+            Try Patkan →
           </Link>
         </section>
       </main>
