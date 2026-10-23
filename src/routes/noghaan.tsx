@@ -148,25 +148,25 @@ function NoGhaanPage() {
         </div>
       </header>
 
-      <main className={`${shell} space-y-14 py-14 sm:py-20`}>
-        <section className="space-y-6">
-          <span className="inline-block rounded-full border px-3 py-1 text-xs font-medium tracking-[0.18em] text-primary">
+      <main className={`${shell} space-y-14 pt-6 pb-14 sm:py-20`}>
+        <section className="space-y-4 sm:space-y-6">
+          <h1 className="font-serif text-[2.6rem] font-bold leading-[1.05] tracking-tight text-primary sm:text-6xl md:text-7xl">
             AI-SLOP, NO MORE!
-          </span>
-          <div className="space-y-2">
-            <h1 className="font-serif text-2xl sm:text-3xl">#How</h1>
-            <p className="text-lg leading-relaxed">Just add this skill in your AI and use it in your regular conversations.</p>
+          </h1>
+          <div className="space-y-1">
+            <h2 className="font-serif text-xl sm:text-3xl">#How</h2>
+            <p className="text-[15px] leading-snug sm:text-lg sm:leading-relaxed">Just add this skill in your AI and use it in your regular conversations.</p>
           </div>
-          <div className="space-y-2">
-            <h2 className="font-serif text-2xl sm:text-3xl">#What is NoGhaan</h2>
-            <p className="text-lg leading-relaxed">
+          <div className="space-y-1">
+            <h2 className="font-serif text-xl sm:text-3xl">#What is /noghaan</h2>
+            <p className="text-[15px] leading-snug sm:text-lg sm:leading-relaxed">
               It's an AI Skill which puts hard guardrails on how AI thinks and responds, thus significantly reducing AI slop responses, hallucination, making up stuff, lying confidently etc.
             </p>
           </div>
-          <p className="text-muted-foreground">Read it once for god's sake. You'll understand how it does what it does.</p>
+          <p className="text-sm text-muted-foreground sm:text-base">Read it once for god's sake. You'll understand how it does what it does.</p>
         </section>
 
-        <section id="skill" className="scroll-mt-20">
+        <section id="skill" className="-mt-8 scroll-mt-20 sm:mt-0">
           <Terminal
             name="noghaan.skill.md"
             actions={
