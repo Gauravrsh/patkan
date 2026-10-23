@@ -106,7 +106,7 @@ function CopyIcon() {
 }
 
 function H2({ children }: { children: React.ReactNode }) {
-  return <h2 className="font-serif text-2xl leading-tight sm:text-3xl">{children}</h2>;
+  return <h2 className="font-serif text-2xl leading-tight text-primary sm:text-3xl">{children}</h2>;
 }
 
 function NoGhaanPage() {
@@ -154,11 +154,11 @@ function NoGhaanPage() {
             AI-SLOP, NO MORE!
           </h1>
           <div className="space-y-1">
-            <h2 className="font-serif text-xl sm:text-3xl">#How</h2>
+            <h2 className="font-serif text-xl text-primary sm:text-3xl">#How</h2>
             <p className="text-[15px] leading-snug sm:text-lg sm:leading-relaxed">Just add this skill in your AI and use it in your regular conversations.</p>
           </div>
           <div className="space-y-1">
-            <h2 className="font-serif text-xl sm:text-3xl">#What is /noghaan</h2>
+            <h2 className="font-serif text-xl text-primary sm:text-3xl">#What is /noghaan</h2>
             <p className="text-[15px] leading-snug sm:text-lg sm:leading-relaxed">
               It's an AI Skill which puts hard guardrails on how AI thinks and responds, thus significantly reducing AI slop responses, hallucination, making up stuff, lying confidently etc.
             </p>
