@@ -1,6 +1,17 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
-import { Check, Copy, Download } from "lucide-react";
+import { ArrowDownToLine, Check, ChevronDown, Copy, Download, Share2 } from "lucide-react";
+import { toast } from "sonner";
+
+import patkanMark from "@/assets/patkan-mark.svg";
+import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { trackEvent } from "@/lib/telemetry";
 
 import { ldScript, organizationLd, pageLd } from "@/lib/seo";
 import skillText from "../../.agents/skills/noghaan/SKILL.md?raw";
@@ -34,37 +45,63 @@ export const Route = createFileRoute("/noghaan")({
 
 const shell = "mx-auto w-full max-w-3xl px-5 sm:px-6 lg:px-8";
 
-const changes: [string, string][] = [
-  ["Filling gaps with plausible guesses", "DATA GAP: followed by what is known and what is missing"],
-  ["Treating an assumption as fact", "An explicit assumption, or a question before proceeding"],
-  ["Agreeing with a wrong premise", "A direct correction in the first line"],
-  ["Giving an answer with no evidence", "A source, a stated basis, or an UNVERIFIED label"],
-  ["Writing long, polished filler", "The shortest answer that fully answers the question"],
-  ["Claiming a task was tested or fixed", "The check that proves it"],
-];
+const CHROME_WEB_STORE_URL =
+  "https://chromewebstore.google.com/detail/patkan-%E2%80%94-instant-expert-p/jcgkfecfliophjfnkokjnifcmalfbnnn";
+
+const shares = {
+  noghaan: {
+    title: "NoGhaan: The Anti-Slop AI Skill",
+    url: "https://patkan.in/noghaan",
+    text: "An AI skill for ChatGPT, Claude, Gemini and more AI, that forces AI to verify facts, stop assuming and stop hallucinating.",
+  },
+  patkan: {
+    title: "Patkan - AI Prompt Generator & Enhancer",
+    url: "https://patkan.in",
+    text: "Turn rough thoughts into expert prompts inside ChatGPT, Claude & Gemini. Just end your sentence with //.",
+  },
+};
+
+async function doShare(kind: keyof typeof shares) {
+  const s = shares[kind];
+  trackEvent("share_clicked", { meta: { target: kind } });
+  if (navigator.share) {
+    try { await navigator.share(s); } catch { /* cancelled */ }
+    return;
+  }
+  try { await navigator.clipboard.writeText(s.url); toast.success("Link copied"); }
+  catch { toast.error("Couldn't copy the link"); }
+}
 
 const downloads = [
-  { label: "Download skill as Markdown", href: "/noghaan/noghaan-skill.md" },
-  { label: "Download skill as TXT", href: "/noghaan/noghaan-skill.txt" },
-  { label: "Download skill as PDF", href: "/noghaan/noghaan-skill.pdf" },
+  { label: "Markdown (.md)", href: "/noghaan/noghaan-skill.md" },
+  { label: "Plain text (.txt)", href: "/noghaan/noghaan-skill.txt" },
+  { label: "PDF (.pdf)", href: "/noghaan/noghaan-skill.pdf" },
 ];
 
-function CopyButton({ className = "" }: { className?: string }) {
+function Terminal({ name, actions, children }: { name: string; actions?: React.ReactNode; children: React.ReactNode }) {
+  return (
+    <div className="overflow-hidden rounded-xl border bg-muted">
+      <div className="flex items-center justify-between gap-2 border-b px-4 py-2">
+        <span className="font-mono text-xs text-muted-foreground">{name}</span>
+        <div className="flex items-center gap-1">{actions}</div>
+      </div>
+      {children}
+    </div>
+  );
+}
+
+function CopyIcon() {
   const [copied, setCopied] = useState(false);
   async function copy() {
     await navigator.clipboard.writeText(skillText);
+    trackEvent("download_clicked", { meta: { file: "noghaan-copy" } });
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   }
   return (
-    <button
-      type="button"
-      onClick={copy}
-      className={`inline-flex items-center gap-2 rounded-full bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-opacity hover:opacity-90 ${className}`}
-    >
-      {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
-      {copied ? "Copied" : "Copy NoGhaan skill"}
-    </button>
+    <Button variant="ghost" size="icon" aria-label="Copy skill" title={copied ? "Copied" : "Copy skill"} onClick={() => void copy()}>
+      {copied ? <Check className="size-4" /> : <Copy className="size-4" />}
+    </Button>
   );
 }
 
@@ -75,43 +112,114 @@ function H2({ children }: { children: React.ReactNode }) {
 function NoGhaanPage() {
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <header className="sticky top-0 z-30 border-b bg-background/90 backdrop-blur-md">
+      <header className="sticky top-0 z-30 border-b bg-background/85 backdrop-blur-md">
         <div className={`${shell} flex h-14 items-center justify-between gap-3 sm:h-16`}>
-          <span className="font-serif text-lg">NoGhaan</span>
-          <CopyButton />
+          <Link to="/" className="flex min-w-0 items-center gap-2">
+            <img src={patkanMark} alt="Patkan" width={816} height={816} className="size-8 rounded-[0.55rem]" />
+            <span className="text-lg font-semibold tracking-tight">Patkan</span>
+            <span className="hidden rounded-full border bg-muted px-2 py-0.5 font-mono text-[10px] text-muted-foreground sm:inline">/पट्कन/</span>
+            <span className="truncate font-mono text-xs text-muted-foreground">/NoGhaan</span>
+          </Link>
+          <div className="flex items-center gap-2">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="sm" className="gap-1.5" aria-label="Share">
+                  <Share2 className="size-4" /><span className="hidden sm:inline">Share</span><ChevronDown className="size-3" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onSelect={() => void doShare("noghaan")}>Share NoGhaan AI Skill</DropdownMenuItem>
+                <DropdownMenuItem onSelect={() => void doShare("patkan")}>Share Patkan extension</DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+            <Button
+              size="sm"
+              className="inline-flex shrink-0 gap-1.5 px-3 sm:px-4"
+              onClick={() => {
+                trackEvent("download_clicked", { meta: { file: "chrome-web-store" } });
+                window.open(CHROME_WEB_STORE_URL, "_blank", "noopener,noreferrer");
+              }}
+            >
+              <span className="hidden sm:inline">Add to Desktop</span>
+              <span className="sm:hidden">Add</span>
+              <ArrowDownToLine className="size-4" aria-hidden />
+            </Button>
+          </div>
         </div>
       </header>
 
-      <main className={`${shell} space-y-16 py-14 sm:py-20`}>
-        <section className="space-y-5">
-          <p className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
-            A no-slop skill for AI
-          </p>
-          <h1 className="font-serif text-4xl leading-[1.05] sm:text-6xl">Stop AI from making things up.</h1>
-          <p className="text-lg leading-relaxed">{DESC.replace("cut long filler.", "cut long filler from its answer.")}</p>
-          <p className="text-muted-foreground">Use it when you need a factual answer—not a confident-sounding one.</p>
-          <a href="#skill" className="inline-block text-sm font-medium text-primary underline-offset-4 hover:underline">
-            Read the skill ↓
-          </a>
+      <main className={`${shell} space-y-14 py-14 sm:py-20`}>
+        <section className="space-y-6">
+          <span className="inline-block rounded-full border px-3 py-1 text-xs font-medium tracking-[0.18em] text-primary">
+            AI-SLOP, NO MORE!
+          </span>
+          <div className="space-y-2">
+            <h1 className="font-serif text-2xl sm:text-3xl">#How</h1>
+            <p className="text-lg leading-relaxed">Just add this skill in your AI and use it in your regular conversations.</p>
+          </div>
+          <div className="space-y-2">
+            <h2 className="font-serif text-2xl sm:text-3xl">#What is NoGhaan</h2>
+            <p className="text-lg leading-relaxed">
+              It's an AI Skill which puts hard guardrails on how AI thinks and responds, thus significantly reducing AI slop responses, hallucination, making up stuff, lying confidently etc.
+            </p>
+          </div>
+          <p className="text-muted-foreground">Read it once for god's sake. You'll understand how it does what it does.</p>
+        </section>
+
+        <section id="skill" className="scroll-mt-20">
+          <Terminal
+            name="noghaan.skill.md"
+            actions={
+              <>
+                <CopyIcon />
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="icon" aria-label="Download skill" title="Download skill">
+                      <Download className="size-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    {downloads.map((d) => (
+                      <DropdownMenuItem key={d.href} asChild>
+                        <a href={d.href} download onClick={() => trackEvent("download_clicked", { meta: { file: d.href } })}>{d.label}</a>
+                      </DropdownMenuItem>
+                    ))}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </>
+            }
+          >
+            <pre className="max-h-[32rem] overflow-auto whitespace-pre-wrap p-4 font-mono text-xs leading-relaxed">{skillText}</pre>
+          </Terminal>
         </section>
 
         <section className="space-y-5">
-          <H2>What it tells an AI to do differently</H2>
-          <div className="overflow-hidden rounded-xl border">
-            <div className="grid grid-cols-2 border-b bg-muted text-xs font-medium uppercase tracking-wider text-muted-foreground">
-              <div className="p-3">Instead of</div>
-              <div className="p-3">NoGhaan asks for</div>
-            </div>
-            {changes.map(([a, b]) => (
-              <div key={a} className="grid grid-cols-2 border-b text-sm last:border-b-0">
-                <div className="p-3 text-muted-foreground">{a}</div>
-                <div className="p-3">{b}</div>
-              </div>
+          <H2># How to use it</H2>
+          <ol className="space-y-4">
+            {[
+              ["ChatGPT / Claude / Gemini", "Paste into Custom Instructions or Project Knowledge."],
+              ["Lovable / Cursor / Claude Code", "Drop into .agents/skills/ or rules."],
+              ["One-off prompt", "Paste at the top of your prompt before asking."],
+            ].map(([t, d], i) => (
+              <li key={t} className="flex gap-4">
+                <span className="font-mono text-sm text-primary">{i + 1}.</span>
+                <div><p className="font-medium">{t}</p><p className="text-muted-foreground">{d}</p></div>
+              </li>
             ))}
-          </div>
-          <p className="text-sm text-muted-foreground">
-            NoGhaan does not make an AI truthful. It makes the AI show its uncertainty, evidence, and assumptions more clearly.
-          </p>
+          </ol>
+        </section>
+
+        <section>
+          <Terminal name="note.txt">
+            <div className="space-y-4 p-5 font-mono text-sm leading-relaxed">
+              <p>
+                When you force AI to produce sources, verify facts before throwing made-up stuff at you, and ask questions instead of assuming and moving forward, it is bound to slightly slow down the AI—because you are making it work harder.
+              </p>
+              <p>
+                Now, whether to spend some more time moving with tight guardrails, or waste a lot more time haggling and arguing with your AI, is for you to decide.
+              </p>
+            </div>
+          </Terminal>
         </section>
 
         <section className="space-y-5">
@@ -136,9 +244,6 @@ function NoGhaanPage() {
               </ul>
             </div>
           </div>
-          <p className="text-sm text-muted-foreground">
-            It may make the AI slower and more likely to stop for missing information. That is intentional.
-          </p>
         </section>
 
         <section className="space-y-5">
@@ -158,51 +263,13 @@ function NoGhaanPage() {
             </figure>
           </div>
         </section>
-
-        <section id="skill" className="scroll-mt-20 space-y-5">
-          <H2>Copy the complete NoGhaan skill</H2>
-          <p className="text-muted-foreground">
-            Paste this skill into an AI chat before your question, or add it to an AI tool’s instructions.
-          </p>
-          <pre className="max-h-[32rem] overflow-auto whitespace-pre-wrap rounded-xl border bg-muted p-4 font-mono text-xs leading-relaxed">
-            {skillText}
-          </pre>
-          <div className="flex flex-wrap gap-3">
-            <CopyButton />
-            {downloads.map((d) => (
-              <a
-                key={d.href}
-                href={d.href}
-                download
-                className="inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm hover:bg-muted"
-              >
-                <Download className="h-4 w-4" />
-                {d.label}
-              </a>
-            ))}
-          </div>
-        </section>
-
-        <section className="space-y-4">
-          <H2>AI can sound certain without being certain.</H2>
-          <p className="leading-relaxed">
-            Language models can produce a plausible answer even when the question leaves out important facts. They can repeat an unverified claim, assume a missing detail, invent a source, or add words that make a thin answer sound complete.
-          </p>
-          <p className="leading-relaxed">
-            NoGhaan is a skill for that behaviour. It asks the AI to make the difference between evidence, inference, and uncertainty visible to you.
-          </p>
-        </section>
-
-        <section className="space-y-4 border-t pt-12">
-          <H2>Turn rough intent into a clearer prompt.</H2>
-          <p className="leading-relaxed">
-            NoGhaan helps you inspect an AI answer. Patkan helps you structure what you ask before the answer is generated.
-          </p>
-          <Link to="/" className="inline-block font-medium text-primary underline-offset-4 hover:underline">
-            Try Patkan →
-          </Link>
-        </section>
       </main>
+
+      <footer className="border-t">
+        <div className={`${shell} py-8 text-sm text-muted-foreground`}>
+          <Link to="/" className="hover:text-foreground">patkan.in</Link> · Open-source browser prompt engine for non-technical professionals.
+        </div>
+      </footer>
     </div>
   );
 }
