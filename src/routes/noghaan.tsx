@@ -150,7 +150,7 @@ function NoGhaanPage() {
 
       <main className={`${shell} space-y-14 pt-6 pb-14 sm:py-20`}>
         <section className="space-y-4 sm:space-y-6">
-          <h1 className="font-serif text-[2.6rem] font-bold leading-[1.05] tracking-tight text-primary sm:text-6xl md:text-7xl">
+          <h1 className="font-serif text-[clamp(1.75rem,9vw,2.5rem)] font-bold leading-[1.05] tracking-tight text-primary sm:text-6xl md:text-7xl">
             AI-SLOP, NO MORE!
           </h1>
           <div className="space-y-1">
@@ -223,7 +223,7 @@ function NoGhaanPage() {
         </section>
 
         <section className="space-y-5">
-          <H2>Use NoGhaan when being wrong has a cost.</H2>
+          <H2>Use /noghaan when being wrong has a cost.</H2>
           <div className="grid gap-6 sm:grid-cols-2">
             <div>
               <h3 className="mb-2 font-medium">Use it for</h3>
@@ -246,28 +246,11 @@ function NoGhaanPage() {
           </div>
         </section>
 
-        <section className="space-y-5">
-          <H2>The difference is not confidence. It is traceability.</H2>
-          <div className="grid gap-4 sm:grid-cols-2">
-            <figure className="rounded-xl border p-4">
-              <figcaption className="mb-2 text-xs font-medium uppercase tracking-wider text-muted-foreground">Without NoGhaan</figcaption>
-              <blockquote className="text-sm">“Yes, this is the best option. It will reduce costs and improve results significantly.”</blockquote>
-            </figure>
-            <figure className="rounded-xl border border-primary/40 p-4">
-              <figcaption className="mb-2 text-xs font-medium uppercase tracking-wider text-primary">With NoGhaan</figcaption>
-              <blockquote className="space-y-2 font-mono text-xs leading-relaxed">
-                <p>UNVERIFIED: I do not have your current costs, alternatives, or outcome data.</p>
-                <p>DATA GAP: I can compare the options once you provide price, expected usage, and the result you want to improve.</p>
-                <p>INFERENCE: Without those inputs, calling one option “best” would be a guess.</p>
-              </blockquote>
-            </figure>
-          </div>
-        </section>
       </main>
 
       <footer className="border-t">
         <div className={`${shell} py-8 text-sm text-muted-foreground`}>
-          <Link to="/" className="hover:text-foreground">patkan.in</Link> · Open-source browser prompt engine for non-technical professionals.
+          <Link to="/" className="hover:text-foreground">patkan.in</Link> · Open-source browser prompt engine for professionals.
         </div>
       </footer>
     </div>
