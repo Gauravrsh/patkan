@@ -20,7 +20,7 @@ const TITLE = "NoGhaan: an AI skill to stop AI from making things up";
 const DESC =
   "An AI skill for ChatGPT, Claude, Gemini and more to verify facts, present proof, ask questions and not assume to reduce bloat and hallucinations.";
 const URL = "https://patkan.in/noghaan";
-const OG_IMAGE = "https://patkan.in/noghaan/og-image-v3.jpg?v=3";
+const OG_IMAGE = "https://patkan.in/noghaan/og-image-v2.jpg?v=2";
 
 export const Route = createFileRoute("/noghaan")({
   head: () => ({
