@@ -106,7 +106,7 @@ function CopyIcon() {
 }
 
 function H2({ children }: { children: React.ReactNode }) {
-  return <h2 className="font-serif text-2xl leading-tight text-primary sm:text-3xl">{children}</h2>;
+  return <h2 className="font-serif text-2xl leading-tight text-foreground sm:text-3xl">{children}</h2>;
 }
 
 function NoGhaanPage() {
@@ -118,7 +118,7 @@ function NoGhaanPage() {
             <img src={patkanMark} alt="Patkan" width={816} height={816} className="size-8 rounded-[0.55rem]" />
             <span className="text-lg font-semibold tracking-tight">Patkan</span>
             <span className="hidden rounded-full border bg-muted px-2 py-0.5 font-mono text-[10px] text-muted-foreground sm:inline">/पट्कन/</span>
-            <span className="truncate font-mono text-xs text-muted-foreground">/NoGhaan</span>
+            <span className="truncate font-mono text-xs text-muted-foreground">/noghaan</span>
           </Link>
           <div className="flex items-center gap-2">
             <DropdownMenu>
@@ -148,25 +148,25 @@ function NoGhaanPage() {
         </div>
       </header>
 
-      <main className={`${shell} space-y-14 pt-6 pb-14 sm:py-20`}>
-        <section className="space-y-4 sm:space-y-6">
-          <h1 className="font-serif text-[clamp(1.75rem,9vw,2.5rem)] font-bold leading-[1.05] tracking-tight text-primary sm:text-6xl md:text-7xl">
+      <main className={`${shell} space-y-12 pt-6 pb-14 sm:space-y-16 sm:py-20`}>
+        <section className="space-y-5 sm:space-y-8">
+          <h1 className="font-serif text-[clamp(1.75rem,9vw,2.5rem)] font-bold leading-[1.05] tracking-tight text-foreground sm:text-6xl md:text-7xl">
             AI-SLOP, NO MORE!
           </h1>
-          <div className="space-y-1">
-            <h2 className="font-serif text-xl text-primary sm:text-3xl">#How</h2>
-            <p className="text-[15px] leading-snug sm:text-lg sm:leading-relaxed">Just add this skill in your AI and use it in your regular conversations.</p>
-          </div>
-          <div className="space-y-1">
-            <h2 className="font-serif text-xl text-primary sm:text-3xl">#What is /noghaan</h2>
+          <div className="space-y-1.5">
+            <h2 className="font-mono text-xs font-semibold uppercase tracking-widest text-foreground sm:text-sm">What is /noghaan</h2>
             <p className="text-[15px] leading-snug sm:text-lg sm:leading-relaxed">
-              It's an AI Skill which puts hard guardrails on how AI thinks and responds, thus significantly reducing AI slop responses, hallucination, making up stuff, lying confidently etc.
+              It's an AI skill which puts hard guardrails on how AI thinks and responds, thus significantly reducing AI slop responses, hallucination, making up stuff, and lying confidently.
             </p>
+          </div>
+          <div className="space-y-1.5">
+            <h2 className="font-mono text-xs font-semibold uppercase tracking-widest text-foreground sm:text-sm">How to use it</h2>
+            <p className="text-[15px] leading-snug sm:text-lg sm:leading-relaxed">Just add this skill in your AI and use it in your regular conversations.</p>
           </div>
           <p className="text-sm text-muted-foreground sm:text-base">Read it once for god's sake. You'll understand how it does what it does.</p>
         </section>
 
-        <section id="skill" className="-mt-8 scroll-mt-20 sm:mt-0">
+        <section id="skill" className="scroll-mt-20">
           <Terminal
             name="noghaan.skill.md"
             actions={
@@ -194,11 +194,11 @@ function NoGhaanPage() {
         </section>
 
         <section className="space-y-5">
-          <H2># How to use it</H2>
+          <H2>Where to add it</H2>
           <ol className="space-y-4">
             {[
               ["ChatGPT / Claude / Gemini", "Paste into Custom Instructions or Project Knowledge."],
-              ["Lovable / Cursor / Claude Code", "Drop into .agents/skills/ or rules."],
+              ["Lovable / Cursor / Claude Code", "Drop into .agents/skills/ or project rules."],
               ["One-off prompt", "Paste at the top of your prompt before asking."],
             ].map(([t, d], i) => (
               <li key={t} className="flex gap-4">
