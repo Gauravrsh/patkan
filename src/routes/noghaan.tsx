@@ -149,8 +149,8 @@ function NoGhaanPage() {
       </header>
 
       <main className={`${shell} space-y-12 pt-6 pb-14 sm:space-y-16 sm:py-20`}>
-        <section className="space-y-5 sm:space-y-8">
-          <h1 className="font-serif text-[clamp(1.5rem,7.6vw,2.4rem)] font-bold leading-[1.05] tracking-tight whitespace-nowrap text-primary sm:whitespace-normal sm:text-6xl md:text-7xl">
+        <section className="flex min-h-[calc(100svh-180px)] flex-col justify-evenly gap-5 sm:block sm:min-h-0 sm:space-y-8">
+          <h1 className="text-center font-serif text-[clamp(1.5rem,7.6vw,2.4rem)] font-bold leading-[1.05] tracking-tight whitespace-nowrap text-primary sm:whitespace-normal sm:text-6xl md:text-7xl">
             AI-SLOP, NO MORE!
           </h1>
           <div className="space-y-1.5">
