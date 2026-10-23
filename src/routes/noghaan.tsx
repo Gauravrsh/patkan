@@ -18,9 +18,9 @@ import skillText from "../../.agents/skills/noghaan/SKILL.md?raw";
 
 const TITLE = "NoGhaan: an AI skill to stop AI from making things up";
 const DESC =
-  "NoGhaan is a copy-paste AI skill that tells ChatGPT, Claude, Gemini, or another AI to separate verified facts from guesses, state assumptions, say “I don’t know” when evidence is missing, and cut long filler.";
+  "An AI skill for ChatGPT, Claude, Gemini and more to verify facts, present proof, ask questions and not assume to reduce bloat and hallucinations.";
 const URL = "https://patkan.in/noghaan";
-const OG_IMAGE = "https://patkan.in/noghaan/og-image-v2.jpg?v=2";
+const OG_IMAGE = "https://patkan.in/noghaan/og-image-v3.jpg?v=3";
 
 export const Route = createFileRoute("/noghaan")({
   head: () => ({
@@ -33,7 +33,7 @@ export const Route = createFileRoute("/noghaan")({
       { property: "og:url", content: URL },
       { property: "og:image", content: OG_IMAGE },
       { property: "og:image:width", content: "1200" },
-      { property: "og:image:height", content: "630" },
+      { property: "og:image:height", content: "640" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:image", content: OG_IMAGE },
     ],
