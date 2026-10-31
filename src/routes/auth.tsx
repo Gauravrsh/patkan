@@ -11,6 +11,7 @@ import { InputOTP, InputOTPGroup, InputOTPSeparator, InputOTPSlot } from "@/comp
 import { lovable } from "@/integrations/lovable/index";
 import { COUNTRIES, flag, guessCountry, type Country } from "@/lib/countries";
 import { requestWhatsappOtp, verifyWhatsappOtp } from "@/lib/whatsapp-auth.functions";
+import { setupProfileUrl } from "@/lib/onboarding";
 
 /** +919876543210 → +91 98•••••10 style mask for on-screen display. */
 function maskPhone(e164: string) {
@@ -141,7 +142,7 @@ function AuthPage() {
       return;
     }
     if (data.session) {
-      window.location.assign(next);
+      window.location.assign(setupProfileUrl(next));
       return;
     }
     if (mode === "signup") {
@@ -183,7 +184,7 @@ function AuthPage() {
         setMessage(error.message);
         return;
       }
-      window.location.assign(safeNext());
+      window.location.assign(setupProfileUrl(safeNext()));
     } catch {
       setMessage("We couldn't sign you in right now. Try again.");
     } finally {
@@ -208,7 +209,7 @@ function AuthPage() {
       return;
     }
     if (result.redirected) return;
-    window.location.assign(safeNext());
+    window.location.assign(setupProfileUrl(safeNext()));
   }
 
   async function forgotPassword() {
@@ -224,6 +225,12 @@ function AuthPage() {
     setBusy(false);
     setMessage(error ? error.message : "Password reset link sent. Check your inbox.");
   }
+
+  // Google returns here already signed in: send new people to profile setup.
+  useEffect(() => {
+    if (loading || !session || recovering) return;
+    if (!session.user.user_metadata?.["onboarded"]) window.location.replace(setupProfileUrl(safeNext()));
+  }, [loading, session, recovering]);
 
   if (!loading && session && recovering) {
     return (
