@@ -16,8 +16,8 @@ export function SiteFooter() {
           <Link to="/about" className={item}>About</Link>
           <Link to="/library" className={item}>Your Library</Link>
         </nav>
-        <nav className={col} aria-label="Free Tools">
-          <p className={head}>Free Tools</p>
+        <nav className={col} aria-label="Prompt Generators">
+          <p className={head}>Prompt Generators</p>
           <Link to="/chatgpt-prompt-generator" className={item}>ChatGPT prompt generator</Link>
           <Link to="/claude-prompt-generator" className={item}>Claude prompt generator</Link>
           <Link to="/gemini-prompt-generator" className={item}>Gemini prompt generator</Link>
