@@ -1,4 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { SiteFooter } from "@/components/SiteFooter";
 import { useQueryClient } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
 import { ArrowDownToLine, ArrowRight, Check, ChevronDown, Code2, Copy, EyeOff, Loader2, RotateCcw, Share2, Slash, UserRound } from "lucide-react";
@@ -116,11 +117,14 @@ function Landing() {
             <span className="rounded-full border bg-muted px-2 py-0.5 font-mono text-[10px] text-muted-foreground">/पट्कन/</span>
           </div>
           <div className="flex items-center gap-2 text-sm text-muted-foreground sm:gap-4">
+            <Link to="/noghaan" className="font-mono text-xs font-semibold text-primary hover:underline sm:text-sm">/noghaan</Link>
             {session ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild><Button variant="ghost" size="sm" className="max-w-24 truncate">Account</Button></DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
                   <DropdownMenuItem asChild><Link to="/library">Your Library</Link></DropdownMenuItem>
+                  <DropdownMenuItem asChild><Link to="/profile">Work Profile</Link></DropdownMenuItem>
+                  <DropdownMenuItem asChild><Link to="/connect">Browser Sync</Link></DropdownMenuItem>
                   {isAdmin && <DropdownMenuItem asChild><Link to="/admin">Admin</Link></DropdownMenuItem>}
                   <DropdownMenuItem onSelect={() => void signOutEverywhere()}>Sign out</DropdownMenuItem>
                 </DropdownMenuContent>
@@ -276,19 +280,7 @@ function Landing() {
         </section>
       </main>
 
-      <footer className="border-t">
-        <div className={`${shell} flex flex-wrap items-center justify-between gap-3 py-8 text-xs text-muted-foreground`}>
-          <p>patkan.in</p>
-          <nav className="flex flex-wrap gap-4">
-            <Link to="/about">About</Link>
-            <Link to="/chatgpt-prompt-generator">ChatGPT prompt generator</Link>
-            <Link to="/claude-prompt-generator">Claude prompt generator</Link>
-            <Link to="/gemini-prompt-generator">Gemini prompt generator</Link>
-            <Link to="/privacy">Privacy Policy</Link>
-            <Link to="/terms">Terms of Use</Link>
-          </nav>
-        </div>
-      </footer>
+      <SiteFooter />
     </div>
   );
 }

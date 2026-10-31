@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { SiteFooter } from "@/components/SiteFooter";
 import { useState } from "react";
 import { ArrowDownToLine, Check, ChevronDown, Copy, Download, Share2 } from "lucide-react";
 import { toast } from "sonner";
@@ -253,11 +254,7 @@ function NoGhaanPage() {
 
       </main>
 
-      <footer className="border-t">
-        <div className={`${shell} py-8 text-sm text-muted-foreground`}>
-          <Link to="/" className="hover:text-foreground">patkan.in</Link> · Open-source browser prompt engine for professionals.
-        </div>
-      </footer>
+      <SiteFooter />
     </div>
   );
 }

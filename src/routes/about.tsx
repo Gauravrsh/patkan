@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { SiteFooter } from "@/components/SiteFooter";
 import { ArrowDownToLine } from "lucide-react";
 
 import { CWS_URL, GITHUB_URL, ldScript, organizationLd, pageLd, softwareLd } from "@/lib/seo";
@@ -168,36 +169,7 @@ function AboutPage() {
         </div>
       </main>
 
-      <footer className="border-t">
-        <div className={`${shell} flex flex-wrap items-center justify-between gap-3 py-8 text-xs text-muted-foreground`}>
-          <p>patkan.in</p>
-          <nav className="flex flex-wrap items-center gap-4" aria-label="Site">
-            <Link to="/privacy" className="transition-colors hover:text-foreground">
-              Privacy Policy
-            </Link>
-            <Link to="/terms" className="transition-colors hover:text-foreground">
-              Terms of Use
-            </Link>
-            <Link to="/chatgpt-prompt-generator" className="transition-colors hover:text-foreground">
-              ChatGPT prompt generator
-            </Link>
-            <Link to="/claude-prompt-generator" className="transition-colors hover:text-foreground">
-              Claude prompt generator
-            </Link>
-            <Link to="/gemini-prompt-generator" className="transition-colors hover:text-foreground">
-              Gemini prompt generator
-            </Link>
-            <a
-              href={GITHUB_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="transition-colors hover:text-foreground"
-            >
-              GitHub (AGPL-3.0)
-            </a>
-          </nav>
-        </div>
-      </footer>
+      <SiteFooter />
     </div>
   );
 }
