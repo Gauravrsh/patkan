@@ -51,10 +51,6 @@ export function syntheticEmail(phoneHash: string): string {
   return `wa_${phoneHash.slice(0, 24)}@wa.patkan.in`;
 }
 
-export function maskPhone(e164: string): string {
-  if (e164.length < 6) return e164;
-  return `${e164.slice(0, e164.length - 8)}${"•".repeat(Math.max(0, 6))}${e164.slice(-2)}`;
-}
 
 export function otpTemplateBody(toDigits: string, code: string) {
   return {

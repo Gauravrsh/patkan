@@ -15,7 +15,8 @@ import { requestWhatsappOtp, verifyWhatsappOtp } from "@/lib/whatsapp-auth.funct
 /** +919876543210 → +91 98•••••10 style mask for on-screen display. */
 function maskPhone(e164: string) {
   if (e164.length < 8) return e164;
-  return `${e164.slice(0, -10 > -e164.length ? -10 : 3)}${e164.slice(-10, -8)}${"•".repeat(6)}${e164.slice(-2)}`;
+  const keep = Math.max(3, e164.length - 8);
+  return `${e164.slice(0, keep)}${"•".repeat(e164.length - keep - 2)}${e164.slice(-2)}`;
 }
 
 export const Route = createFileRoute("/auth")({
