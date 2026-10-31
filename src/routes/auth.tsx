@@ -266,8 +266,8 @@ function AuthPage() {
           <p className="text-base leading-relaxed">
             You&rsquo;re signed in as{" "}
             <span className="font-medium">
-              {typeof session.user.user_metadata?.whatsapp_phone === "string"
-                ? maskPhone(session.user.user_metadata.whatsapp_phone)
+              {typeof session.user.user_metadata?.["whatsapp_phone"] === "string"
+                ? maskPhone(session.user.user_metadata["whatsapp_phone"])
                 : session.user.email}
             </span>
             . Get your best work done :)

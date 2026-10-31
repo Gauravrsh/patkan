@@ -25,7 +25,7 @@ export function normalizeE164(dialCode: string, national: string): string | null
 export function generateOtp(): string {
   const buf = new Uint32Array(1);
   crypto.getRandomValues(buf);
-  return String(buf[0] % 1_000_000).padStart(6, "0");
+  return String((buf[0] ?? 0) % 1_000_000).padStart(6, "0");
 }
 
 export async function hmacHex(secret: string, message: string): Promise<string> {
