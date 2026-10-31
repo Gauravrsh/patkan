@@ -16,7 +16,7 @@ import {
 
 const phoneInput = z.object({
   dialCode: z.string().min(1).max(5),
-  national: z.string().min(4).max(20),
+  national: z.string().min(1).max(30),
 });
 
 function pepper() {
