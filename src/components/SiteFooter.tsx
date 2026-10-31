@@ -1,5 +1,7 @@
 import { Link } from "@tanstack/react-router";
 
+import { GITHUB_URL } from "@/lib/seo";
+
 const col = "flex flex-col gap-2";
 const head = "mb-1 text-xs font-semibold uppercase tracking-[0.12em] text-foreground";
 const item = "transition-colors hover:text-foreground";
@@ -30,6 +32,7 @@ export function SiteFooter() {
           <p className={head}>Legal &amp; Privacy</p>
           <Link to="/privacy" className={item}>Privacy Policy</Link>
           <Link to="/terms" className={item}>Terms of Use</Link>
+          <a href={GITHUB_URL} target="_blank" rel="noopener noreferrer" className={item}>GitHub (AGPL-3.0)</a>
           <a href="mailto:contact@patkan.in" className={item}>contact@patkan.in</a>
         </nav>
       </div>
