@@ -196,19 +196,142 @@ function AuthPage() {
   }
 
 
+  if (otpPhone) {
+    return (
+      <main className="flex min-h-screen items-center justify-center bg-background px-6 py-16">
+        <div className="w-full max-w-sm">
+          <Link to="/" className="mb-8 flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
+            <span className="text-base">✦</span> Patkan
+          </Link>
+          <h1 className="text-2xl font-semibold tracking-tight">Enter verification code</h1>
+          <p className="mt-2 text-sm text-muted-foreground">
+            We sent a 6-digit code via WhatsApp to {maskPhone(otpPhone)}.
+          </p>
+          <form onSubmit={verifyCode} className="mt-6 space-y-4">
+            <InputOTP maxLength={6} value={code} onChange={setCode} autoComplete="one-time-code" inputMode="numeric">
+              <InputOTPGroup>
+                <InputOTPSlot index={0} />
+                <InputOTPSlot index={1} />
+                <InputOTPSlot index={2} />
+              </InputOTPGroup>
+              <InputOTPSeparator />
+              <InputOTPGroup>
+                <InputOTPSlot index={3} />
+                <InputOTPSlot index={4} />
+                <InputOTPSlot index={5} />
+              </InputOTPGroup>
+            </InputOTP>
+            <Button type="submit" className="w-full" disabled={busy || code.length !== 6}>
+              {busy ? "Working…" : "Verify & Sign in"}
+            </Button>
+          </form>
+          {message ? <p className="mt-4 text-sm text-destructive">{message}</p> : null}
+          <p className="mt-6 text-sm text-muted-foreground">
+            Code expires in {String(Math.floor(secondsLeft / 60)).padStart(2, "0")}:
+            {String(secondsLeft % 60).padStart(2, "0")}
+          </p>
+          <div className="mt-3 flex flex-col items-start gap-2 text-sm text-muted-foreground">
+            <span>
+              Didn&rsquo;t receive it?{" "}
+              <button
+                type="button"
+                onClick={() => sendCode()}
+                disabled={busy}
+                className="underline underline-offset-4 hover:text-foreground"
+              >
+                Resend code
+              </button>
+            </span>
+            <button
+              type="button"
+              onClick={() => {
+                setOtpPhone(null);
+                setCode("");
+                setMessage(null);
+              }}
+              className="underline underline-offset-4 hover:text-foreground"
+            >
+              Edit phone number
+            </button>
+          </div>
+        </div>
+      </main>
+    );
+  }
+
   return (
     <main className="flex min-h-screen items-center justify-center bg-background px-6 py-16">
       <div className="w-full max-w-sm">
         <Link to="/" className="mb-8 flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
           <span className="text-base">✦</span> Patkan
         </Link>
-        <h1 className="text-2xl font-semibold tracking-tight">
-          {mode === "signin" ? "Sign in" : "Create an account"}
-        </h1>
+        <h1 className="text-2xl font-semibold tracking-tight">Sign in to Patkan</h1>
         <p className="mt-2 text-sm text-muted-foreground">
-          Your Library of saved frameworks syncs to the extension on every device.
+          Save the prompts you use often and pick them up on any computer.
         </p>
 
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            sendCode();
+          }}
+          className="mt-6 space-y-3"
+        >
+          <Label htmlFor="wa-number">WhatsApp Number</Label>
+          <div className="flex gap-2">
+            <select
+              aria-label="Country code"
+              value={country.iso}
+              onChange={(e) => setCountry(COUNTRIES.find((c) => c.iso === e.target.value) ?? country)}
+              className="h-9 w-28 shrink-0 rounded-md border border-input bg-background px-2 text-sm"
+            >
+              {COUNTRIES.map((c) => (
+                <option key={c.iso} value={c.iso}>
+                  {flag(c.iso)} +{c.dial} {c.name}
+                </option>
+              ))}
+            </select>
+            <Input
+              id="wa-number"
+              type="tel"
+              inputMode="tel"
+              autoComplete="tel-national"
+              required
+              value={national}
+              onChange={(e) => setNational(e.target.value)}
+            />
+          </div>
+          <Button type="submit" className="w-full" disabled={busy}>
+            {busy && !showEmail ? "Working…" : "Send verification code via WhatsApp"}
+          </Button>
+          <p className="text-xs text-muted-foreground">Code expires in 3 minutes.</p>
+        </form>
+
+        {message && !showEmail ? <p className="mt-4 text-sm text-destructive">{message}</p> : null}
+
+        <div className="my-6 flex items-center gap-3 text-xs text-muted-foreground">
+          <span className="h-px flex-1 bg-border" />
+          or continue with
+          <span className="h-px flex-1 bg-border" />
+        </div>
+
+        <Button type="button" variant="outline" className="w-full" disabled={busy} onClick={withGoogle}>
+          Continue with Google
+        </Button>
+
+        <button
+          type="button"
+          onClick={() => {
+            setShowEmail((v) => !v);
+            setMessage(null);
+          }}
+          className="mt-4 text-sm text-muted-foreground underline underline-offset-4 hover:text-foreground"
+        >
+          Use email and password instead {showEmail ? "▴" : "▾"}
+        </button>
+
+        {showEmail ? (
+        <>
         <form onSubmit={withEmail} className="mt-6 space-y-4">
           <div className="space-y-1.5">
             <Label htmlFor="email">Email</Label>
