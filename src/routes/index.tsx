@@ -139,7 +139,7 @@ function Landing() {
           <div className="flex items-center gap-2">
             <img src={patkanMark} alt="Patkan" width={816} height={816} className="size-8 rounded-[0.55rem]" />
             <span className="text-lg font-semibold tracking-tight">Patkan</span>
-            <span className="rounded-full border bg-muted px-2 py-0.5 font-mono text-[10px] text-muted-foreground">/पट्कन/</span>
+            <span className="hidden whitespace-nowrap rounded-full border bg-muted px-2 py-0.5 font-mono text-[10px] text-muted-foreground sm:inline">/पट्कन/</span>
           </div>
           <div className="flex items-center gap-2 text-sm text-muted-foreground sm:gap-4">
             <Link to="/noghaan" className="font-mono text-xs font-semibold text-primary hover:underline sm:text-sm">/noghaan</Link>
