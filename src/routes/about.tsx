@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { SiteFooter } from "@/components/SiteFooter";
 import { ArrowDownToLine } from "lucide-react";
 
-import { CWS_URL, GITHUB_URL, ldScript, organizationLd, pageLd, softwareLd } from "@/lib/seo";
+import { CWS_URL, ldScript, organizationLd, pageLd, softwareLd } from "@/lib/seo";
 import patkanMark from "@/assets/patkan-mark.svg";
 
 const TITLE = "About Patkan | AI Prompt Engineer for professionals";
