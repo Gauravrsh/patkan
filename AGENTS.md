@@ -14,3 +14,4 @@
 - Stage extension archives in the system temporary directory and serve completed ZIPs from public/ so packaging does not leave staging files in the project.
 - Advisory usage reads return an explicit unavailable result on configuration or database failure, never a fabricated zero count; transformation quota enforcement remains independent.
 - Keep Bun regression tests in tests/ outside src/routes so the file router does not treat test files as pages.
+- WhatsApp OTP sign-in mints a session server-side (admin magic-link token, verified in browser) keyed by whatsapp_identities; OTP TTL is tied to the approved Meta template text, so change both together.

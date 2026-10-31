@@ -302,6 +302,102 @@ export type Database = {
         }
         Relationships: []
       }
+      whatsapp_identities: {
+        Row: {
+          created_at: string
+          phone_e164: string
+          user_id: string
+          verified_at: string
+        }
+        Insert: {
+          created_at?: string
+          phone_e164: string
+          user_id: string
+          verified_at?: string
+        }
+        Update: {
+          created_at?: string
+          phone_e164?: string
+          user_id?: string
+          verified_at?: string
+        }
+        Relationships: []
+      }
+      whatsapp_otp_challenges: {
+        Row: {
+          attempts: number
+          code_hash: string
+          consumed_at: string | null
+          created_at: string
+          delivery_error: Json | null
+          delivery_status: string
+          expires_at: string
+          id: string
+          phone_e164: string
+          request_ip_hash: string | null
+          status_at: string | null
+          wa_message_id: string | null
+        }
+        Insert: {
+          attempts?: number
+          code_hash: string
+          consumed_at?: string | null
+          created_at?: string
+          delivery_error?: Json | null
+          delivery_status?: string
+          expires_at: string
+          id?: string
+          phone_e164: string
+          request_ip_hash?: string | null
+          status_at?: string | null
+          wa_message_id?: string | null
+        }
+        Update: {
+          attempts?: number
+          code_hash?: string
+          consumed_at?: string | null
+          created_at?: string
+          delivery_error?: Json | null
+          delivery_status?: string
+          expires_at?: string
+          id?: string
+          phone_e164?: string
+          request_ip_hash?: string | null
+          status_at?: string | null
+          wa_message_id?: string | null
+        }
+        Relationships: []
+      }
+      whatsapp_webhook_events: {
+        Row: {
+          delivery_id: string
+          event: string
+          id: string
+          payload: Json
+          processed_at: string | null
+          processing_error: string | null
+          received_at: string
+        }
+        Insert: {
+          delivery_id: string
+          event: string
+          id?: string
+          payload: Json
+          processed_at?: string | null
+          processing_error?: string | null
+          received_at?: string
+        }
+        Update: {
+          delivery_id?: string
+          event?: string
+          id?: string
+          payload?: Json
+          processed_at?: string | null
+          processing_error?: string | null
+          received_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

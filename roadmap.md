@@ -7,3 +7,4 @@
 - [x] Build and inspect current v1.0.5 Chrome and Firefox extension packages at owner's explicit request.
 - [x] B-03: Build approved /prompt-generator hub with all 14 apps, verify the shared playground and search metadata, and update the master checklist. Verified real transform/reset and desktop/phone layout; live on next publish.
 - [ ] Owner uploads v1.0.5 to CWS; live host testing remains unverified, and P1 is not included.
+- [ ] WhatsApp OTP sign-in: built; live send to a real phone not yet tested by owner
