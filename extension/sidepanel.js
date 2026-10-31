@@ -126,11 +126,19 @@ function showLimitNote(res) {
   }
 }
 
-$("go").addEventListener("click", async () => {
+let running = false;
+// `//` at the end of the text is the only trigger, same as inside AI chat boxes.
+$("input").addEventListener("input", () => {
+  const el = $("input");
+  if (running || !/\/\/\s*$/.test(el.value)) return;
+  el.value = el.value.replace(/\s*\/\/\s*$/, "");
+  void run();
+});
+
+async function run() {
   const text = $("input").value.trim();
   if (text.length < 3) return;
-  $("go").disabled = true;
-  $("go").textContent = "Sharpening…";
+  running = true;
   $("assumed").textContent = "";
   $("clarifiers").innerHTML = "";
   $("copy").disabled = true;
@@ -151,8 +159,7 @@ $("go").addEventListener("click", async () => {
       surface: "extension-panel",
     },
   });
-  $("go").disabled = false;
-  $("go").textContent = "Patkan it";
+  running = false;
   $("out").style.opacity = "1";
   if (!res?.ok) {
     if (res?.limitReached) {
@@ -207,7 +214,7 @@ $("go").addEventListener("click", async () => {
     $("clarifiers").appendChild(b);
   }
   setUsage(res.used, res.limit);
-});
+}
 
 $("copy").addEventListener("click", async () => {
   await navigator.clipboard.writeText(output);

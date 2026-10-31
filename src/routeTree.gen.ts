@@ -33,6 +33,7 @@ import { Route as WelcomeRouteImport } from './routes/welcome'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedDictionaryCardRouteImport } from './routes/_authenticated/dictionary-card'
 import { Route as AuthenticatedLibraryRouteImport } from './routes/_authenticated/library'
+import { Route as AuthenticatedSetupProfileRouteImport } from './routes/_authenticated/setup-profile'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
 import { Route as AuthenticatedAdminCarouselRouteImport } from './routes/_authenticated/admin.carousel'
 import { Route as AuthenticatedAdminDocsRouteImport } from './routes/_authenticated/admin.docs'
@@ -168,6 +169,12 @@ const AuthenticatedLibraryRoute = AuthenticatedLibraryRouteImport.update({
   path: '/library',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedSetupProfileRoute =
+  AuthenticatedSetupProfileRouteImport.update({
+    id: '/setup-profile',
+    path: '/setup-profile',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -256,6 +263,7 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/dictionary-card': typeof AuthenticatedDictionaryCardRoute
   '/library': typeof AuthenticatedLibraryRoute
+  '/setup-profile': typeof AuthenticatedSetupProfileRoute
   '/admin/carousel': typeof AuthenticatedAdminCarouselRoute
   '/admin/docs': typeof AuthenticatedAdminDocsRoute
   '/admin/events': typeof AuthenticatedAdminEventsRoute
@@ -292,6 +300,7 @@ export interface FileRoutesByTo {
   '/welcome': typeof WelcomeRoute
   '/dictionary-card': typeof AuthenticatedDictionaryCardRoute
   '/library': typeof AuthenticatedLibraryRoute
+  '/setup-profile': typeof AuthenticatedSetupProfileRoute
   '/admin/carousel': typeof AuthenticatedAdminCarouselRoute
   '/admin/docs': typeof AuthenticatedAdminDocsRoute
   '/admin/events': typeof AuthenticatedAdminEventsRoute
@@ -331,6 +340,7 @@ export interface FileRoutesById {
   '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
   '/_authenticated/dictionary-card': typeof AuthenticatedDictionaryCardRoute
   '/_authenticated/library': typeof AuthenticatedLibraryRoute
+  '/_authenticated/setup-profile': typeof AuthenticatedSetupProfileRoute
   '/_authenticated/admin/carousel': typeof AuthenticatedAdminCarouselRoute
   '/_authenticated/admin/docs': typeof AuthenticatedAdminDocsRoute
   '/_authenticated/admin/events': typeof AuthenticatedAdminEventsRoute
@@ -370,6 +380,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/dictionary-card'
     | '/library'
+    | '/setup-profile'
     | '/admin/carousel'
     | '/admin/docs'
     | '/admin/events'
@@ -406,6 +417,7 @@ export interface FileRouteTypes {
     | '/welcome'
     | '/dictionary-card'
     | '/library'
+    | '/setup-profile'
     | '/admin/carousel'
     | '/admin/docs'
     | '/admin/events'
@@ -444,6 +456,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin'
     | '/_authenticated/dictionary-card'
     | '/_authenticated/library'
+    | '/_authenticated/setup-profile'
     | '/_authenticated/admin/carousel'
     | '/_authenticated/admin/docs'
     | '/_authenticated/admin/events'
@@ -659,6 +672,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedLibraryRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/setup-profile': {
+      id: '/_authenticated/setup-profile'
+      path: '/setup-profile'
+      fullPath: '/setup-profile'
+      preLoaderRoute: typeof AuthenticatedSetupProfileRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/admin/': {
       id: '/_authenticated/admin/'
       path: '/'
@@ -769,12 +789,14 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminRoute: typeof AuthenticatedAdminRouteWithChildren
   AuthenticatedDictionaryCardRoute: typeof AuthenticatedDictionaryCardRoute
   AuthenticatedLibraryRoute: typeof AuthenticatedLibraryRoute
+  AuthenticatedSetupProfileRoute: typeof AuthenticatedSetupProfileRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminRoute: AuthenticatedAdminRouteWithChildren,
   AuthenticatedDictionaryCardRoute: AuthenticatedDictionaryCardRoute,
   AuthenticatedLibraryRoute: AuthenticatedLibraryRoute,
+  AuthenticatedSetupProfileRoute: AuthenticatedSetupProfileRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =

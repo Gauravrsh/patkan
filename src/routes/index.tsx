@@ -1,4 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { SiteFooter } from "@/components/SiteFooter";
 import { useQueryClient } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
 import { ArrowDownToLine, ArrowRight, Check, ChevronDown, Code2, Copy, EyeOff, Loader2, RotateCcw, Share2, Slash, UserRound } from "lucide-react";
@@ -20,6 +21,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useAuth } from "@/hooks/useAuth";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
 import { useSectionTracking } from "@/hooks/useSectionTracking";
@@ -89,8 +91,32 @@ function Landing() {
     void navigate({ to: "/", replace: true });
   }
 
+  // Mobile visitors who go to the Chrome Web Store see a confirmation when they come back.
+  const [cwsReturn, setCwsReturn] = useState(false);
+  useEffect(() => {
+    const check = () => {
+      if (document.visibilityState !== "visible") return;
+      try {
+        if (sessionStorage.getItem("patkan_cws_mobile") === "1") {
+          sessionStorage.removeItem("patkan_cws_mobile");
+          setCwsReturn(true);
+        }
+      } catch { /* storage blocked */ }
+    };
+    check();
+    document.addEventListener("visibilitychange", check);
+    window.addEventListener("pageshow", check);
+    return () => {
+      document.removeEventListener("visibilitychange", check);
+      window.removeEventListener("pageshow", check);
+    };
+  }, []);
+
   function getExtension() {
     trackEvent("download_clicked", { meta: { file: "chrome-web-store" } });
+    if (window.matchMedia("(pointer: coarse)").matches && window.innerWidth < 1024) {
+      try { sessionStorage.setItem("patkan_cws_mobile", "1"); } catch { /* storage blocked */ }
+    }
     window.open(CHROME_WEB_STORE_URL, "_blank", "noopener,noreferrer");
   }
 
@@ -113,14 +139,17 @@ function Landing() {
           <div className="flex items-center gap-2">
             <img src={patkanMark} alt="Patkan" width={816} height={816} className="size-8 rounded-[0.55rem]" />
             <span className="text-lg font-semibold tracking-tight">Patkan</span>
-            <span className="rounded-full border bg-muted px-2 py-0.5 font-mono text-[10px] text-muted-foreground">/पट्कन/</span>
+            <span className="hidden whitespace-nowrap rounded-full border bg-muted px-2 py-0.5 font-mono text-[10px] text-muted-foreground sm:inline">/पट्कन/</span>
           </div>
           <div className="flex items-center gap-2 text-sm text-muted-foreground sm:gap-4">
+            <Link to="/noghaan" className="font-mono text-xs font-semibold text-primary hover:underline sm:text-sm">/noghaan</Link>
             {session ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild><Button variant="ghost" size="sm" className="max-w-24 truncate">Account</Button></DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
                   <DropdownMenuItem asChild><Link to="/library">Your Library</Link></DropdownMenuItem>
+                  <DropdownMenuItem asChild><Link to="/profile">Work Profile</Link></DropdownMenuItem>
+                  <DropdownMenuItem asChild><Link to="/connect">Browser Sync</Link></DropdownMenuItem>
                   {isAdmin && <DropdownMenuItem asChild><Link to="/admin">Admin</Link></DropdownMenuItem>}
                   <DropdownMenuItem onSelect={() => void signOutEverywhere()}>Sign out</DropdownMenuItem>
                 </DropdownMenuContent>
@@ -276,19 +305,23 @@ function Landing() {
         </section>
       </main>
 
-      <footer className="border-t">
-        <div className={`${shell} flex flex-wrap items-center justify-between gap-3 py-8 text-xs text-muted-foreground`}>
-          <p>patkan.in</p>
-          <nav className="flex flex-wrap gap-4">
-            <Link to="/about">About</Link>
-            <Link to="/chatgpt-prompt-generator">ChatGPT prompt generator</Link>
-            <Link to="/claude-prompt-generator">Claude prompt generator</Link>
-            <Link to="/gemini-prompt-generator">Gemini prompt generator</Link>
-            <Link to="/privacy">Privacy Policy</Link>
-            <Link to="/terms">Terms of Use</Link>
-          </nav>
-        </div>
-      </footer>
+      <SiteFooter />
+
+      <Dialog open={cwsReturn} onOpenChange={setCwsReturn}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Congratulations</DialogTitle>
+            <DialogDescription className="leading-relaxed">
+              If you have added the Patkan extension to your browser, you don&apos;t need to do anything more. Next time you
+              are working on your desktop with your AI, type <span className="font-mono text-primary">//</span> at the end
+              of your raw sentences to convert them into expert prompts, right inside your AI chat window.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button onClick={() => setCwsReturn(false)}>Got it</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

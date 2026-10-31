@@ -71,7 +71,7 @@ function ConnectPage() {
               {sent ? "Extension connected" : "Connecting…"}
             </h1>
             <p className="mt-2 text-sm text-muted-foreground">
-              Signed in as {session.user.email}. You can close this tab — the Patkan extension now has
+              Signed in as {String(session.user.user_metadata?.["display_name"] ?? (session.user.user_metadata?.["whatsapp_phone"] ? "your WhatsApp number" : session.user.email))}. You can close this tab — the Patkan extension now has
               access to your Library.
             </p>
             <Button asChild variant="outline" className="mt-5">

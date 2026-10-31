@@ -1,4 +1,5 @@
 import { Link } from "@tanstack/react-router";
+import { SiteFooter } from "@/components/SiteFooter";
 import { ArrowDownToLine, ArrowRight } from "lucide-react";
 
 import patkanMark from "@/assets/patkan-mark.svg";
@@ -115,19 +116,7 @@ export function PlatformGeneratorPage({ c }: { c: PlatformPageContent }) {
         </section>
       </main>
 
-      <footer className="border-t">
-        <div className={`${shell} flex flex-wrap items-center justify-end gap-3 py-8 text-xs text-muted-foreground`}>
-          <Link to="/chatgpt-prompt-generator" className="hover:text-foreground">ChatGPT prompt generator</Link>
-          <Link to="/claude-prompt-generator" className="hover:text-foreground">Claude prompt generator</Link>
-          <Link to="/gemini-prompt-generator" className="hover:text-foreground">Gemini prompt generator</Link>
-          <Link to="/copilot-prompt-generator" className="hover:text-foreground">Copilot prompt generator</Link>
-          <Link to="/perplexity-prompt-generator" className="hover:text-foreground">Perplexity prompt generator</Link>
-          <Link to="/deepseek-prompt-generator" className="hover:text-foreground">DeepSeek prompt generator</Link>
-          <Link to="/promptperfect-alternative" className="hover:text-foreground">PromptPerfect alternative</Link>
-          <Link to="/privacy" className="hover:text-foreground">Privacy Policy</Link>
-          <Link to="/terms" className="hover:text-foreground">Terms of Use</Link>
-        </div>
-      </footer>
+      <SiteFooter />
     </div>
   );
 }
