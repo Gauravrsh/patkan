@@ -21,6 +21,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useAuth } from "@/hooks/useAuth";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
 import { useSectionTracking } from "@/hooks/useSectionTracking";
@@ -90,8 +91,32 @@ function Landing() {
     void navigate({ to: "/", replace: true });
   }
 
+  // Mobile visitors who go to the Chrome Web Store see a confirmation when they come back.
+  const [cwsReturn, setCwsReturn] = useState(false);
+  useEffect(() => {
+    const check = () => {
+      if (document.visibilityState !== "visible") return;
+      try {
+        if (sessionStorage.getItem("patkan_cws_mobile") === "1") {
+          sessionStorage.removeItem("patkan_cws_mobile");
+          setCwsReturn(true);
+        }
+      } catch { /* storage blocked */ }
+    };
+    check();
+    document.addEventListener("visibilitychange", check);
+    window.addEventListener("pageshow", check);
+    return () => {
+      document.removeEventListener("visibilitychange", check);
+      window.removeEventListener("pageshow", check);
+    };
+  }, []);
+
   function getExtension() {
     trackEvent("download_clicked", { meta: { file: "chrome-web-store" } });
+    if (window.matchMedia("(pointer: coarse)").matches && window.innerWidth < 1024) {
+      try { sessionStorage.setItem("patkan_cws_mobile", "1"); } catch { /* storage blocked */ }
+    }
     window.open(CHROME_WEB_STORE_URL, "_blank", "noopener,noreferrer");
   }
 
@@ -281,6 +306,22 @@ function Landing() {
       </main>
 
       <SiteFooter />
+
+      <Dialog open={cwsReturn} onOpenChange={setCwsReturn}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Congratulations</DialogTitle>
+            <DialogDescription className="leading-relaxed">
+              If you have added the Patkan extension to your browser, you don&apos;t need to do anything more. Next time you
+              are working on your desktop with your AI, type <span className="font-mono text-primary">//</span> at the end
+              of your raw sentences to convert them into expert prompts, right inside your AI chat window.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button onClick={() => setCwsReturn(false)}>Got it</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
